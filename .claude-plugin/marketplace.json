@@ -1,6 +1,6 @@
 {
   "name": "agentic-mode",
-  "description": "Optional Claude Code plugins for the agentic-mode methodology: the doc-contract bootstrapper plus three harness-neutral collaboration playbooks (commit messages, two-axis review, review response). Install only the ones your team wants.",
+  "description": "Optional Claude Code plugins for the agentic-mode methodology: the doc-contract bootstrapper, three harness-neutral collaboration playbooks (commit messages, two-axis review, review response), and the fable5 commander-mode operating discipline. Install only the ones your team wants.",
   "owner": {
     "name": "agentic-mode maintainers"
   },
@@ -24,6 +24,11 @@
       "name": "review-response",
       "source": "./adapters/claude-code/plugins/review-response",
       "description": "Discipline for responding to code-review feedback: verify each comment against the codebase before implementing, no sycophantic openers, and always push back with evidence — treating the ticket description itself as an external signal to be checked."
+    },
+    {
+      "name": "fable5",
+      "source": "./adapters/claude-code/plugins/fable5",
+      "description": "Commander-mode operating discipline: the main model stays an advisor/dispatcher that converses, decides, delegates, and integrates while subagents do the heavy execution — plus the founding prompt for spending one strong-model session to externalize judgment into rule files a weaker model can follow long-term. Harness-specific and self-canonical (no harness-neutral playbook counterpart, not part of the vendoring sync)."
     }
   ]
 }

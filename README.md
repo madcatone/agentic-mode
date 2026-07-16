@@ -118,7 +118,7 @@ Alongside the doc contract, [`playbooks/`](playbooks/) holds a small set of
 ## Install as Claude Code plugins
 
 This repo is also a **Claude Code plugin marketplace**. Once it is on GitHub,
-add the marketplace and install any subset of the four plugins — each is
+add the marketplace and install any subset of the five plugins — each is
 independent and optional:
 
 ```
@@ -127,6 +127,7 @@ independent and optional:
 /plugin install gcm@agentic-mode
 /plugin install two-axis-review@agentic-mode
 /plugin install review-response@agentic-mode
+/plugin install fable5@agentic-mode
 ```
 
 | Plugin | Installs | Canonical source |
@@ -135,12 +136,20 @@ independent and optional:
 | `gcm` | Commit-message convention skill. | [`playbooks/COMMIT-MESSAGES.md`](playbooks/COMMIT-MESSAGES.md) |
 | `two-axis-review` | Dual-axis review skill. | [`playbooks/TWO-AXIS-REVIEW.md`](playbooks/TWO-AXIS-REVIEW.md) |
 | `review-response` | Review-response discipline skill. | [`playbooks/REVIEW-RESPONSE.md`](playbooks/REVIEW-RESPONSE.md) |
+| `fable5` | Commander-mode operating discipline + the strong-model founding prompt. | The plugin directory itself (self-canonical) |
 
 The commit/review conventions differ from team to team, which is why they are
 optional plugins and policy-overridable playbooks rather than part of the core.
-Each plugin vendors a self-contained copy of its canonical source; see
+Each of those plugins vendors a self-contained copy of its canonical source; see
 [`adapters/claude-code/README.md`](adapters/claude-code/README.md) for the
 vendoring + anti-drift sync.
+
+`fable5` is the exception: it is **Claude Code-specific with no harness-neutral
+playbook counterpart** — it governs how you operate a *session* (the main model
+as advisor/dispatcher, subagent tiers, output written into a per-user config
+home) rather than a repo's document contract, so it cannot live in the neutral
+core. Its **plugin directory is its own canon**: nothing is vendored into it and
+it is not part of the `sync_plugins.py` sync.
 
 ## Repo map
 
@@ -165,8 +174,9 @@ names a specific agent product, model, or proprietary tool. Harness-specific
 packaging lives only under [`adapters/`](adapters/):
 
 - [`adapters/claude-code/`](adapters/claude-code/) — a Claude Code plugin
-  marketplace: the `agentic-bootstrap` toolkit plus the three playbooks packaged
-  as optional, independently installable plugins (see
+  marketplace: the `agentic-bootstrap` toolkit, the three playbooks, and the
+  self-canonical `fable5` commander-mode discipline packaged as optional,
+  independently installable plugins (see
   [its README](adapters/claude-code/README.md) and [Install as Claude Code
   plugins](#install-as-claude-code-plugins) above).
 - [`adapters/devin-ide/`](adapters/devin-ide/) — a Devin IDE rule and a review

@@ -1,0 +1,8 @@
+{
+  "name": "fable5",
+  "description": "Commander-mode operating discipline: the main model acts as advisor/dispatcher — it converses, decides, delegates, and integrates, while heavy execution (large reads, repo scans, batch edits) goes to subagents that return only conclusions. Bundles the founding prompt for spending one strong-model session to externalize judgment into rule files a weaker model can follow long-term. Harness-specific and self-canonical: it names model tiers, dispatches via a subagent tool, and writes its output into a per-user config home, so it has no harness-neutral playbook counterpart.",
+  "version": "1.0.0",
+  "author": {
+    "name": "agentic-mode maintainers"
+  }
+}

@@ -75,7 +75,9 @@ python3 -m json.tool .claude-plugin/marketplace.json >/dev/null && echo ok
 5. If a `playbooks/*.md` or a vendored core file (`RUNBOOK.md`, `doctrine/`,
    `templates/`, `checker/`) changed, `python3 scripts/sync_plugins.py` was run
    so the plugin copies match, and `--check` exits 0. Never hand-edit a vendored
-   copy under `adapters/claude-code/plugins/`.
+   copy under `adapters/claude-code/plugins/`. (Exception: the `fable5` plugin is
+   self-canonical — not vendored and not in the sync MANIFEST — so its files are
+   edited in place.)
 6. `README.md` and `README-ZH.md` stay information-equivalent when either changes.
 
 ## Sign-Off Points

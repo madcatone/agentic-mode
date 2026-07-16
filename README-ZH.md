@@ -104,7 +104,7 @@ playbook**——任何協作者（人或 agent、用哪個工具）都能直接�
 ## 安裝為 Claude Code plugin
 
 本 repo 同時是一個 **Claude Code plugin marketplace**。發佈到 GitHub 後，加入
-marketplace 即可安裝四個 plugin 中的任意子集——每個都獨立、可選：
+marketplace 即可安裝五個 plugin 中的任意子集——每個都獨立、可選：
 
 ```
 /plugin marketplace add <owner>/<repo>
@@ -112,6 +112,7 @@ marketplace 即可安裝四個 plugin 中的任意子集——每個都獨立、
 /plugin install gcm@agentic-mode
 /plugin install two-axis-review@agentic-mode
 /plugin install review-response@agentic-mode
+/plugin install fable5@agentic-mode
 ```
 
 | Plugin | 安裝什麼 | 正典來源 |
@@ -120,10 +121,16 @@ marketplace 即可安裝四個 plugin 中的任意子集——每個都獨立、
 | `gcm` | commit message 慣例 skill。 | [`playbooks/COMMIT-MESSAGES.md`](playbooks/COMMIT-MESSAGES.md) |
 | `two-axis-review` | 雙軸 review skill。 | [`playbooks/TWO-AXIS-REVIEW.md`](playbooks/TWO-AXIS-REVIEW.md) |
 | `review-response` | review-response 紀律 skill。 | [`playbooks/REVIEW-RESPONSE.md`](playbooks/REVIEW-RESPONSE.md) |
+| `fable5` | 指揮官操作模式 + 強模型創始 prompt。 | plugin 目錄本身（self-canonical） |
 
 commit／review 慣例每個團隊偏好不同，所以做成可選 plugin 與可覆寫 playbook，而非併入
-core。每個 plugin 都 vendor 一份自足的正典拷貝；vendoring 與防漂移同步見
+core。上述這些 plugin 都 vendor 一份自足的正典拷貝；vendoring 與防漂移同步見
 [`adapters/claude-code/README.md`](adapters/claude-code/README.md)。
+
+`fable5` 是例外：它是 **Claude Code 專屬、沒有 harness-neutral playbook 對應**的——
+它管的是你怎麼操作一個 *session*（主模型當 advisor／指揮官、subagent 分階、產出寫進
+使用者層級的 config home），而非某個 repo 的文件契約，所以無法放進中性 core。它的
+**plugin 目錄即正典**：不 vendor 任何東西進來，也不納入 `sync_plugins.py` 同步。
 
 ## Repo 地圖
 
@@ -147,8 +154,9 @@ core。每個 plugin 都 vendor 一份自足的正典拷貝；vendoring 與防�
 特定 agent 產品、model 或專有工具。harness 專屬的包裝只放在 [`adapters/`](adapters/)：
 
 - [`adapters/claude-code/`](adapters/claude-code/)——一個 Claude Code plugin
-  marketplace：`agentic-bootstrap` 工具包，加上三份 playbook，各自封裝成可選、可獨立
-  安裝的 plugin（見[它的 README](adapters/claude-code/README.md)與上面的
+  marketplace：`agentic-bootstrap` 工具包、三份 playbook，加上 self-canonical 的
+  `fable5` 指揮官操作模式，各自封裝成可選、可獨立安裝的 plugin（見[它的
+  README](adapters/claude-code/README.md)與上面的
   [安裝為 Claude Code plugin](#安裝為-claude-code-plugin)）。
 - [`adapters/devin-ide/`](adapters/devin-ide/)——一份 Devin IDE rule 與一個 review
   workflow。
