@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Checker / example runtime output
+examples/minimal-cli/tasks.json
+tasks.json
+
+# OS / editor cruft
+.DS_Store
+*.swp
+.idea/
+.vscode/

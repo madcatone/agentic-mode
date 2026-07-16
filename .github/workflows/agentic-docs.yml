@@ -1,0 +1,32 @@
+# Agentic-mode documentation gate (GitHub Actions).
+#
+# Runs the config-driven documentation-consistency checker against the worked
+# example (examples/minimal-cli). The example is a full, passing doc contract,
+# so this job proves the checker and the example stay coherent on every change.
+#
+# To gate your OWN repo, copy checker/check_agentic_docs.py into it (e.g. as
+# scripts/check_agentic_docs.py), drop an agentic-mode/config.json beside it,
+# and adapt the run step below to point at your config.
+
+name: agentic-docs-gate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  agentic-docs-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Byte-compile the checker
+        run: python -m py_compile checker/check_agentic_docs.py
+      - name: Run the documentation gate on the worked example
+        run: >-
+          python checker/check_agentic_docs.py
+          --config examples/minimal-cli/agentic-mode/config.json
+          --root examples/minimal-cli

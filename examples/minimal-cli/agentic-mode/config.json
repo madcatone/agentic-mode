@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "project": {
+    "name": "todo",
+    "type": "cli",
+    "description": "A tiny standard-library task tracker used as the agentic-mode worked example."
+  },
+  "id": {
+    "prefix": "TODO"
+  },
+  "docs": {
+    "index": "AGENTIC-MODE.md",
+    "readme": "README.md",
+    "agents": "AGENTS.md",
+    "requirements": "docs/REQUIREMENTS.md",
+    "user_guide": "docs/USER_GUIDE.md",
+    "validation": "docs/VALIDATION.md",
+    "workflow": "docs/WORKFLOW.md",
+    "architecture": null
+  },
+  "bilingual": {
+    "enabled": false,
+    "secondary_language": "zh-TW",
+    "primary_heading": "## English",
+    "secondary_heading": "## 繁體中文"
+  },
+  "checks": {
+    "line_limits": {
+      "agents": 200
+    },
+    "deny_words": [],
+    "harness_neutrality": {
+      "enabled": true,
+      "extra_deny": []
+    },
+    "url_allowlist": [],
+    "forbid_ipv4": true,
+    "ipv4_allowlist": ["127.0.0.1", "0.0.0.0"],
+    "forbid_local_paths": true,
+    "iteration_history": {
+      "enabled": true,
+      "heading": "Iteration History"
+    },
+    "commands": [
+      {
+        "run": "python3 -m py_compile todo.py",
+        "must_appear_in": ["agents", "readme"]
+      },
+      {
+        "run": "python3 todo.py list",
+        "must_appear_in": ["agents", "readme"]
+      }
+    ],
+    "entrypoints": ["todo.py"]
+  },
+  "ci": {
+    "platform": "github"
+  }
+}
