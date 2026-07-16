@@ -1,0 +1,8 @@
+{
+  "name": "gcm",
+  "description": "Write commit messages in a Conventional-Commits variant: a type table with explicit build/ci/chore adjudications, an optional ticket appended between type and colon (on demand, not mandatory), and scope rules — always deferring to a repo's local commit-msg hook.",
+  "version": "1.0.0",
+  "author": {
+    "name": "agentic-mode maintainers"
+  }
+}

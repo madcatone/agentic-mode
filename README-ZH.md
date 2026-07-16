@@ -66,8 +66,8 @@ python3 checker/check_agentic_docs.py \
 
 `checker/check_agentic_docs.py` 是純標準函式庫、config 驅動的 gate。所有專案特有的東西
 （ID 前綴、文件路徑、雙語標題、entry points、指令規則、deny words、allowlist）都放在
-外部的 `agentic-mode/config.json`——框架程式碼在各專案間完全不變。把它複製進 repo、
-旁邊放一份 config、然後執行：
+外部的 `agentic-mode/config.json`——框架程式碼在各專案間完全不變。把它複製進 repo
+（慣例路徑 `scripts/check_agentic_docs.py`）、旁邊放一份 config、在該 repo 根目錄執行：
 
 ```bash
 python3 scripts/check_agentic_docs.py --config agentic-mode/config.json
@@ -89,6 +89,42 @@ python3 scripts/check_agentic_docs.py --config agentic-mode/config.json
 任何帶有 `agentic-gate: allow` 標記的行會被文字掃描略過，所以規則／規格文件可以刻意
 引用壞例子。所有旋鈕見 [`checker/config.example.json`](checker/config.example.json)。
 
+## Playbooks
+
+除了文件契約，[`playbooks/`](playbooks/) 收錄一小組 **harness-neutral 的協作
+playbook**——任何協作者（人或 agent、用哪個工具）都能直接把它當 rules 檔閱讀的正典。
+它們是**可選且政策可覆寫**的：repo 自己的 hook、審查正典、`AGENTS.md` 規則一律優先。
+
+| Playbook | 涵蓋什麼 |
+| --- | --- |
+| [`COMMIT-MESSAGES.md`](playbooks/COMMIT-MESSAGES.md) | Conventional-Commits 變體：type 表（含 build/ci/chore 裁決）、按需附加的票號、scope 規則——本地 commit-msg hook 優先。 |
+| [`TWO-AXIS-REVIEW.md`](playbooks/TWO-AXIS-REVIEW.md) | 雙軸 review——Standards（寫得對不對）與 Spec（做得對不對）平行分審、不跨軸挑贏家。 |
+| [`REVIEW-RESPONSE.md`](playbooks/REVIEW-RESPONSE.md) | 被審者回應回饋的紀律：先查證後實作、不空泛討好、反駁帶證據。 |
+
+## 安裝為 Claude Code plugin
+
+本 repo 同時是一個 **Claude Code plugin marketplace**。發佈到 GitHub 後，加入
+marketplace 即可安裝四個 plugin 中的任意子集——每個都獨立、可選：
+
+```
+/plugin marketplace add <owner>/<repo>
+/plugin install agentic-bootstrap@agentic-mode
+/plugin install gcm@agentic-mode
+/plugin install two-axis-review@agentic-mode
+/plugin install review-response@agentic-mode
+```
+
+| Plugin | 安裝什麼 | 正典來源 |
+| --- | --- | --- |
+| `agentic-bootstrap` | 文件契約 bootstrapper skill（跑 RUNBOOK）。 | `RUNBOOK.md` + `doctrine/` + `templates/` + `checker/`（vendored） |
+| `gcm` | commit message 慣例 skill。 | [`playbooks/COMMIT-MESSAGES.md`](playbooks/COMMIT-MESSAGES.md) |
+| `two-axis-review` | 雙軸 review skill。 | [`playbooks/TWO-AXIS-REVIEW.md`](playbooks/TWO-AXIS-REVIEW.md) |
+| `review-response` | review-response 紀律 skill。 | [`playbooks/REVIEW-RESPONSE.md`](playbooks/REVIEW-RESPONSE.md) |
+
+commit／review 慣例每個團隊偏好不同，所以做成可選 plugin 與可覆寫 playbook，而非併入
+core。每個 plugin 都 vendor 一份自足的正典拷貝；vendoring 與防漂移同步見
+[`adapters/claude-code/README.md`](adapters/claude-code/README.md)。
+
 ## Repo 地圖
 
 | 路徑 | 是什麼 |
@@ -98,7 +134,10 @@ python3 scripts/check_agentic_docs.py --config agentic-mode/config.json
 | [`doctrine/FIELD-NOTES.md`](doctrine/FIELD-NOTES.md) | 來自原始專案、形塑了教義的實戰教訓。 |
 | [`checker/`](checker/) | config 驅動的檢查器與一份註解過的範例 config。 |
 | [`templates/`](templates/) | 每份產出文件的填空骨架 + CI 檔。 |
-| [`adapters/`](adapters/) | harness 專屬的包裝（Claude Code skill、Devin IDE rule + review workflow）。 |
+| [`playbooks/`](playbooks/) | harness-neutral 的協作正典（commit message、雙軸 review、review response）——可選，本地規則優先。 |
+| [`adapters/`](adapters/) | harness 專屬的包裝（Claude Code plugins + marketplace、Devin IDE rule + review workflow）。 |
+| [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json) | Claude Code plugin marketplace 清單。 |
+| [`scripts/sync_plugins.py`](scripts/sync_plugins.py) | 單向 vendoring 同步（正典 → plugins）與 `--check` 防漂移 gate。 |
 | [`examples/minimal-cli/`](examples/minimal-cli/) | 一個可通過檢查器的完整範例。 |
 | [`AGENTS.md`](AGENTS.md) | 本 repo 自己的契約（吃自己的狗糧）。 |
 
@@ -107,13 +146,15 @@ python3 scripts/check_agentic_docs.py --config agentic-mode/config.json
 核心（doctrine、RUNBOOK、templates、checker）是 **harness-neutral** 的——絕不指名任何
 特定 agent 產品、model 或專有工具。harness 專屬的包裝只放在 [`adapters/`](adapters/)：
 
-- [`adapters/claude-code/SKILL.md`](adapters/claude-code/SKILL.md)——把工具包裝成
-  Claude Code skill。
+- [`adapters/claude-code/`](adapters/claude-code/)——一個 Claude Code plugin
+  marketplace：`agentic-bootstrap` 工具包，加上三份 playbook，各自封裝成可選、可獨立
+  安裝的 plugin（見[它的 README](adapters/claude-code/README.md)與上面的
+  [安裝為 Claude Code plugin](#安裝為-claude-code-plugin)）。
 - [`adapters/devin-ide/`](adapters/devin-ide/)——一份 Devin IDE rule 與一個 review
   workflow。
 
-每個 adapter 都很薄：它指向根目錄的 `RUNBOOK.md`，並把路徑解析到 vendor 進來的核心。
-要支援新 harness 就新增一個 adapter，不要 fork 教義。
+每個 adapter 都很薄：它指向（或 vendor）正典核心，並把路徑解析到它。要支援新 harness
+就新增一個 adapter，不要 fork 教義。
 
 ## 正典來源
 

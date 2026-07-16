@@ -77,7 +77,8 @@ filled-in contract end to end.
 Everything project-specific (ID prefix, doc paths, bilingual headings, entry
 points, command rules, deny words, allowlists) lives in an external
 `agentic-mode/config.json` — the framework code never changes between projects.
-Copy it into a repo, drop a config beside it, and run:
+Copy it into a repo (conventionally as `scripts/check_agentic_docs.py`), drop a
+config beside it, and run from that repo's root:
 
 ```bash
 python3 scripts/check_agentic_docs.py --config agentic-mode/config.json
@@ -100,6 +101,47 @@ A line carrying the marker `agentic-gate: allow` is skipped by the text scans, s
 rule/spec docs can quote a bad example on purpose. See
 [`checker/config.example.json`](checker/config.example.json) for every knob.
 
+## Playbooks
+
+Alongside the doc contract, [`playbooks/`](playbooks/) holds a small set of
+**harness-neutral collaboration playbooks** — canonical rules any collaborator
+(human or agent, in any tool) can read directly as a rules file. They are
+**optional and policy-overridable**: a repo's own hooks, review canon, or
+`AGENTS.md` rules always take precedence.
+
+| Playbook | What it covers |
+| --- | --- |
+| [`COMMIT-MESSAGES.md`](playbooks/COMMIT-MESSAGES.md) | A Conventional-Commits variant: type table with build/ci/chore adjudications, an optional on-demand ticket, and scope rules — deferring to a local commit-msg hook. |
+| [`TWO-AXIS-REVIEW.md`](playbooks/TWO-AXIS-REVIEW.md) | Dual-axis review — Standards (written right) and Spec (meets the ticket) audited on independent axes that never cross-rank. |
+| [`REVIEW-RESPONSE.md`](playbooks/REVIEW-RESPONSE.md) | Discipline for the author answering review feedback: verify before implementing, no sycophantic openers, push back with evidence. |
+
+## Install as Claude Code plugins
+
+This repo is also a **Claude Code plugin marketplace**. Once it is on GitHub,
+add the marketplace and install any subset of the four plugins — each is
+independent and optional:
+
+```
+/plugin marketplace add <owner>/<repo>
+/plugin install agentic-bootstrap@agentic-mode
+/plugin install gcm@agentic-mode
+/plugin install two-axis-review@agentic-mode
+/plugin install review-response@agentic-mode
+```
+
+| Plugin | Installs | Canonical source |
+| --- | --- | --- |
+| `agentic-bootstrap` | The doc-contract bootstrapper skill (runs the RUNBOOK). | `RUNBOOK.md` + `doctrine/` + `templates/` + `checker/` (vendored) |
+| `gcm` | Commit-message convention skill. | [`playbooks/COMMIT-MESSAGES.md`](playbooks/COMMIT-MESSAGES.md) |
+| `two-axis-review` | Dual-axis review skill. | [`playbooks/TWO-AXIS-REVIEW.md`](playbooks/TWO-AXIS-REVIEW.md) |
+| `review-response` | Review-response discipline skill. | [`playbooks/REVIEW-RESPONSE.md`](playbooks/REVIEW-RESPONSE.md) |
+
+The commit/review conventions differ from team to team, which is why they are
+optional plugins and policy-overridable playbooks rather than part of the core.
+Each plugin vendors a self-contained copy of its canonical source; see
+[`adapters/claude-code/README.md`](adapters/claude-code/README.md) for the
+vendoring + anti-drift sync.
+
 ## Repo map
 
 | Path | What it is |
@@ -109,7 +151,10 @@ rule/spec docs can quote a bad example on purpose. See
 | [`doctrine/FIELD-NOTES.md`](doctrine/FIELD-NOTES.md) | Field lessons from the origin project that shaped the doctrine. |
 | [`checker/`](checker/) | The config-driven checker and an annotated example config. |
 | [`templates/`](templates/) | The fill-in skeletons for every generated doc + CI files. |
-| [`adapters/`](adapters/) | Harness-specific packaging (Claude Code skill, Devin IDE rule + review workflow). |
+| [`playbooks/`](playbooks/) | Harness-neutral collaboration canon (commit messages, two-axis review, review response) — optional, local rules override. |
+| [`adapters/`](adapters/) | Harness-specific packaging (Claude Code plugins + marketplace, Devin IDE rule + review workflow). |
+| [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json) | The Claude Code plugin marketplace manifest. |
+| [`scripts/sync_plugins.py`](scripts/sync_plugins.py) | One-way vendoring sync (canon → plugins) with a `--check` drift gate. |
 | [`examples/minimal-cli/`](examples/minimal-cli/) | A complete worked example that passes the checker. |
 | [`AGENTS.md`](AGENTS.md) | This repo's own contract (it dogfoods the methodology). |
 
@@ -119,13 +164,16 @@ The core (doctrine, RUNBOOK, templates, checker) is **harness-neutral** — it n
 names a specific agent product, model, or proprietary tool. Harness-specific
 packaging lives only under [`adapters/`](adapters/):
 
-- [`adapters/claude-code/SKILL.md`](adapters/claude-code/SKILL.md) — package the
-  toolkit as a Claude Code skill.
+- [`adapters/claude-code/`](adapters/claude-code/) — a Claude Code plugin
+  marketplace: the `agentic-bootstrap` toolkit plus the three playbooks packaged
+  as optional, independently installable plugins (see
+  [its README](adapters/claude-code/README.md) and [Install as Claude Code
+  plugins](#install-as-claude-code-plugins) above).
 - [`adapters/devin-ide/`](adapters/devin-ide/) — a Devin IDE rule and a review
   workflow.
 
-Each adapter is thin: it points at the root `RUNBOOK.md` and resolves paths to the
-vendored core. Add a new adapter for a new harness; do not fork the doctrine.
+Each adapter is thin: it points at (or vendors) the canonical core and resolves
+paths to it. Add a new adapter for a new harness; do not fork the doctrine.
 
 ## Canonical source
 

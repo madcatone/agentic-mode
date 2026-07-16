@@ -1,0 +1,29 @@
+{
+  "name": "agentic-mode",
+  "description": "Optional Claude Code plugins for the agentic-mode methodology: the doc-contract bootstrapper plus three harness-neutral collaboration playbooks (commit messages, two-axis review, review response). Install only the ones your team wants.",
+  "owner": {
+    "name": "agentic-mode maintainers"
+  },
+  "plugins": [
+    {
+      "name": "agentic-bootstrap",
+      "source": "./adapters/claude-code/plugins/agentic-bootstrap",
+      "description": "Bootstrap or adopt the agentic-mode documentation pipeline in any repo — a layered, ID-joined, harness-neutral set of collaboration docs (AGENTS.md, REQUIREMENTS, USER_GUIDE/API_REFERENCE, VALIDATION, WORKFLOW) plus a config-driven checker and CI gate. Self-contained: vendors the RUNBOOK, doctrine, templates, and checker."
+    },
+    {
+      "name": "gcm",
+      "source": "./adapters/claude-code/plugins/gcm",
+      "description": "Write commit messages in a Conventional-Commits variant: a type table with explicit build/ci/chore adjudications, an optional ticket appended between type and colon (on demand, not mandatory), and scope rules — always deferring to a repo's local commit-msg hook."
+    },
+    {
+      "name": "two-axis-review",
+      "source": "./adapters/claude-code/plugins/two-axis-review",
+      "description": "Dual-axis code review that audits Standards (is it written right) and Spec (does it meet the ticket) on independent parallel axes that never merge or cross-rank — deferring to a repo's local review canon for the Standards checklist and adding the ticket-acceptance axis."
+    },
+    {
+      "name": "review-response",
+      "source": "./adapters/claude-code/plugins/review-response",
+      "description": "Discipline for responding to code-review feedback: verify each comment against the codebase before implementing, no sycophantic openers, and always push back with evidence — treating the ticket description itself as an external signal to be checked."
+    }
+  ]
+}

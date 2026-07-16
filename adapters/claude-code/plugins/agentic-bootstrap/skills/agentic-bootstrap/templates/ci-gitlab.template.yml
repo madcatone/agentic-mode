@@ -1,0 +1,25 @@
+# Agentic-mode documentation gate (GitLab CI).
+# Copy to .gitlab-ci.yml (or `include:` it) and add your project's own
+# build / test commands in the marked section below.
+#
+# This job runs on merge requests and on pushes to the default branch, sets up
+# a plain Python 3, and runs the config-driven documentation-consistency gate.
+
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+
+stages:
+  - validate
+
+agentic_docs_gate:
+  stage: validate
+  image: python:3.12-slim
+  script:
+    - python --version
+    - python scripts/check_agentic_docs.py --config agentic-mode/config.json
+    # ---------------------------------------------------------------------
+    # add project test commands here
+    #   e.g. pip install -e . && python -m pytest
+    # ---------------------------------------------------------------------

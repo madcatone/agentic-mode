@@ -1,0 +1,8 @@
+{
+  "name": "review-response",
+  "description": "Discipline for responding to code-review feedback: verify each comment against the codebase before implementing, no sycophantic openers, and always push back with evidence — treating the ticket description itself as an external signal to be checked.",
+  "version": "1.0.0",
+  "author": {
+    "name": "agentic-mode maintainers"
+  }
+}

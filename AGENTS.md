@@ -25,7 +25,11 @@ model, or dispatch to use. Read [`README.md`](README.md) first, then this.
 - `checker/check_agentic_docs.py`: the config-driven gate (pure stdlib).
 - `checker/config.example.json`: an annotated config with every knob.
 - `templates/`: fill-in skeletons for every generated doc + CI files.
-- `adapters/`: Claude Code skill, Devin IDE rule + review workflow.
+- `playbooks/`: harness-neutral collaboration canon (commit messages, two-axis
+  review, review response) — optional, local rules override them.
+- `adapters/`: Claude Code plugins + marketplace, Devin IDE rule + review workflow.
+- `.claude-plugin/marketplace.json`: the Claude Code plugin marketplace manifest.
+- `scripts/sync_plugins.py`: one-way vendoring sync (canon → plugins) + `--check` gate.
 - `examples/minimal-cli/`: a complete contract that passes the checker.
 
 ## Development Commands
@@ -48,6 +52,18 @@ python3 checker/check_agentic_docs.py --config examples/minimal-cli/agentic-mode
 grep -rn '{{' examples/minimal-cli && echo "FOUND" || echo "clean"
 ```
 
+- Verify the plugin vendored copies are in sync with the canon (must exit 0):
+
+```bash
+python3 scripts/sync_plugins.py --check
+```
+
+- Validate the marketplace + plugin manifests parse:
+
+```bash
+python3 -m json.tool .claude-plugin/marketplace.json >/dev/null && echo ok
+```
+
 ## Change Flow (What "Done" Requires)
 
 1. Code / doctrine / template edited.
@@ -56,7 +72,11 @@ grep -rn '{{' examples/minimal-cli && echo "FOUND" || echo "clean"
 3. If the doc-set changed, the templates and `RUNBOOK.md`'s layout/schema stay
    in sync (the config schema is stated in exactly one place — `RUNBOOK.md`).
 4. The worked example still passes the gate (see Development Commands).
-5. `README.md` and `README-ZH.md` stay information-equivalent when either changes.
+5. If a `playbooks/*.md` or a vendored core file (`RUNBOOK.md`, `doctrine/`,
+   `templates/`, `checker/`) changed, `python3 scripts/sync_plugins.py` was run
+   so the plugin copies match, and `--check` exits 0. Never hand-edit a vendored
+   copy under `adapters/claude-code/plugins/`.
+6. `README.md` and `README-ZH.md` stay information-equivalent when either changes.
 
 ## Sign-Off Points
 

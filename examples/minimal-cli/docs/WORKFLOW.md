@@ -73,7 +73,7 @@ Conventional commit (team convention — the canonical rules live in the team-sk
 <body — explain WHY, not what>
 ```
 **Types:** `feat`, `fix`, `refactor`, `perf`, `test`, `docs`, `style`, `build`, `ci`, `ops`, `chore`, `revert` (dependency bumps are `build`, not `chore`; only CI-config changes are `ci`).
-**Ticket (as-needed):** when the change maps to a tracked ticket, put its ID between the type and the colon, space-separated, no parentheses (`fix ARK22-232: Correct session teardown`); omit it when there is no ticket.
+**Ticket (as-needed):** when the change maps to a tracked ticket, put its ID between the type and the colon, space-separated, no parentheses (`fix PROJ-123: Correct session teardown`); omit it when there is no ticket.
 **Subject:** ≤ 50 chars, type lowercase, subject first letter capitalized, imperative, no trailing period.
 **Body:** a few tight lines; explain motivation/trade-offs/pitfalls; include measured evidence; reference the requirement ID ("implements TODO-0NN") and `Closes #N`. Omit the body entirely when the diff already shows the why.
 **Precedence:** if this repo has a commit-msg hook or its own documented convention, that takes precedence over these defaults.

@@ -1,0 +1,8 @@
+{
+  "name": "two-axis-review",
+  "description": "Dual-axis code review that audits Standards (is it written right) and Spec (does it meet the ticket) on independent parallel axes that never merge or cross-rank — deferring to a repo's local review canon for the Standards checklist and adding the ticket-acceptance axis.",
+  "version": "1.0.0",
+  "author": {
+    "name": "agentic-mode maintainers"
+  }
+}
