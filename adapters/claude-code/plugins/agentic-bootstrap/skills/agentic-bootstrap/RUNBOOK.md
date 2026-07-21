@@ -17,7 +17,7 @@ The doctrine behind every rule lives in [`doctrine/BOOTSTRAP-CORE.md`](doctrine/
 
 - **TOOLKIT** — this repository. It carries everything you need: this RUNBOOK,
   `doctrine/` (the doctrine), `templates/` (all document templates), and
-  `checker/` (the mechanical gate). Nothing is ever written into TOOLKIT.
+  `checker/` (the mechanical checker). Nothing is ever written into TOOLKIT.
 - **TARGET** — the repository you are bootstrapping. All generated files are
   written into TARGET. Ask your user if TARGET is ambiguous.
 
@@ -34,10 +34,10 @@ agentic-mode/SELF-TEST.md    # coherence gate + four guardrails + read-back prob
 docs/REQUIREMENTS.md         # behavior contract, stable IDs, append-only iteration history
 docs/USER_GUIDE.md | docs/API_REFERENCE.md   # observable surface (by project.type)
 docs/VALIDATION.md           # per-feature done evidence (seeded empty)
-docs/WORKFLOW.md             # platform review loop (copied ~as-is from a WORKFLOW template)
+docs/WORKFLOW.md             # platform review loop (ported as-is from a WORKFLOW template)
 docs/architecture.json       # optional component graph (by project.type / need)
 scripts/check_agentic_docs.py  # the checker, copied verbatim from TOOLKIT/checker/
-.gitlab-ci.yml | .github/workflows/agentic-docs.yml   # CI gate (unless the profile skips it)
+.gitlab-ci.yml | .github/workflows/agentic-docs.yml   # CI gate (placed unless ci.platform: none)
 ```
 
 ## config.json — schema v1 (the single source of machine truth)
@@ -91,9 +91,9 @@ Prefer simple shell tools first: `echo`, `jq`, `sed`, `head`, `grep`, `sort`,
 
 If unsure, list the target paths. A hit on any **contract doc** (AGENTS,
 REQUIREMENTS, VALIDATION, WORKFLOW, AGENTIC-MODE, a surface guide) → adopt. A
-`README.md` alone does not force adopt: a trivial stub (≤15 lines, no structure
-worth preserving) folds into the bootstrap-generated README; a substantive
-README → adopt.
+`README.md` alone does not force adopt: a trivial stub (≤15 non-blank lines and
+no `##` headings) folds into the bootstrap-generated README; anything longer, or
+containing any heading, → adopt.
 
 ---
 
@@ -117,10 +117,10 @@ Scan TARGET first; only ask what the scan cannot derive. The scan is
 Then ask the user **only** these 10 questions. **Question 1 is always first** —
 it sets the rigor for everything after:
 
-1. **Co-op profile** — `full` / `docs-only` / `light`?
-   - `full`: CI gate runs on every change; append-only provenance enforced. *(default)*
-   - `docs-only`: **no CI gate** (checker still runnable by hand); append-only enforced.
-   - `light`: **no append-only ritual** (iteration history + per-feature VALIDATION encouraged, not required); CI optional.
+1. **Co-op profile** — `full` / `docs-only` / `light`? Sets how strictly the **append-only ritual** binds; it does **not** decide the CI gate — gate placement follows `ci.platform` (Q3), for every profile.
+   - `full`: append-only provenance enforced. *(default; repo expected to outlive one feature cycle.)*
+   - `docs-only`: append-only provenance enforced. *(docs/knowledge repos.)*
+   - `light`: **no append-only ritual** — iteration history + per-feature VALIDATION encouraged, not required.
 2. **Project type** — `cli` / `library` / `web-service` / `docs-only`? (Selects the observable-surface doc: `cli`→USER_GUIDE-cli, `library`→API_REFERENCE, `web-service`→USER_GUIDE-web, `docs-only`→none.)
 3. **CI platform** — `gitlab` / `github` / `none`? `none` governs only the CI **gate**; the WORKFLOW doc still follows the team's **actual review platform**.
 4. **Primary language + test/build command** — the one command that compiles/builds and the one that runs tests, verbatim. No build step? Agree on a cheap static sanity command (syntax check, lint, byte-compile) to fill `{{BUILD_CMD}}`. A placeholder must never survive unresolved.
@@ -144,7 +144,7 @@ every `{{PLACEHOLDER}}` from the bundle, write the file into TARGET, then run it
 inline gate. **Do not advance on a failed gate.** Production order:
 
 1. **`docs/architecture.json`** *(optional — skip unless Q2/need calls for it; set `docs.architecture: null`)*. Gate: every `connection.from`/`.to` resolves; every component label naming a real symbol exists in source; JSON parses.
-2. **`docs/WORKFLOW.md`** — **copied ~as-is** from `WORKFLOW-<platform>.template.md`. Substitute the H1 platform name, the `Template-Source:` marker, and every `{{PLACEHOLDER}}` in the body (build/test/smoke commands, prefix, bilingual conditionals). Do **not** re-author its prose — the review loop, comment style, and red lines are platform constants.
+2. **`docs/WORKFLOW.md`** — **ported as-is** (verbatim except its declared substitution points) from `WORKFLOW-<platform>.template.md`. Substitute the H1 platform name, the `Template-Source:` marker, and every `{{PLACEHOLDER}}` in the body (build/test/smoke commands, prefix, bilingual conditionals). Do **not** re-author its prose — the review loop, comment style, and red lines are platform constants.
 3. **`docs/REQUIREMENTS.md`** — Problem/Goals/Non-Goals, enumerated `{{PREFIX}}-001..N` requirements (one per observable behavior), domain/event model, **empty** Iteration History (append-only from here), acceptance criteria, verification commands. Gate: every entry-point behavior maps to ≥1 ID; if bilingual, both tracks share identical ID set/count/order.
 4. **`docs/USER_GUIDE.md` or `docs/API_REFERENCE.md`** — the observable surface, template chosen by `project.type`. Each behavior subsection cites its owning `{{PREFIX}}-XXX`. Gate: every cited ID exists in REQUIREMENTS; surface tables match source 1:1.
 5. **`README.md`** — onboarding: entry table, quick start, architecture overview *derived from the JSON when present*, agent-onboarding pointer, verification commands, neutrality checklist, doc cross-links. Gate: every quick-start command appears in the surface doc; neutrality sweep clean.
@@ -160,8 +160,10 @@ Also write **`AGENTIC-MODE.md`** (root index) and **`agentic-mode/SELF-TEST.md`*
 
 1. **Copy the checker** verbatim: `TOOLKIT/checker/check_agentic_docs.py` →
    `TARGET/scripts/check_agentic_docs.py`.
-2. **Place the CI gate** unless the profile skips it (`docs-only`/`light` with
-   `ci.platform: none`):
+2. **Place the CI gate whenever `ci.platform` is `gitlab` or `github`** — for
+   every co-op profile, `docs-only` included; the placed gate runs the checker on
+   **all** changes (docs-only changes are not exempt). The only thing that skips
+   a CI file is `ci.platform: none`:
    - gitlab → `templates/ci-gitlab.template.yml` → `.gitlab-ci.yml`
    - github → `templates/ci-github.template.yml` → `.github/workflows/agentic-docs.yml`
 3. **Run** `python scripts/check_agentic_docs.py --config agentic-mode/config.json`.
@@ -186,7 +188,7 @@ Summarize for the user:
   requirement ID in REQUIREMENTS (with an Iteration History entry) → update the
   USER_GUIDE/API_REFERENCE subsection citing that ID → update README quick-start
   if the surface changed → **append** a VALIDATION block citing the ID +
-  issue/MR-PR number → run the checker → move the change through
+  issue/MR/PR number → run the checker → move the change through
   `docs/WORKFLOW.md`. The ID is the join key.
 - **The guardrails** — point them at `agentic-mode/SELF-TEST.md`: two failed
   fixes of one check → stop and escalate; the Stop-and-Ask list; "uncertainty =
@@ -230,8 +232,9 @@ a rewrite.
   next is produced. Phase C must exit the checker clean before Phase D.
 - **The config is the single machine truth.** Any command, path, prefix, or limit
   a doc references must match `agentic-mode/config.json`.
-- **Never advance past a failed gate.** If the same check fails after two fix
-  attempts, stop and escalate to your user with the failure trail.
+- **Never advance past a failed inline doc gate** (the per-file check at the end
+  of each Phase-B step). If the same check fails after two fix attempts, stop and
+  escalate to your user with the failure trail.
 
 ## Done means
 

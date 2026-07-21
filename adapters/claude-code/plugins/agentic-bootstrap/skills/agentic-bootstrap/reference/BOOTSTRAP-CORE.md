@@ -135,19 +135,19 @@ Two collaborator-facing docs, with different jobs:
 
 Keeping them separate avoids one giant rules file that no one re-reads.
 
-**The `WORKFLOW.md` doc is PORTED-AS-IS.** When adopting this mode in a new repo, copy the canonical platform workflow doc verbatim — only substitute the platform name in the H1. Do not re-author its body; its baked-in conventions (comment style, review loop, red lines) are platform constants and out of scope for regeneration.
+**The `WORKFLOW.md` doc is ported as-is** — verbatim except its declared substitution points. When adopting this mode in a new repo, copy the canonical platform workflow doc, then resolve only those points: the H1 platform name, the `Template-Source:` marker, and every `{{PLACEHOLDER}}` the template header lists (build/test/smoke commands, prefix, bilingual conditionals). Do not re-author its prose: the review loop, comment style, and red lines are platform constants and out of scope for regeneration.
 
 **Boundary test:** if a candidate AGENTS.md rule names the platform CLI or a platform-specific comment style, it belongs in WORKFLOW, not AGENTS.md.
 
 ### Workflow template versioning
 
-Because the platform WORKFLOW doc is copied as-is, every imported copy should record where it came from:
+Because the platform WORKFLOW doc is ported as-is, every imported copy must record where it came from:
 
 - **Template marker.** Add a short header note such as `Template-Source: <canonical-repo-or-skill>@<version>` near the top of the copied WORKFLOW doc.
-- **No local drift.** Local repos should not hand-edit platform constants. If a platform rule changes, update the canonical template first, then replace the copied WORKFLOW body from that version.
+- **No local drift.** Local repos must not hand-edit platform constants. If a platform rule changes, update the canonical template first, then replace the copied WORKFLOW body from that version.
 - **Review visibility.** Merge/pull requests that update WORKFLOW should state whether they are a template refresh or a local repo-specific exception. Exceptions should be rare and explicitly justified.
 
-This preserves the "copied as-is" rule while still making long-term template drift visible.
+This preserves the "ported as-is" rule while still making long-term template drift visible.
 
 ---
 
@@ -256,11 +256,11 @@ Not every repo can adopt the full system on day one, and not every team wants th
 
 | Co-op profile | CI gate | Append-only ritual | Use when |
 |---|---|---|---|
-| `full` | Yes — `ci.platform` set, gate runs on every change | Enforced | Default. Repo expected to live beyond one feature cycle, multiple collaborators. |
-| `docs-only` | **No CI gate** — the checker is still runnable by hand, but no pipeline enforces it | Enforced | Docs/knowledge repos, or teams not ready to wire CI. The contract is honored manually. |
-| `light` | Optional | **Relaxed** — iteration history and per-feature VALIDATION blocks are encouraged, not required | Small, low-churn repos, prototypes, solo work where full provenance is overhead. |
+| `full` | Placed when `ci.platform` is `gitlab`/`github`; the gate runs the checker on every change | Enforced | Default. Repo expected to live beyond one feature cycle, multiple collaborators. |
+| `docs-only` | Placed when `ci.platform` is `gitlab`/`github`, exactly as every profile; the gate runs the checker on every change (docs-only changes included). The checker also stays runnable by hand. | Enforced | Docs/knowledge repos. Enforced in CI when a platform is set, honored by hand when `ci.platform` is `none`. |
+| `light` | Placed when `ci.platform` is `gitlab`/`github` | **Relaxed** — iteration history and per-feature VALIDATION blocks are encouraged, not required | Small, low-churn repos, prototypes, solo work where full provenance is overhead. |
 
-The co-op profile sets `ci.platform` (to `none` for `docs-only`/`light` if desired) and signals to collaborators how strictly the append-only rules bind.
+The co-op profile signals to collaborators how strictly the append-only rules bind; CI gate placement follows `ci.platform` independently (set it to `none` only when the repo genuinely wants no pipeline enforcement — the gate is otherwise placed for every profile, `docs-only` included).
 
 ### Doc-set profile (how many layers to seed initially)
 

@@ -11,7 +11,7 @@ Harness-neutral: never name a specific agent product, model, or proprietary tool
 
 # {{COMPONENT_NAME}} — Implementation Validation
 
-Per-feature done evidence. One block per landed non-trivial change. A reviewer (human or agent) re-verifies any feature by running its Verification Commands. Each block cites the stable requirement IDs and the issue/MR-PR number so the ID trail stays followable.
+Per-feature done evidence. One block per landed non-trivial change. A reviewer (human or agent) re-verifies any feature by running its Verification Commands. Each block cites the stable requirement IDs and the issue/MR/PR number so the ID trail stays followable.
 
 <!--
 ==== PER-FEATURE BLOCK TEMPLATE — copy below the line when a new feature lands ====

@@ -23,8 +23,8 @@ Project: **{{PROJECT_NAME}}** ({{PROJECT_TYPE}}). ID prefix: `{{PREFIX}}`. It is
 | Repo facts + co-op contract | `{{AGENTS_PATH}}` | Scope, key files, dev commands, change-flow, sign-off points, Stop-and-Ask list — *What/Done* only. |
 | Behavior contract | `{{REQUIREMENTS_PATH}}` | Problem/Goals/Non-Goals, enumerated functional requirements with stable IDs, event/domain model, append-only iteration history, acceptance criteria, verification commands. |
 | Observable surface | `{{SURFACE_DOC_PATH}}` | {{SURFACE_DOC_ROLE}} — what users see, press, or call. |
-| Done evidence | `{{VALIDATION_PATH}}` | Per-feature checklist: Code / Integration / Requirements Met / Docs Updated / Testing / Verification Commands / Status. |
-| Process rules | `{{WORKFLOW_PATH}}` | Issue → branch → commit → MR/PR → review loop, red lines, platform CLI conventions — copied ~as-is. |
+| Done evidence | `{{VALIDATION_PATH}}` | Per-feature checklist: Code Implementation / Integration Points / User Requirements Met / Documentation Updates / Testing / Verification Commands / Status. |
+| Process rules | `{{WORKFLOW_PATH}}` | Issue → branch → commit → MR/PR → review loop, red lines, platform CLI conventions — copied as-is except the H1 and `Template-Source` line. |
 | Visual architecture (optional) | `{{ARCHITECTURE_PATH_OR_NA}}` | Component graph as committed, diffable JSON. |
 
 **Anti-pattern:** a single `NOTES.md` / `DESIGN.md` mixing contract, guide, status, and process. It rots because no one knows which section is authoritative. <!-- agentic-gate: allow -->
@@ -35,7 +35,7 @@ Resolve by responsibility, not by recency.
 
 | Question | Winning layer |
 |---|---|
-| What is allowed during git / issue / MR-PR operations? | `{{WORKFLOW_PATH}}` |
+| What is allowed during git / issue / MR/PR operations? | `{{WORKFLOW_PATH}}` |
 | What safety and repo-scope rules bind collaborators? | `{{AGENTS_PATH}}` |
 | What is the required behavior? | `{{REQUIREMENTS_PATH}}` |
 | What should users type, press, see, or call? | `{{SURFACE_DOC_PATH}}` |

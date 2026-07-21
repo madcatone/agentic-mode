@@ -1,5 +1,5 @@
 <!--
-TEMPLATE: docs/WORKFLOW.md for ci.platform == "gitlab". This doc is COPIED ~AS-IS into the target repo:
+TEMPLATE: docs/WORKFLOW.md for ci.platform == "gitlab". This doc is ported as-is into the target repo:
 substitute only the H1 platform name, the Template-Source marker, and the {{PLACEHOLDER}} test/build
 commands (from AGENTS Development Commands). Do NOT re-author the review-loop body — the issue→branch→
 commit→MR→review conventions and red lines are platform constants.
@@ -13,13 +13,13 @@ Template-Source: agentic-bootstrap/WORKFLOW-gitlab@v1
 
 # GitLab Workflow — Collaborator Rule
 
-This document is the authoritative GitLab workflow rule for anyone (human or agent) working in this repo. Read it before touching issues, branches, commits, or MRs. It complements `README.md` and `AGENTS.md` (code/scope/test discipline) — this file focuses on the issue → branch → commit → MR → review loop. Assume the reader is new and has no chat history. All commands run from the repo root.
+This document is the authoritative GitLab workflow rule for anyone (human or agent) working in this repo. Read it before touching issues, branches, commits, or MRs. It complements `README.md` and `AGENTS.md` (code/scope/test discipline) — this file focuses on the issue → branch → commit → merge request (MR) → review loop. Assume the reader is new and has no chat history. All commands run from the repo root.
 
 ## 0. Iron Rules (apply in every context)
 
 - **Without explicit user consent, do not commit, push, amend, rebase, force-push, or `--no-verify`.** "The user agreed once" is not standing consent; ask every time.
 - **No blanket staging** (`git add -A` / `git add .`). Stage files explicitly: `git add <file1> <file2>`. Ignored directories can still let stray untracked files slip into the stage.
-- **Never claim tests pass without actually running them.** Run the repo's real commands (from AGENTS Development Commands): build/compile `{{BUILD_CMD}}`; tests `{{TEST_CMD}}`. Green means you saw the passing summary, not "should pass."
+- **Never claim tests pass without actually running them.** Run the repo's real commands (from AGENTS Development Commands): build/compile `{{BUILD_CMD}}`; tests `{{TEST_CMD}}`. Green means you saw the passing summary, not "should pass." (see §10 Red lines)
 - **A behavior change must sync docs in the same change** (REQUIREMENTS iteration history + observable-surface doc + VALIDATION). Otherwise it is not done.
 - **MR and issue comments must be self-contained.** The reader has not seen your chat history; write so a cold read is enough.
 - External replies posted to GitLab issues/MRs use an EOF-terminated multi-line format (HEREDOC). {{IF_BILINGUAL: post both languages.}} Chat replies are exempt.
@@ -97,7 +97,7 @@ Conventional commit (team convention — the canonical rules live in the team-sk
 **Types:** `feat`, `fix`, `refactor`, `perf`, `test`, `docs`, `style`, `build`, `ci`, `ops`, `chore`, `revert` (dependency bumps are `build`, not `chore`; only CI-config changes are `ci`).
 **Ticket (as-needed):** when the change maps to a tracked ticket, put its ID between the type and the colon, space-separated, no parentheses (`fix PROJ-123: Correct session teardown`); omit it when there is no ticket.
 **Subject:** ≤ 50 chars, type lowercase, subject first letter capitalized, imperative mood ("Add X" not "Added X"), no trailing period.
-**Body:** a few tight lines; explain motivation/trade-offs/pitfalls; include measured evidence (numbers, fingerprint, repro case); reference the requirement ID ("implements {{PREFIX}}-0NN") and `Closes #N`. Omit the body entirely when the diff already shows the why.
+**Body:** 1–4 tight lines; explain motivation/trade-offs/pitfalls; include measured evidence (numbers, fingerprint, repro case); reference the requirement ID ("implements {{PREFIX}}-0NN") and `Closes #N`. Omit the body entirely when the diff already shows the why.
 **Precedence:** if this repo has a commit-msg hook or its own documented convention, that takes precedence over these defaults.
 
 ### HEREDOC example
@@ -192,7 +192,7 @@ Report the MR URL and key metadata (source→target, assignee, pipeline status) 
 
 ## 6.a Code review — requesting
 - Review the MR the user names.
-- Find non-nitpick issues where possible.
+- Report every non-nitpick issue you find. If you find none after reading the full diff, say so explicitly.
 - Raise findings in MR replies; a blocking finding may stay a default resolvable discussion.
 - If quality is fine, reply `LGTM`; informational/status notes add `--resolvable=false`.
 
@@ -218,7 +218,7 @@ glab mr view --comments <N>
 
 ### Notes
 - **A bug fix must include a before/after repro** — reproduce the reviewer's condition once (wrong result), fix, reproduce again (right result). That is the only credible proof.
-- **Non-blocking trade-off:** if a change balloons scope, split it into a follow-up issue and say so in the note.
+- **Non-blocking trade-off:** if fixing a non-blocking item touches files outside the current issue's scope, or adds a new behavior, split it into a follow-up issue and say so in the note.
 - **Do not silently drop a reviewer's point:** if you disagree with a blocking item, argue the case in reply rather than ignoring it.
 
 ```bash
@@ -243,7 +243,7 @@ Note: `glab mr note <N> -m` is deprecated — use `glab mr note create <N> -m`. 
 - Reading `LGTM` means the code quality is accepted; no further review needed.
 
 ## 7. Cleanup after merge
-- After the MR merges, the local branch may be deleted: `git branch -d <branch>` (merged only; never `-D`).
+- After the MR merges, you may delete the local branch: `git branch -d <branch>` (delete only if merged; never `-D`).
 - Do not proactively delete the remote branch (project settings may auto-delete).
 
 ## 8. glab quick reference

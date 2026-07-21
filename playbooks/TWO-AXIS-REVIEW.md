@@ -15,7 +15,7 @@ rules (a review canon, a defect taxonomy) take precedence over this playbook.**
 一次 review 拆成兩條互不相干的軸，各自審、各自報告：
 
 - **Standards 軸（寫得對不對）**：程式碼品質、缺陷模式、風格慣例——diff 內部的正確性。
-- **Spec 軸（做得對不對）**：實作有沒有滿足 ticket 要求——diff 對外的達成度。
+- **Spec 軸（做得對不對）**：實作有沒有滿足票（ticket）要求——diff 對外的達成度。
 
 若你的工具內建一個只審 diff 品質的 code-review 功能，它大致等於 Standards 軸；本 playbook 保留那條軸，並**多出 Spec 軸**——把實作對照票逐條驗收。要做完整「對票 review」時走兩軸；只想看 diff 品質時單審 Standards 軸即可。
 
@@ -50,7 +50,7 @@ rules (a review canon, a defect taxonomy) take precedence over this playbook.**
 
 **來源與信任規則：**
 
-1. ticket 用 fetch 工具抓，**必含 comments**——關鍵 log 通常在 comments 不在附件；要下載大附件（log/video）前先讀 comments 決定值不值得。
+1. 票 用 fetch 工具抓，**必含 comments**——關鍵 log 通常在 comments 不在附件；要下載大附件（log/video）前先讀 comments 決定值不值得。
 2. **票面只是線索，不是地面真相**：症狀常指錯層，`label`／`component` 會誤導（實例：標「輸出格式」的票，真缺陷在上游資料 mapping；標「音訊」的票，實際修在對話狀態層）。裁決一律以 **diff 與 raw 證據**為準；有實證的 repo 裡「真缺陷票近半症狀指錯層」不是特例而是常態。
 3. **無對應票**（test/chore/release 類）→ Spec 軸回報「no spec」，只跑 Standards 軸——但 release/merge 類要加抓夾帶（見下）。
 

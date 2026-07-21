@@ -1,6 +1,6 @@
 <!--
 TEMPLATE: docs/WORKFLOW.md for ci.platform == "github". PR-based equivalent of the GitLab workflow,
-using the `gh` CLI. Copied ~as-is: substitute only the H1, the Template-Source marker, and the
+using the `gh` CLI. Ported as-is: substitute only the H1, the Template-Source marker, and the
 {{PLACEHOLDER}} build/test commands (from AGENTS Development Commands). Do NOT re-author the review-loop body.
 NOTE: NEW — not yet battle-tested. The GitLab variant is the field-proven one; this GitHub variant mirrors
 its structure onto issues → branch → commit → PR → review. Treat deviations as bugs to report upstream.
@@ -14,13 +14,13 @@ Template-Source: agentic-bootstrap/WORKFLOW-github@v1
 
 > **Status: NEW — not yet battle-tested.** This mirrors the field-proven GitLab workflow onto GitHub's PR model. If a step does not fit `gh`'s actual behavior, fix it and note the deviation.
 
-This document is the authoritative GitHub workflow rule for anyone (human or agent) working in this repo. Read it before touching issues, branches, commits, or PRs. It complements `README.md` and `AGENTS.md` (code/scope/test discipline) — this file focuses on the issue → branch → commit → PR → review loop. Assume the reader is new and has no chat history. All commands run from the repo root.
+This document is the authoritative GitHub workflow rule for anyone (human or agent) working in this repo. Read it before touching issues, branches, commits, or PRs. It complements `README.md` and `AGENTS.md` (code/scope/test discipline) — this file focuses on the issue → branch → commit → pull request (PR) → review loop. Assume the reader is new and has no chat history. All commands run from the repo root.
 
 ## 0. Iron Rules (apply in every context)
 
 - **Without explicit user consent, do not commit, push, amend, rebase, force-push, or `--no-verify`.** "The user agreed once" is not standing consent; ask every time.
-- **No blanket staging** (`git add -A` / `git add .`). Stage files explicitly: `git add <file1> <file2>`.
-- **Never claim tests pass without running them.** Run the repo's real commands (from AGENTS Development Commands): build/compile `{{BUILD_CMD}}`; tests `{{TEST_CMD}}`. Green means you saw the passing summary.
+- **No blanket staging** (`git add -A` / `git add .`). Stage files explicitly: `git add <file1> <file2>`. Ignored directories can still let stray untracked files slip into the stage.
+- **Never claim tests pass without running them.** Run the repo's real commands (from AGENTS Development Commands): build/compile `{{BUILD_CMD}}`; tests `{{TEST_CMD}}`. Green means you saw the passing summary, not "should pass." (see §10 Red lines)
 - **A behavior change must sync docs in the same change** (REQUIREMENTS iteration history + observable-surface doc + VALIDATION). Otherwise it is not done.
 - **PR and issue comments must be self-contained.** The reader has not seen your chat history.
 - External replies posted to GitHub issues/PRs use an EOF-terminated multi-line format (HEREDOC). {{IF_BILINGUAL: post both languages.}} Chat replies are exempt.
@@ -33,7 +33,7 @@ gh issue view <N> --comments
 ```
 
 ### Post research / progress to an issue
-Summarize findings into at least one comment. When asked to "investigate and reply on the issue," use a HEREDOC:
+Keep the issue title in the primary title language the platform expects. Summarize findings into at least one comment. When asked to "investigate and reply on the issue," use a HEREDOC:
 ```bash
 gh issue comment <N> --body "$(cat <<'EOF'
 ## <title> — research
@@ -81,7 +81,7 @@ Conventional commit (team convention — the canonical rules live in the team-sk
 **Types:** `feat`, `fix`, `refactor`, `perf`, `test`, `docs`, `style`, `build`, `ci`, `ops`, `chore`, `revert` (dependency bumps are `build`, not `chore`; only CI-config changes are `ci`).
 **Ticket (as-needed):** when the change maps to a tracked ticket, put its ID between the type and the colon, space-separated, no parentheses (`fix PROJ-123: Correct session teardown`); omit it when there is no ticket.
 **Subject:** ≤ 50 chars, type lowercase, subject first letter capitalized, imperative, no trailing period.
-**Body:** a few tight lines; explain motivation/trade-offs/pitfalls; include measured evidence; reference the requirement ID ("implements {{PREFIX}}-0NN") and `Closes #N`. Omit the body entirely when the diff already shows the why.
+**Body:** 1–4 tight lines; explain motivation/trade-offs/pitfalls; include measured evidence; reference the requirement ID ("implements {{PREFIX}}-0NN") and `Closes #N`. Omit the body entirely when the diff already shows the why.
 **Precedence:** if this repo has a commit-msg hook or its own documented convention, that takes precedence over these defaults.
 
 ### HEREDOC example
@@ -175,7 +175,7 @@ Report the PR URL and key metadata (head→base, assignee, checks status) to the
 
 ## 6.a Code review — requesting
 - Review the PR the user names: `gh pr view <N> --comments` and `gh pr diff <N>`.
-- Find non-nitpick issues where possible.
+- Report every non-nitpick issue you find. If you find none after reading the full diff, say so explicitly.
 - Raise findings as PR review comments. If quality is fine, approve with `LGTM`.
 
 ```bash
@@ -198,11 +198,11 @@ gh pr view <N> --comments
 2. Fix blocking (mandatory) + cheap non-blocking (batch them).
 3. **One review round = one commit**, message `fix(<scope>): <what> (PR #N review)`.
 4. Re-run full verification (§4).
-5. Commit, push, then post a summary comment.
+5. Commit. Push only if the user has consented (a PR review commit must be pushed to appear — ask first). Then post a summary comment.
 
 ### Notes
 - **A bug fix must include a before/after repro** — reproduce the reviewer's condition (wrong result), fix, reproduce again (right result).
-- **Non-blocking trade-off:** if a change balloons scope, split it into a follow-up issue and say so.
+- **Non-blocking trade-off:** if fixing a non-blocking item touches files outside the current issue's scope, or adds a new behavior, split it into a follow-up issue and say so in the comment.
 - **Do not silently drop a reviewer's point:** argue the case in reply rather than ignoring it.
 
 ```bash
@@ -226,7 +226,7 @@ EOF
 - Reading an approval / `LGTM` means the code quality is accepted; no further review needed.
 
 ## 7. Cleanup after merge
-- After the PR merges, the local branch may be deleted: `git branch -d <branch>` (merged only; never `-D`).
+- After the PR merges, you may delete the local branch: `git branch -d <branch>` (delete only if merged; never `-D`).
 - GitHub can auto-delete the head branch on merge (repo setting); do not force it manually.
 
 ## 8. gh quick reference

@@ -54,12 +54,12 @@ A behavior change is **not done** until all of these hold. The ID is the join ke
 2. `{{REQUIREMENTS_PATH}}` — the requirement `{{PREFIX}}-XXX` is added or updated, with a new **append-only** Iteration History entry (lead with the decision, then the evidence: numbers/fingerprint/issue-MR link). {{LIGHT_PROFILE_NOTE_OR_DELETE}}
 3. `{{SURFACE_DOC_PATH}}` — the subsection for that behavior is updated and cites the `{{PREFIX}}-XXX` ID.
 4. `{{README_PATH}}` — quick-start updated **iff** a user-visible command/entry changed.
-5. `{{VALIDATION_PATH}}` — a per-feature block is **appended**, citing the `{{PREFIX}}-XXX` ID and the issue/MR-PR number.
+5. `{{VALIDATION_PATH}}` — a per-feature block is **appended**, citing the `{{PREFIX}}-XXX` ID and the issue/MR/PR number.
 6. Verification commands run clean (see Development Commands) and the docs gate exits clean.
 
 ## Sign-Off Points
 
-- The author of a change does not sign off their own completion claim on evidence they merely asserted. Completion is proven by **objective command output** (build/test/gate) or by a **fresh-context reviewer** re-verifying against the acceptance criteria — not by "looks fine."
+- The author of a change does not sign off their own completion claim on evidence they merely asserted. Completion is proven by **objective command output** (build/test/gate) or by a **zero-context reviewer** re-verifying against the acceptance criteria — not by "looks fine."
 - A reviewer (human or agent) can re-verify any landed feature by running the Verification Commands in its `{{VALIDATION_PATH}}` block. If they cannot, the block is incomplete.
 
 ## Stop-and-Ask (do NOT proceed silently)
@@ -70,7 +70,7 @@ Stop and ask a human before any of these, even if permissions technically allow 
 - **Irreversible deletion** of files, data, or history.
 - **CI / release configuration** changes, or anything touching credentials, tokens, or **auth/security**.
 - Any **irreversible or externally visible** action not explicitly requested (deploy, force-push, publish, send).
-- A user premise that the evidence contradicts — report the evidence first; do not silently comply or silently do something else.
+- A user premise that the evidence contradicts — report the evidence to the user first and wait for their decision. Do not act on the original premise, and do not substitute your own alternative, until they respond.
 
 ## MR / PR Governance
 
@@ -89,6 +89,6 @@ Landing a change on `main`, the default branch, or any protected branch happens 
 
 ## Git Hygiene
 
-- Do not commit transient output, generated assets, local virtual environments, or dependency folders.
-- Explicit file staging; do not blanket-add. Never commit secrets or `.env` values.
+- Keep transient output, generated assets, local virtual environments, and dependency folders out of commits — add them to the ignore file instead of staging them.
+- Stage files explicitly; never blanket-add. Keep secrets and `.env` values out of every commit — load them from the environment at runtime instead.
 - Do not push, force-push, tag, or delete branches unless the user explicitly asks. Never push directly to `main` / the default / protected branches — open a merge/pull request instead.

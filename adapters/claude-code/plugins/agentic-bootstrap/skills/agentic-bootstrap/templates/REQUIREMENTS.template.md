@@ -53,7 +53,7 @@ Harness-neutral: never name a specific agent product, model, or proprietary tool
 
 ### Iteration History
 <!-- APPEND-ONLY. Newest entry has the highest number. Never edit a past entry. -->
-1. {{decision lead, then evidence: measurement / fingerprint / issue or MR-PR link}}.
+1. {{decision lead, then evidence: measurement / fingerprint / issue or MR/PR link}}.
 2. {{append-only; never renumber}}.
 
 ### Acceptance Criteria
