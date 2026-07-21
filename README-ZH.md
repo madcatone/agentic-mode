@@ -100,11 +100,12 @@ playbook**——任何協作者（人或 agent、用哪個工具）都能直接�
 | [`COMMIT-MESSAGES.md`](playbooks/COMMIT-MESSAGES.md) | Conventional-Commits 變體：type 表（含 build/ci/chore 裁決）、按需附加的票號、scope 規則——本地 commit-msg hook 優先。 |
 | [`TWO-AXIS-REVIEW.md`](playbooks/TWO-AXIS-REVIEW.md) | 雙軸 review——Standards（寫得對不對）與 Spec（做得對不對）平行分審、不跨軸挑贏家。 |
 | [`REVIEW-RESPONSE.md`](playbooks/REVIEW-RESPONSE.md) | 被審者回應回饋的紀律：先查證後實作、不空泛討好、反駁帶證據。 |
+| [`DOC-LINTER.md`](playbooks/DOC-LINTER.md) | lint 給 agent 看的文件的模糊性——術語漂移、被動語態、hedge word、疊加否定、結構問題，規則改編自 ASD-STE100 Simplified Technical English。 |
 
 ## 安裝為 Claude Code plugin
 
 本 repo 同時是一個 **Claude Code plugin marketplace**。發佈到 GitHub 後，加入
-marketplace 即可安裝五個 plugin 中的任意子集——每個都獨立、可選：
+marketplace 即可安裝六個 plugin 中的任意子集——每個都獨立、可選：
 
 ```
 /plugin marketplace add <owner>/<repo>
@@ -112,6 +113,7 @@ marketplace 即可安裝五個 plugin 中的任意子集——每個都獨立、
 /plugin install gcm@agentic-mode
 /plugin install two-axis-review@agentic-mode
 /plugin install review-response@agentic-mode
+/plugin install doc-linter@agentic-mode
 /plugin install fable5@agentic-mode
 ```
 
@@ -121,6 +123,7 @@ marketplace 即可安裝五個 plugin 中的任意子集——每個都獨立、
 | `gcm` | commit message 慣例 skill。 | [`playbooks/COMMIT-MESSAGES.md`](playbooks/COMMIT-MESSAGES.md) |
 | `two-axis-review` | 雙軸 review skill。 | [`playbooks/TWO-AXIS-REVIEW.md`](playbooks/TWO-AXIS-REVIEW.md) |
 | `review-response` | review-response 紀律 skill。 | [`playbooks/REVIEW-RESPONSE.md`](playbooks/REVIEW-RESPONSE.md) |
+| `doc-linter` | 給 agent 看的文件 linter skill。 | [`playbooks/DOC-LINTER.md`](playbooks/DOC-LINTER.md) |
 | `fable5` | 指揮官操作模式 + 強模型創始 prompt。 | plugin 目錄本身（self-canonical） |
 
 commit／review 慣例每個團隊偏好不同，所以做成可選 plugin 與可覆寫 playbook，而非併入
@@ -141,7 +144,7 @@ core。上述這些 plugin 都 vendor 一份自足的正典拷貝；vendoring �
 | [`doctrine/FIELD-NOTES.md`](doctrine/FIELD-NOTES.md) | 來自原始專案、形塑了教義的實戰教訓。 |
 | [`checker/`](checker/) | config 驅動的檢查器與一份註解過的範例 config。 |
 | [`templates/`](templates/) | 每份產出文件的填空骨架 + CI 檔。 |
-| [`playbooks/`](playbooks/) | harness-neutral 的協作正典（commit message、雙軸 review、review response）——可選，本地規則優先。 |
+| [`playbooks/`](playbooks/) | harness-neutral 的協作正典（commit message、雙軸 review、review response、文件 lint）——可選，本地規則優先。 |
 | [`adapters/`](adapters/) | harness 專屬的包裝（Claude Code plugins + marketplace、Devin IDE rule + review workflow）。 |
 | [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json) | Claude Code plugin marketplace 清單。 |
 | [`scripts/sync_plugins.py`](scripts/sync_plugins.py) | 單向 vendoring 同步（正典 → plugins）與 `--check` 防漂移 gate。 |
@@ -154,7 +157,7 @@ core。上述這些 plugin 都 vendor 一份自足的正典拷貝；vendoring �
 特定 agent 產品、model 或專有工具。harness 專屬的包裝只放在 [`adapters/`](adapters/)：
 
 - [`adapters/claude-code/`](adapters/claude-code/)——一個 Claude Code plugin
-  marketplace：`agentic-bootstrap` 工具包、三份 playbook，加上 self-canonical 的
+  marketplace：`agentic-bootstrap` 工具包、四份 playbook，加上 self-canonical 的
   `fable5` 指揮官操作模式，各自封裝成可選、可獨立安裝的 plugin（見[它的
   README](adapters/claude-code/README.md)與上面的
   [安裝為 Claude Code plugin](#安裝為-claude-code-plugin)）。

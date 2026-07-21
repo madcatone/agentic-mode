@@ -26,7 +26,7 @@ model, or dispatch to use. Read [`README.md`](README.md) first, then this.
 - `checker/config.example.json`: an annotated config with every knob.
 - `templates/`: fill-in skeletons for every generated doc + CI files.
 - `playbooks/`: harness-neutral collaboration canon (commit messages, two-axis
-  review, review response) — optional, local rules override them.
+  review, review response, doc linting) — optional, local rules override them.
 - `adapters/`: Claude Code plugins + marketplace, Devin IDE rule + review workflow.
 - `.claude-plugin/marketplace.json`: the Claude Code plugin marketplace manifest.
 - `scripts/sync_plugins.py`: one-way vendoring sync (canon → plugins) + `--check` gate.

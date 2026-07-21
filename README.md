@@ -114,11 +114,12 @@ Alongside the doc contract, [`playbooks/`](playbooks/) holds a small set of
 | [`COMMIT-MESSAGES.md`](playbooks/COMMIT-MESSAGES.md) | A Conventional-Commits variant: type table with build/ci/chore adjudications, an optional on-demand ticket, and scope rules — deferring to a local commit-msg hook. |
 | [`TWO-AXIS-REVIEW.md`](playbooks/TWO-AXIS-REVIEW.md) | Dual-axis review — Standards (written right) and Spec (meets the ticket) audited on independent axes that never cross-rank. |
 | [`REVIEW-RESPONSE.md`](playbooks/REVIEW-RESPONSE.md) | Discipline for the author answering review feedback: verify before implementing, no sycophantic openers, push back with evidence. |
+| [`DOC-LINTER.md`](playbooks/DOC-LINTER.md) | Lint agent-facing documents for ambiguity — terminology drift, passive voice, hedge words, stacked negations, structure — with rules adapted from ASD-STE100 Simplified Technical English. |
 
 ## Install as Claude Code plugins
 
 This repo is also a **Claude Code plugin marketplace**. Once it is on GitHub,
-add the marketplace and install any subset of the five plugins — each is
+add the marketplace and install any subset of the six plugins — each is
 independent and optional:
 
 ```
@@ -127,6 +128,7 @@ independent and optional:
 /plugin install gcm@agentic-mode
 /plugin install two-axis-review@agentic-mode
 /plugin install review-response@agentic-mode
+/plugin install doc-linter@agentic-mode
 /plugin install fable5@agentic-mode
 ```
 
@@ -136,6 +138,7 @@ independent and optional:
 | `gcm` | Commit-message convention skill. | [`playbooks/COMMIT-MESSAGES.md`](playbooks/COMMIT-MESSAGES.md) |
 | `two-axis-review` | Dual-axis review skill. | [`playbooks/TWO-AXIS-REVIEW.md`](playbooks/TWO-AXIS-REVIEW.md) |
 | `review-response` | Review-response discipline skill. | [`playbooks/REVIEW-RESPONSE.md`](playbooks/REVIEW-RESPONSE.md) |
+| `doc-linter` | Agent-facing document linter skill. | [`playbooks/DOC-LINTER.md`](playbooks/DOC-LINTER.md) |
 | `fable5` | Commander-mode operating discipline + the strong-model founding prompt. | The plugin directory itself (self-canonical) |
 
 The commit/review conventions differ from team to team, which is why they are
@@ -160,7 +163,7 @@ it is not part of the `sync_plugins.py` sync.
 | [`doctrine/FIELD-NOTES.md`](doctrine/FIELD-NOTES.md) | Field lessons from the origin project that shaped the doctrine. |
 | [`checker/`](checker/) | The config-driven checker and an annotated example config. |
 | [`templates/`](templates/) | The fill-in skeletons for every generated doc + CI files. |
-| [`playbooks/`](playbooks/) | Harness-neutral collaboration canon (commit messages, two-axis review, review response) — optional, local rules override. |
+| [`playbooks/`](playbooks/) | Harness-neutral collaboration canon (commit messages, two-axis review, review response, doc linting) — optional, local rules override. |
 | [`adapters/`](adapters/) | Harness-specific packaging (Claude Code plugins + marketplace, Devin IDE rule + review workflow). |
 | [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json) | The Claude Code plugin marketplace manifest. |
 | [`scripts/sync_plugins.py`](scripts/sync_plugins.py) | One-way vendoring sync (canon → plugins) with a `--check` drift gate. |
@@ -174,7 +177,7 @@ names a specific agent product, model, or proprietary tool. Harness-specific
 packaging lives only under [`adapters/`](adapters/):
 
 - [`adapters/claude-code/`](adapters/claude-code/) — a Claude Code plugin
-  marketplace: the `agentic-bootstrap` toolkit, the three playbooks, and the
+  marketplace: the `agentic-bootstrap` toolkit, the four playbooks, and the
   self-canonical `fable5` commander-mode discipline packaged as optional,
   independently installable plugins (see
   [its README](adapters/claude-code/README.md) and [Install as Claude Code

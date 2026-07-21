@@ -1,6 +1,6 @@
 {
   "name": "agentic-mode",
-  "description": "Optional Claude Code plugins for the agentic-mode methodology: the doc-contract bootstrapper, three harness-neutral collaboration playbooks (commit messages, two-axis review, review response), and the fable5 commander-mode operating discipline. Install only the ones your team wants.",
+  "description": "Optional Claude Code plugins for the agentic-mode methodology: the doc-contract bootstrapper, four harness-neutral collaboration playbooks (commit messages, two-axis review, review response, document linting), and the fable5 commander-mode operating discipline. Install only the ones your team wants.",
   "owner": {
     "name": "agentic-mode maintainers"
   },
@@ -24,6 +24,11 @@
       "name": "review-response",
       "source": "./adapters/claude-code/plugins/review-response",
       "description": "Discipline for responding to code-review feedback: verify each comment against the codebase before implementing, no sycophantic openers, and always push back with evidence — treating the ticket description itself as an external signal to be checked."
+    },
+    {
+      "name": "doc-linter",
+      "source": "./adapters/claude-code/plugins/doc-linter",
+      "description": "Lint agent-facing documents (SKILL.md, CLAUDE.md, HANDOFF.md, README, runbooks, prompts) for ambiguity, terminology drift, passive voice, hedge words, stacked negations, and structure problems, using rules adapted from ASD-STE100 Simplified Technical English — a severity-ordered report with verbatim quotes and ready-to-paste rewrites. Harness-neutral (pure markdown, no scripts); writes only to a document you point it at, in fix mode, after you accept the rewrites."
     },
     {
       "name": "fable5",

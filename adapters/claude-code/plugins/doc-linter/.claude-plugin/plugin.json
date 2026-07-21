@@ -1,0 +1,8 @@
+{
+  "name": "doc-linter",
+  "description": "Lint agent-facing documents (SKILL.md, CLAUDE.md, HANDOFF.md, README, runbooks, prompts) for ambiguity, terminology drift, passive voice, hedge words, stacked negations, and structure problems, using rules adapted from ASD-STE100 Simplified Technical English — emitting a severity-ordered report with verbatim quotes and ready-to-paste rewrites. Harness-neutral (pure markdown, no scripts); writes only to a document you point it at, in fix mode, after you accept the rewrites.",
+  "version": "1.0.0",
+  "author": {
+    "name": "agentic-mode maintainers"
+  }
+}

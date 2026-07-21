@@ -45,6 +45,8 @@ SKILL_SYNC = [
      "adapters/claude-code/plugins/two-axis-review/skills/two-axis-review/SKILL.md"),
     ("playbooks/REVIEW-RESPONSE.md",
      "adapters/claude-code/plugins/review-response/skills/review-response/SKILL.md"),
+    ("playbooks/DOC-LINTER.md",
+     "adapters/claude-code/plugins/doc-linter/skills/doc-linter/SKILL.md"),
 ]
 
 # canon file -> byte-for-byte vendored copy.
