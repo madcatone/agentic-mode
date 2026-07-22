@@ -161,6 +161,10 @@ core。上述這些 plugin 都 vendor 一份自足的正典拷貝；vendoring �
   `fable5` 指揮官操作模式，各自封裝成可選、可獨立安裝的 plugin（見[它的
   README](adapters/claude-code/README.md)與上面的
   [安裝為 Claude Code plugin](#安裝為-claude-code-plugin)）。
+  - 除了 plugin，[`adapters/claude-code/dispatch/`](adapters/claude-code/dispatch/)
+    另附一份原始機器 `~/.claude/` 指揮官派工系統的定時快照（規則檔 + subagent 定義檔），
+    可直接安裝——即 `fable5` founding prompt 的演化版成品（見[它的
+    README](adapters/claude-code/dispatch/README.md)）。
 - [`adapters/devin-ide/`](adapters/devin-ide/)——一份 Devin IDE rule 與一個 review
   workflow。
 

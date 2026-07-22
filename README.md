@@ -182,6 +182,11 @@ packaging lives only under [`adapters/`](adapters/):
   independently installable plugins (see
   [its README](adapters/claude-code/README.md) and [Install as Claude Code
   plugins](#install-as-claude-code-plugins) above).
+  - Alongside the plugins, [`adapters/claude-code/dispatch/`](adapters/claude-code/dispatch/)
+    ships a dated snapshot of the origin machine's `~/.claude/` commander-mode
+    dispatch system (rule files + subagent definitions) as a directly installable
+    kit — the evolved counterpart to the `fable5` founding prompt (see [its
+    README](adapters/claude-code/dispatch/README.md)).
 - [`adapters/devin-ide/`](adapters/devin-ide/) — a Devin IDE rule and a review
   workflow.
 
