@@ -28,8 +28,12 @@ instance and then let it keep evolving through *your* `LESSONS.md`.
 
 ## Snapshot positioning & sync discipline
 
-- **This kit is a `2026-07-18` snapshot.** It is a point-in-time copy, not a live
-  feed.
+- **This kit is a `2026-07-25` snapshot.** It is a point-in-time copy, not a live
+  feed. This refresh adds the **標準行為 (standard behavior)** section to
+  `CLAUDE.md` — the gcm commit/PR convention that suppresses the harness's default
+  `Co-Authored-By` line — and mirrors the origin machine's lazy-load split, moving
+  `00-DIAGNOSIS.md` and `LESSONS.md` out of always-loaded `rules/` into on-demand
+  `rules-ref/`.
 - **The canon lives on the origin machine's `~/.claude/`.** That copy keeps
   evolving (it appends to `LESSONS.md`, revises `rules/` as the harness changes).
   This kit does not.
@@ -56,7 +60,7 @@ Run from **this directory** (`adapters/claude-code/dispatch/`).
 ```bash
 # 1) Back up anything that already exists (skipped if absent)
 ts=$(date +%Y%m%d-%H%M%S)
-for p in ~/.claude/CLAUDE.md ~/.claude/rules ~/.claude/agents; do
+for p in ~/.claude/CLAUDE.md ~/.claude/rules ~/.claude/rules-ref ~/.claude/agents; do
   [ -e "$p" ] && cp -R "$p" "$p.bak-$ts"
 done
 
@@ -70,7 +74,7 @@ cp -R home/. ~/.claude/
 ```powershell
 # 1) Back up anything that already exists (skipped if absent)
 $ts = Get-Date -Format "yyyyMMdd-HHmmss"
-foreach ($p in @("$HOME\.claude\CLAUDE.md","$HOME\.claude\rules","$HOME\.claude\agents")) {
+foreach ($p in @("$HOME\.claude\CLAUDE.md","$HOME\.claude\rules","$HOME\.claude\rules-ref","$HOME\.claude\agents")) {
   if (Test-Path $p) { Copy-Item $p "$p.bak-$ts" -Recurse -Force }
 }
 
@@ -94,6 +98,11 @@ The kit deliberately ships no `settings.json`. Set these by hand:
 - **Quality-first cost posture.** The rules default to strong models and only
   downgrade for clearly mechanical batch work. If you want a cheaper default,
   that is a deliberate posture change — see `rules/10-DISPATCH.md`.
+- **Consider `permissions.defaultMode: "auto"`.** It lets a classifier approve
+  routine actions instead of prompting on every one; where the classifier is
+  unavailable the CLI falls back to the normal `default` prompting, so it does
+  not lower your backstop. This suits the delegate-heavy model — fewer
+  interruptions on the dispatch loop.
 - The rules were verified against Claude Code `2.1.204` on darwin (2026-07-17).
   On a newer build, re-verify the harness facts in `rules/10-DISPATCH.md` §0.
 
@@ -120,6 +129,10 @@ this checklist instead. Walk it once after installing:
    parameters, the model-resolution order, and Explore's inheritance behavior as
    observed on a specific Claude Code build. If yours differs, fix the file per
    `rules/40-MAINTENANCE.md` §5 and mark it `(verified <date>)`.
+6. **Don't duplicate team plugin skills in personal `~/.claude/skills/`.** If a
+   skill is already distributed as a team plugin, keep it there as the single
+   source of truth; a personal copy under `~/.claude/skills/` drifts out of sync
+   the moment either side changes.
 
 ## What was adapted from the origin machine
 
@@ -150,13 +163,14 @@ dispatch/
   README.md            # this file
   README-ZH.md         # 繁體中文（等價）
   home/                # mirrors ~/.claude/ — the install payload
-    CLAUDE.md          # machine-wide router + 6 hard rules
-    rules/
-      00-DIAGNOSIS.md  # the three failure modes every rule file fixes
+    CLAUDE.md          # machine-wide router + 6 hard rules + standard behavior
+    rules/             # always-loaded every session
       10-DISPATCH.md   # model dispatch protocol, subagent params, cost levers
       20-JUDGMENT.md   # judgment rubrics (done-ness, when to ask, quality floor)
       30-TEMPLATES.md  # fill-in dispatch prompt templates
       40-MAINTENANCE.md# how to evolve the rules without rotting them
+    rules-ref/         # read on demand (kept out of the always-loaded context)
+      00-DIAGNOSIS.md  # the three failure modes every rule file fixes
       LESSONS.md       # curated, append-only field lessons
     agents/            # subagent definition files (dispatch table as files)
       README.md        # how the definitions work + known gaps

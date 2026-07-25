@@ -1,7 +1,7 @@
 # 制度維護協議
 <!-- last-updated: 2026-07-03 | 對象：未來所有 session（含弱模型）。目的：讓制度能安全演化，而不是腐化或膨脹。 -->
 
-制度檔清單：`~/.claude/CLAUDE.md`（全機路由）、`~/.claude/rules/00–40 各檔`、`LESSONS.md`、
+制度檔清單：`~/.claude/CLAUDE.md`（全機路由）、`~/.claude/rules/10–40 各檔`（常駐載入）、`~/.claude/rules-ref/{00-DIAGNOSIS,LESSONS}.md`（按需讀取，2026-07-25 遷出自動載入以省常駐 context）、
 各專案的 `CLAUDE.md`（專案事實路由）。
 
 ---
@@ -24,7 +24,7 @@
 
 ## 2. 踩坑教訓寫哪裡
 
-- 通用教訓（任何專案都適用）→ **append** 到 `~/.claude/rules/LESSONS.md`，格式照該檔範例：
+- 通用教訓（任何專案都適用）→ **append** 到 `~/.claude/rules-ref/LESSONS.md`，格式照該檔範例：
 
   ```
   ## YYYY-MM-DD <一句話標題>

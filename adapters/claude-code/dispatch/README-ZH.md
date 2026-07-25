@@ -24,7 +24,10 @@
 
 ## 快照定位與同步紀律
 
-- **本套件是 `2026-07-18` 的快照。** 這是一個時間點的拷貝，不是 live feed。
+- **本套件是 `2026-07-25` 的快照。** 這是一個時間點的拷貝，不是 live feed。本次刷新
+  在 `CLAUDE.md` 補上 **標準行為** 節（gcm commit／PR 慣例，用來壓掉 harness 內建的
+  `Co-Authored-By` 預設），並鏡射原始機器的懶載入拆分，把 `00-DIAGNOSIS.md` 與
+  `LESSONS.md` 從常駐的 `rules/` 移到按需讀取的 `rules-ref/`。
 - **正典位於原始機器的 `~/.claude/`。** 那一份會持續演化（往 `LESSONS.md` 追加、隨
   harness 改動而修訂 `rules/`）。本套件不會。
 - **要更新本套件：** 從原始機器的 `~/.claude/` 重新打包（重跑一次去個資 pass），把快照
@@ -47,7 +50,7 @@
 ```bash
 # 1) 備份既有的東西（不存在則略過）
 ts=$(date +%Y%m%d-%H%M%S)
-for p in ~/.claude/CLAUDE.md ~/.claude/rules ~/.claude/agents; do
+for p in ~/.claude/CLAUDE.md ~/.claude/rules ~/.claude/rules-ref ~/.claude/agents; do
   [ -e "$p" ] && cp -R "$p" "$p.bak-$ts"
 done
 
@@ -61,7 +64,7 @@ cp -R home/. ~/.claude/
 ```powershell
 # 1) 備份既有的東西（不存在則略過）
 $ts = Get-Date -Format "yyyyMMdd-HHmmss"
-foreach ($p in @("$HOME\.claude\CLAUDE.md","$HOME\.claude\rules","$HOME\.claude\agents")) {
+foreach ($p in @("$HOME\.claude\CLAUDE.md","$HOME\.claude\rules","$HOME\.claude\rules-ref","$HOME\.claude\agents")) {
   if (Test-Path $p) { Copy-Item $p "$p.bak-$ts" -Recurse -Force }
 }
 
@@ -82,6 +85,9 @@ Code（詳見 `home/agents/README.md` 的備註）。
   表塌成單一 model，而且毫無警示。請保持未設定。
 - **品質優先的成本姿態。** 規則預設使用強模型，只有面對明顯機械性的批次工作才降級。
   若你想要更便宜的預設值，那是一個刻意的姿態調整——見 `rules/10-DISPATCH.md`。
+- **建議設 `permissions.defaultMode: "auto"`。** 它讓分類器代替逐次彈窗來核可例行動作；
+  分類器不可用時，CLI 會自動退回一般的 `default` 逐次詢問，不會降低你的最後防線。這契合
+  重派工的操作模型——派工迴圈上少被打斷。
 - 規則已在 Claude Code `2.1.204`、darwin 上驗證（2026-07-17）。在更新的 build 上，
   請重新驗證 `rules/10-DISPATCH.md` §0 裡的 harness 事實。
 
@@ -102,6 +108,9 @@ Code（詳見 `home/agents/README.md` 的備註）。
 5. **重新查證 harness 事實。** `rules/10-DISPATCH.md` §0 記錄了 subagent 參數、model
    解析順序、Explore 的繼承行為，這些都是在某個特定 Claude Code build 上觀察到的。若
    你的情況不同，依 `rules/40-MAINTENANCE.md` §5 修正該檔，並標記 `(verified <date>)`。
+6. **個人 `~/.claude/skills/` 別跟 team plugin skill 重複。** 若某個 skill 已經以 team
+   plugin 形式發佈，就讓它留在那裡當單一事實源；在 `~/.claude/skills/` 底下再放一份個人
+   拷貝，只要任一邊改動就會開始漂移。
 
 ## 從原始機器改編了什麼
 
@@ -128,13 +137,14 @@ dispatch/
   README.md            # 本檔（英文）
   README-ZH.md         # 繁體中文（等價）
   home/                # 鏡射 ~/.claude/ —— 安裝 payload
-    CLAUDE.md          # 機器級路由器 + 6 條硬規則
-    rules/
-      00-DIAGNOSIS.md  # 每個規則檔所要修復的三種失敗模式
+    CLAUDE.md          # 機器級路由器 + 6 條硬規則 + 標準行為
+    rules/             # 每個 session 常駐載入
       10-DISPATCH.md   # model 派工協議、subagent 參數、成本控制桿
       20-JUDGMENT.md   # 判斷準則（done-ness、何時該問、品質底線）
       30-TEMPLATES.md  # 填空式派工 prompt 模板
       40-MAINTENANCE.md# 如何在不讓規則腐爛的前提下演化它們
+    rules-ref/         # 按需讀取（不進常駐 context）
+      00-DIAGNOSIS.md  # 每個規則檔所要修復的三種失敗模式
       LESSONS.md       # 經過整理、append-only 的田野 lesson
     agents/            # subagent 定義檔（以檔案形式呈現的派工表）
       README.md        # 定義檔如何運作 + 已知缺口

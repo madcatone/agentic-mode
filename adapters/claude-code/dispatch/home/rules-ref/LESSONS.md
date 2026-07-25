@@ -1,6 +1,6 @@
 # LESSONS — 踩坑教訓（append-only）
 <!-- 格式見 40-MAINTENANCE.md 第 2 節。新條目加在檔案最下方。 -->
-<!-- 本檔是原始機器 ~/.claude/rules/LESSONS.md 的「策展快照」：只收錄換一個 repo 仍成立的通用教訓，
+<!-- 本檔是原始機器 ~/.claude/rules-ref/LESSONS.md 的「策展快照」：只收錄換一個 repo 仍成立的通用教訓，
      內部識別符（repo 名、票號、MR 號、內部工具名）已泛化；只對原機專案成立的條目已略過。
      採用後這是你自己的 append-only 檔——把你機器上的新教訓往下加，不需回流原機。 -->
 
