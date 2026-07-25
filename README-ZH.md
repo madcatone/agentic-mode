@@ -108,7 +108,7 @@ playbook**——任何協作者（人或 agent、用哪個工具）都能直接�
 marketplace 即可安裝六個 plugin 中的任意子集——每個都獨立、可選：
 
 ```
-/plugin marketplace add <owner>/<repo>
+/plugin marketplace add madcatone/agentic-mode
 /plugin install agentic-bootstrap@agentic-mode
 /plugin install gcm@agentic-mode
 /plugin install two-axis-review@agentic-mode

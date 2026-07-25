@@ -12,7 +12,7 @@ The marketplace manifest lives at the repo root:
 this repo is on GitHub, a user adds it and installs any subset of plugins:
 
 ```
-/plugin marketplace add <owner>/<repo>
+/plugin marketplace add madcatone/agentic-mode
 /plugin install agentic-bootstrap@agentic-mode
 /plugin install gcm@agentic-mode
 /plugin install two-axis-review@agentic-mode

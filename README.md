@@ -123,7 +123,7 @@ add the marketplace and install any subset of the six plugins — each is
 independent and optional:
 
 ```
-/plugin marketplace add <owner>/<repo>
+/plugin marketplace add madcatone/agentic-mode
 /plugin install agentic-bootstrap@agentic-mode
 /plugin install gcm@agentic-mode
 /plugin install two-axis-review@agentic-mode
