@@ -177,8 +177,20 @@ QUANTIFIER_RE = re.compile(
 )
 
 # N2 -- stacked negation.
+# Implicit negators are listed in the bare form only. The stack this rule hunts
+# always governs them with a preceding negator ("do not fail to check"), and
+# English requires the bare infinitive in exactly that position, so the bare form
+# loses no true positive. The finite forms are descriptive instead of governed --
+# "if even that fails to execute, the IDE can't run bundled shell" is a
+# conditional whose two halves negate different predicates, not a polarity the
+# reader has to unwind -- so they stay out. `omit` is excluded for the mirror
+# reason: its bare form is also the free imperative documents use constantly
+# ("omit it when there is no ticket"), where the neighbouring negator states the
+# condition rather than stacking with it, so the free imperative cannot be told
+# apart from the governed "never omit Y" without a reader-level judgement.
 NEG_RE = re.compile(
     r"\bnot\b|\bnever\b|\bno\b|\bnone\b|\bcannot\b|\bwithout\b|\bunless\b|n't\b"
+    r"|\bfail\s+to\b|\bneglect\s+to\b|\brefrain\s+from\b"
     r"|不|沒|未|勿|別|非|除非",
     re.IGNORECASE,
 )
@@ -222,6 +234,7 @@ COMPOUND_RE = re.compile(r",\s*(?:and|then)\s+\w|，\s*(?:並|然後|再)|、\s*
 LIST_ITEM_RE = re.compile(r"^\s*(?:[-*+]\s+|\d+[.)]\s+)")
 SENTENCE_SPLIT_RE = re.compile(r"[.!?;。！？；]+\s*")
 WORD_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9'\-]*")
+WS_RE = re.compile(r"\s+")
 CJK_RE = re.compile("[" + CJK + "]")
 CODE_TOKEN_RE = re.compile(r"`([^`]+)`")
 IDENT_RE = re.compile(r"^[A-Za-z][A-Za-z0-9_\-]{3,}$")
@@ -340,13 +353,18 @@ def count_negations(sentence: str) -> List[str]:
     side reads 不要合併，除非 build 是綠的. Both sides are counted per clause but
     on their own clause boundaries, so a sentence with neither opener is scored
     exactly as before.
+
+    An implicit negator ("do not fail to check") is a multi-word form, so its
+    inner spacing is collapsed before it joins the set: a line-wrapped "fail to"
+    and a single-spaced one are the same negator and must dedupe to one. Every
+    single-word negator is unaffected.
     """
     cleaned = sentence
     for friend in NEG_FALSE_FRIENDS:
         cleaned = cleaned.replace(friend, " ")
     worst_ascii = set()
     for clause in EN_CLAUSE_BREAK_RE.split(cleaned):
-        ascii_forms = {m.lower() for m in NEG_RE.findall(clause)
+        ascii_forms = {WS_RE.sub(" ", m.lower()) for m in NEG_RE.findall(clause)
                        if not CJK_RE.search(m)}
         if len(ascii_forms) > len(worst_ascii):
             worst_ascii = ascii_forms
@@ -625,6 +643,18 @@ N2_CASES = [
     ("you cannot merge without a second approval", 2),
     # The stack sits inside the exception clause, so it still counts.
     ("do not commit unless the tests did not fail", 2),
+    # Implicit negators. Alone they are the sentence's own single polarity.
+    ("fail to check the manifest and the release breaks", 1),
+    ("refrain from merging on a red build", 1),
+    # Governed by a negator, they are the double negative this rule hunts.
+    ("do not fail to check the manifest before you tag", 2),
+    ("never refrain from filing the incident note", 2),
+    ("do not neglect to update the changelog", 2),
+    # Finite forms are descriptive, so they are not negators: the only negation
+    # here is the consequent's, and the conditional is not a stack.
+    ("if even that fails to execute, the IDE can't run bundled shell", 1),
+    # `omit` stays out -- the free imperative reads as a condition, not a stack.
+    ("omit the ticket id when there is no ticket", 1),
 ]
 
 
