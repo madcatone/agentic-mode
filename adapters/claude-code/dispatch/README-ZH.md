@@ -24,10 +24,14 @@
 
 ## 快照定位與同步紀律
 
-- **本套件是 `2026-07-25` 的快照。** 這是一個時間點的拷貝，不是 live feed。本次刷新
-  在 `CLAUDE.md` 補上 **標準行為** 節（gcm commit／PR 慣例，用來壓掉 harness 內建的
-  `Co-Authored-By` 預設），並鏡射原始機器的懶載入拆分，把 `00-DIAGNOSIS.md` 與
-  `LESSONS.md` 從常駐的 `rules/` 移到按需讀取的 `rules-ref/`。
+- **本套件是 `2026-08-07` 的快照。** 這是一個時間點的拷貝，不是 live feed。本次刷新
+  從原始機器重新打包了同一組檔案：`CLAUDE.md`、`rules/`、`agents/` 打回來的內容不變
+  （前一版 `2026-07-25` 快照對它們已是最新），整個差異就是 **`LESSONS.md` 新增九條**
+  （`2026-07-11`～`2026-07-27`）——分發鏈是雙向紀律（拷貝側的 feature 也要回流正典）、
+  port 前先要目標產品的實際產出物當地面真相、可觀測性要當 v1 需求、五輪盲測坐實的模型階梯與它逼出
+  的「誠實逃生口」、`tool_uses=0` 的空殼 subagent 判定式、抽樣單位是 render 路徑而非
+  頁面、append/prepend-only 檔案的行號腐爛、以及把一份回報裡不同強度的宣稱拆開各自
+  驗證。
 - **正典位於原始機器的 `~/.claude/`。** 那一份會持續演化（往 `LESSONS.md` 追加、隨
   harness 改動而修訂 `rules/`）。本套件不會。
 - **要更新本套件：** 從原始機器的 `~/.claude/` 重新打包（重跑一次去個資 pass），把快照
@@ -125,8 +129,9 @@ Code（詳見 `home/agents/README.md` 的備註）。
 - **整理 `LESSONS.md`**：只保留在別的 repo 仍然成立的 lesson（內部 repo 名稱、ticket
   /MR 號、內部工具名稱都已一般化）；剔除只屬於原始機器自己 pipeline 的條目。Append-only
   的格式與日期都保留。
-- **完整排除 `50-LETTER.md`**（原始機器的私人交接信），並從 `CLAUDE.md` 移除它的
-  routing-table 那一列。
+- **完整排除** `50-LETTER.md`（原始機器的私人交接信）與 `60-DOCKER.md`（它在地的
+  容器／服務慣例），並從 `CLAUDE.md` 移除這兩列 routing-table，以及 `CLAUDE.md` 裡指向
+  機器在地個人 skill 的那一段。
 
 `~/.claude/…` 相對路徑則原樣保留——它們在每位同事的機器上都以同樣方式解析。
 

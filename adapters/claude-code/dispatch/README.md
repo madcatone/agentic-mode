@@ -28,12 +28,19 @@ instance and then let it keep evolving through *your* `LESSONS.md`.
 
 ## Snapshot positioning & sync discipline
 
-- **This kit is a `2026-07-25` snapshot.** It is a point-in-time copy, not a live
-  feed. This refresh adds the **標準行為 (standard behavior)** section to
-  `CLAUDE.md` — the gcm commit/PR convention that suppresses the harness's default
-  `Co-Authored-By` line — and mirrors the origin machine's lazy-load split, moving
-  `00-DIAGNOSIS.md` and `LESSONS.md` out of always-loaded `rules/` into on-demand
-  `rules-ref/`.
+- **This kit is a `2026-08-07` snapshot.** It is a point-in-time copy, not a live
+  feed. This refresh re-packaged the same file set from the origin machine:
+  `CLAUDE.md`, `rules/`, and `agents/` came back unchanged (the previous
+  `2026-07-25` snapshot was already current for them), and the whole delta is
+  **nine new `LESSONS.md` entries** (`2026-07-11` … `2026-07-27`) covering
+  the two-way distribution-chain discipline (a feature landed in a copy must
+  flow back to the canon), grounding a port in the target product's actual
+  artifacts before packaging,
+  observability as a v1 requirement, a five-run blind model-tier comparison and
+  the "honest escape hatch" it produced, the `tool_uses=0` empty-shell subagent
+  signature, sampling by render path rather than by page, line-number rot in
+  append/prepend-only files, and splitting a report's claims by evidence
+  strength.
 - **The canon lives on the origin machine's `~/.claude/`.** That copy keeps
   evolving (it appends to `LESSONS.md`, revises `rules/` as the harness changes).
   This kit does not.
@@ -150,8 +157,10 @@ To make the snapshot portable, the de-personalization pass:
   (with internal repo names, ticket/MR numbers, and internal tool names
   generalized); dropped entries that were specific to the origin machine's own
   pipelines. The append-only format and dates are preserved.
-- **Excluded `50-LETTER.md`** entirely (the origin machine's private hand-off
-  letter) and dropped its routing-table row from `CLAUDE.md`.
+- **Excluded** `50-LETTER.md` (the origin machine's private hand-off letter) and
+  `60-DOCKER.md` (its local container/service conventions) entirely, and dropped
+  both routing-table rows from `CLAUDE.md` — along with `CLAUDE.md`'s pointer to
+  a machine-local personal skill.
 
 `~/.claude/…`-relative paths are kept verbatim — they resolve the same way on any
 colleague's machine.
