@@ -206,7 +206,7 @@ After:
 > Do not use pypdf. Use pdfplumber instead.
 
 ### N2 · warning — No stacked negations
-More than one negation in a sentence forces the reader to compute the polarity. Rewrite as a positive statement.
+More than one negation in the same clause forces the reader to compute the polarity (enumerated items and "not X, unless Y" conditionals each count as their own clause). Rewrite as a positive statement.
 
 Before:
 > Do not skip validation unless the input is not user-provided.

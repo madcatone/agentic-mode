@@ -14,6 +14,9 @@ Run it before the reading pass::
 
     python3 scripts/doc_lint.py <target> [--type skill|claude-md|handoff|readme|runbook|generic]
 
+``python3 scripts/doc_lint.py --selftest`` runs the built-in rule cases instead,
+and exits non-zero if any of them regressed.
+
 Output has three parts:
 
 ``VIOLATIONS``
@@ -181,6 +184,15 @@ NEG_RE = re.compile(
 )
 # Compounds that contain a negation character without negating.
 NEG_FALSE_FRIENDS = ["非常", "非同步", "未來", "不僅", "不但", "不只", "無論"]
+# CJK clause boundaries. A negation on each side of one of these negates its own
+# predicate: a further enumerated item (、), the next table cell (|), a coordinate
+# predicate (不修 bug 也不加功能), an aside, or the exception a prohibition hangs
+# off (不加作者行，除非使用者明確要求). Only negations inside one clause stack into
+# a polarity the reader has to compute, so N2 counts each clause on its own.
+# `除非` opens its clause instead of ending one, so 除非不 still stacks.
+CJK_CLAUSE_BREAK_RE = re.compile(
+    r"[、|；：（）()【】\[\]／/]|——|[且並也又而或]|(?=除非)"
+)
 
 # N1 -- a prohibition with no stated alternative.
 PROHIBIT_RE = re.compile(r"\b(?:do\s+not|don't|never|avoid)\b|不要|不得|禁止|勿",
@@ -306,21 +318,29 @@ def count_negations(sentence: str) -> List[str]:
     """Negations that force the reader to compute the polarity.
 
     A repeated ASCII negator is an enumeration ("no network, no installs"), so
-    those count once. Mixed negators stack ("do not ... unless ... not"). CJK
-    negators count every time, because a repeated one is the double negative
-    itself (不要不做).
+    those count once. Mixed negators stack ("do not ... unless ... not").
+
+    CJK negators count every time *within one clause*, because a repeated one
+    there is the double negative itself (不要不做). Across clause boundaries
+    (CJK_CLAUSE_BREAK_RE) they are separate statements -- an enumerated list of
+    prohibitions, one table row after another -- so the sentence is scored by
+    its worst clause rather than by its total.
     """
     cleaned = sentence
     for friend in NEG_FALSE_FRIENDS:
         cleaned = cleaned.replace(friend, " ")
     ascii_forms = set()
-    cjk_forms = []
-    for match in NEG_RE.findall(cleaned):
-        if CJK_RE.search(match):
-            cjk_forms.append(match)
-        else:
-            ascii_forms.add(match.lower())
-    return sorted(ascii_forms) + cjk_forms
+    worst_cjk = []
+    for clause in CJK_CLAUSE_BREAK_RE.split(cleaned):
+        cjk_forms = []
+        for match in NEG_RE.findall(clause):
+            if CJK_RE.search(match):
+                cjk_forms.append(match)
+            else:
+                ascii_forms.add(match.lower())
+        if len(cjk_forms) > len(worst_cjk):
+            worst_cjk = cjk_forms
+    return sorted(ascii_forms) + worst_cjk
 
 
 def scan_frontmatter(lines: Sequence[str]) -> Tuple[List[str], int]:
@@ -554,12 +574,63 @@ def report(path: str, doc_type: str) -> int:
     return 1 if violations else 0
 
 
+# --------------------------------------------------------------------------
+# Self-test
+# --------------------------------------------------------------------------
+
+# (sentence, expected negation count). The count is what N2 reports; N2 fires
+# above 1. These pin the boundary between an enumeration of separately negated
+# items, which reads fine, and a stack the reader has to unwind.
+N2_CASES = [
+    # Enumerations and coordinate predicates -- one negation per statement.
+    ("不接受括號 scope、不接受 `ops` type、另接受 `release` type", 1),
+    ("| `refactor` | 重寫／重組程式碼，不修 bug 也不加功能 | | `style` | 純格式，不改語意 |", 1),
+    ("以上皆非且不動 src/test 檔", 1),
+    ("無 type、非祈使、未大寫", 1),
+    ("只有 CI 設定歸 ci，不歸 build——兩型不重疊", 1),
+    # A prohibition plus the exception it hangs off.
+    ("不加作者行，除非使用者明確要求", 1),
+    # False friends stay invisible.
+    ("非常重要，所以不要略過", 1),
+    # Real stacks -- the reader has to compute the polarity.
+    ("不要不做已經排程的檢查", 2),
+    ("不要不去不做這件事", 3),
+    ("非做不可", 2),
+    ("不得不改寫這段", 2),
+    ("不要提交，除非測試沒失敗", 2),
+    # ASCII behaviour is unchanged by the clause split.
+    ("no network, no installs", 1),
+    ("do not merge unless the build is green", 2),
+]
+
+
+def selftest() -> int:
+    failures = 0
+    for sentence, expected in N2_CASES:
+        found = count_negations(sentence)
+        ok = len(found) == expected
+        if not ok:
+            failures += 1
+        print("  %-4s N2 expected %d, got %d %-28s %s"
+              % ("PASS" if ok else "FAIL", expected, len(found),
+                 "(" + ", ".join(found) + ")", sentence))
+    print("")
+    print("doc_lint selftest: %s of %s N2 cases passed"
+          % (len(N2_CASES) - failures, len(N2_CASES)))
+    return 1 if failures else 0
+
+
 def parse_args(argv: Sequence[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         prog="doc_lint.py",
         description="Mechanical checks for the doc-linter rule catalog.",
     )
-    parser.add_argument("paths", nargs="+", help="document(s) to lint")
+    parser.add_argument("paths", nargs="*", help="document(s) to lint")
+    parser.add_argument(
+        "--selftest",
+        action="store_true",
+        help="run the built-in rule cases and exit",
+    )
     parser.add_argument(
         "--type",
         dest="doc_type",
@@ -572,6 +643,11 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
     args = parse_args(sys.argv[1:] if argv is None else argv)
+    if args.selftest:
+        return selftest()
+    if not args.paths:
+        print("doc_lint: no document given", file=sys.stderr)
+        return 2
     status = 0
     for i, path in enumerate(args.paths):
         if i:
