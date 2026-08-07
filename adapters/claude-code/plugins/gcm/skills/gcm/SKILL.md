@@ -1,6 +1,11 @@
 ---
 name: gcm
-description: 撰寫團隊慣例的 commit message（Conventional Commits 變體，票號按需附加、非強制）。當要建立任何 git commit、使用者說 gcm、幫我 commit、要 commit message 建議，或要審視/改寫既有 commit 訊息時使用。
+description: >
+  當要產出或修訂 git commit message 時使用：撰寫團隊慣例的 commit message（Conventional Commits
+  變體，票號按需附加、非強制），或審視／改寫既有的 commit 訊息。本 skill 只負責 commit 訊息這段文字；不適用於審查改動內容本身（→
+  two-axis-review）、回覆 reviewer 的意見（→ review-response）；撰寫 PR/MR 的說明本文不需要任何 skill，照 repo 慣例直接寫。Triggers on: "gcm",
+  "commit message", "write a commit message", "squash message", "幫我 commit", "commit
+  訊息怎麼寫", "這個 commit message 好嗎", "改一下 commit 訊息".
 ---
 
 # Commit Messages — team convention (playbook)
@@ -54,7 +59,7 @@ repo 若有 commit-msg hook（常見於 `hooks/` 目錄）或 `AGENTS.md` 內的
 
 ## 票號（按需，不強制）
 
-- 改動對應到追蹤中的票就附上：`fix PROJ-123: Correct session teardown on sync event`
+- 改動對應到追蹤中的票就附上：`fix PROJ-123: Correct teardown on sync event`
 - 位置在 type 與冒號之間，空格連接，不用括號。
 - 沒有對應票（順手修 typo、工具腳本、文件）就省略：`docs: Fix stale link in README`
 - repo 的 hook 若強制票號（見上節），以 hook 為準。
@@ -68,7 +73,7 @@ repo 若有 commit-msg hook（常見於 `hooks/` 目錄）或 `AGENTS.md` 內的
 
 ## Subject
 
-- 全長 ≤50 字元。
+- 全長 ≤50 字元——含 type、票號、scope 在內；票號吃掉字元時精簡描述，不省票號。
 - type 小寫；描述（冒號後那段）首字大寫。
 - 祈使句。自測：subject 應能接完「If applied, this commit will ___」。
 - 結尾不加句點。
@@ -89,7 +94,7 @@ repo 若有 commit-msg hook（常見於 `hooks/` 目錄）或 `AGENTS.md` 內的
 好：
 
 ```
-fix PROJ-123: Prevent crash when config file is missing
+fix PROJ-123: Prevent crash on missing config
 
 The loader assumed config.json always exists and dereferenced the
 parse result unconditionally. Return defaults instead so first-run

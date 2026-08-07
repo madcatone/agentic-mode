@@ -3,15 +3,19 @@
 **About this playbook.** This file is the canonical, harness-neutral version.
 Any collaborator — human or agent, in any tool — can read it directly as a rules
 file; installation as an optional plugin is described under `adapters/`. It is
-**pure markdown, self-contained, and writes nothing** except the one document you
-point it at in fix mode, after you accept the rewrites. **Local repo rules (a
-style guide, a terminology glossary) take precedence over this playbook.**
+**self-contained and writes nothing** except the one document you point it at in
+fix mode, after you accept the rewrites. Its only companion is
+`scripts/doc_lint.py` — pure standard library, no network, no installs.
+**Local repo rules (a style guide, a terminology glossary) take precedence over
+this playbook.**
 
 Lint instruction documents with rules adapted from ASD-STE100 (Simplified Technical English). The premise: an AI agent fails in the same way an aircraft technician fails — it executes the literal text, and ambiguity causes wrong actions. The linter finds the ambiguity before the agent does.
 
 This playbook applies to any document that an agent or a person must follow: skills, CLAUDE.md, HANDOFF.md, README, runbooks, prompts, slash commands, onboarding guides.
 
 This file is self-contained by design: the full rule catalog is below, so it works even when someone copies this single file into another project or tool. Do not split the catalog into separate reference files.
+
+`scripts/doc_lint.py` runs the mechanical half of that catalog. It is an accelerator, never a replacement: it decides the rules a pattern settles, it flags the rules that need your judgment, and it prints the rules it leaves to you. Run it first, then read for the rest.
 
 ## Workflow
 
@@ -20,7 +24,7 @@ Follow these steps in order.
 ### Step 1 — Classify the document
 
 Identify:
-- **Document type**: skill / claude-md / handoff / readme / runbook-or-prompt / generic. If unsure, ask the user.
+- **Document type**: skill / claude-md / handoff / readme / runbook-or-prompt / generic. Ask the user when the file name and the content point to different types.
 - **Language**: English / Traditional Chinese / mixed. Lint rules apply to all languages. Write the report in the language the user speaks in the conversation.
 
 ### Step 2 — Build the terminology map
@@ -36,7 +40,15 @@ A concept with 2+ names is a T1 finding. Do this step first because terminology 
 
 ### Step 3 — Run the rule catalog
 
-Check the document against every rule in the [Rule catalog](#rule-catalog) below, then apply the matching section of [Document-type checks](#document-type-checks).
+Run the mechanical pass first. Read for the rest afterwards.
+
+1. Run `python3 scripts/doc_lint.py <target> --type <type>` from this playbook's directory.
+2. Report every line the script prints under `VIOLATIONS`. The pattern alone settles each one.
+3. Adjudicate every line the script prints under `CANDIDATES`. The script found the pattern; you decide whether the sentence is an instruction (a finding) or explanatory prose (acceptable). Record a decision for each one.
+4. Read the document for every rule the script prints under `NOT CHECKED`.
+5. Apply the matching section of [Document-type checks](#document-type-checks) for the type from Step 1.
+
+When the script cannot run, apply the whole catalog by reading. List every rule you left unverified under `Not checked` in the report.
 
 ### Step 4 — Write the report
 
@@ -46,6 +58,7 @@ Use this exact structure:
 # Lint report: <document name>
 
 **Type**: <type> | **Language**: <language> | **Findings**: <N> (<x> error, <y> warning, <z> info)
+**Mechanical pass**: `<the doc_lint.py command you ran>` — <v> violations, <c> candidates. <Write "not run" plus the reason when you skipped it.>
 
 ## Summary
 <2-3 sentences: the document's biggest systemic problem, not a list of findings.>
@@ -62,7 +75,10 @@ Use this exact structure:
 <repeat per finding, ordered by severity: error → warning → info>
 
 ## Passed
-<one line listing the categories with no findings, so the user knows they were checked.>
+<the checks you actually ran that came back clean: the rule IDs the script decided, plus each rule you read the document for. Name the evidence for each: the script run, or the section you read.>
+
+## Not checked
+<every remaining rule ID, each with its reason: no mechanical coverage and you did not read for it, the script did not run, or the rule does not apply to this document type. Write "none" only when this list is empty.>
 ```
 
 Severity levels:
@@ -72,14 +88,15 @@ Severity levels:
 
 Rules for the report itself:
 - Quote the document verbatim in every finding. Never paraphrase the evidence.
-- Every finding includes a ready-to-paste rewrite. A finding without a rewrite is not a finding.
+- Every finding includes a ready-to-paste rewrite. Drop any finding you cannot write a rewrite for.
 - Do not invent findings to look thorough. A clean document gets a short report. Cap the report at the 15 most important findings; summarize the rest in one line.
+- List a category under `Passed` only when the script decided it or you read the document for it. Everything else belongs under `Not checked`. A category listed as passed without a check tells the user the document is clean when nobody looked.
 
 ### Step 5 — Offer fix mode
 
 After the report, offer to apply the rewrites. If the user accepts:
 1. Copy the document to a writable location if the original is read-only.
-2. Apply the rewrites with edits. Do not restructure beyond the findings unless the user asks.
+2. Apply the rewrites with edits. Restructure further only when the user asks.
 3. Show a summary of what changed.
 
 ## Constraints
@@ -87,7 +104,7 @@ After the report, offer to apply the rewrites. If the user accepts:
 - Lint the writing, not the logic. If a step seems technically wrong (a wrong command, a wrong API), flag it once as a separate note outside the findings — that is a review comment, not a lint finding.
 - Preserve the author's voice in rewrites. Fix the ambiguity; do not flatten the style.
 - Do not apply STE's 900-word approved vocabulary. Agents handle rich vocabulary well. The controlled part is structure and ambiguity, not word choice.
-- This playbook's own file follows its own rules. If you find a violation in this file, tell the user.
+- This playbook's own file follows its own rules: `python3 scripts/doc_lint.py DOC-LINTER.md` reports zero violations. If you find a violation in this file, tell the user.
 
 ---
 
@@ -118,7 +135,7 @@ After:
 > Sync the merge request (MR) corpus into Elasticsearch (ES) before drift detection runs.
 
 ### T3 · warning — Names match between rules and code
-Identifiers in prose match identifiers in code blocks exactly, including case. If the prose says `output_dir` the code block must not say `outputDir`.
+Identifiers in prose match identifiers in code blocks exactly, including case. If the prose says `output_dir` the code block must not say `outputDir`. <!-- doc-lint:ignore -->
 
 ## S — Sentences
 
@@ -143,7 +160,7 @@ After:
 > 5. If any value changed, restart the service.
 
 ### S3 · info — Sentence length
-Keep instruction sentences under about 25 words (English) or about 40 characters (Chinese). Split longer sentences at each conjunction. This limit applies to instructions, not to explanatory prose.
+Keep instruction sentences to 25 words or fewer (English) or 40 characters or fewer (Chinese). Split a longer sentence at each conjunction. This limit applies to instructions, not to explanatory prose.
 
 ### S4 · warning — Number every procedure
 When steps must run in order, use a numbered list. Use bullets only when order does not matter. Prose paragraphs that hide a sequence ("first do X, then after Y you can Z") are a finding.
@@ -241,7 +258,7 @@ Apply the section that matches the document type. These add to the rule catalog;
 - **D-SK1 · error** — All triggering information lives in the frontmatter `description`, none in the body. The body is invisible until the skill triggers.
 - **D-SK2 · warning** — The description names concrete trigger phrases a user would actually type, in each language the user works in.
 - **D-SK3 · warning** — The body opens with the workflow, not with background. Background goes after the workflow or into a reference file.
-- **D-SK4 · info** — Body under ~500 lines. If longer, cut with the deletion test (P3) first; split into reference files only when the split passes P2.
+- **D-SK4 · info** — Body of 500 lines or fewer. When the body is longer, cut with the deletion test (P3) first; split into reference files only when the split passes P2.
 
 ## claude-md (CLAUDE.md / project memory)
 
@@ -277,8 +294,10 @@ Apply the rule catalog only.
 
 Flag these when they appear in an instruction sentence. In explanatory prose they are acceptable.
 
+<!-- doc-lint:ignore-start the two lists below are the patterns themselves -->
 **English**: might, may (as "perhaps"), could, should ideally, ideally, if possible, if needed, as needed, as appropriate, when appropriate, appears to, seems to, generally, usually, typically, try to, attempt to, consider doing, it might be necessary, feel free to, prefer (when the rule is mandatory).
 
 **中文**: 可能、或許、視情況、必要時、如有需要、適當地、適時、盡量、儘可能、原則上、基本上、一般來說、通常、似乎、看起來、考慮、建議可以、應該要(當作「大概要」使用時)。
+<!-- doc-lint:ignore-end -->
 
 **Replacement pattern**: for each hedge, either delete it (the instruction is mandatory) or replace it with a testable condition (H2). "盡量保持句子簡短" → "指令句不超過 40 字;超過就拆句"。

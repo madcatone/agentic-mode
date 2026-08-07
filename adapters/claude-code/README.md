@@ -15,9 +15,11 @@ this repo is on GitHub, a user adds it and installs any subset of plugins:
 /plugin marketplace add madcatone/agentic-mode
 /plugin install agentic-bootstrap@agentic-mode
 /plugin install gcm@agentic-mode
+/plugin install doc-linter@agentic-mode
 /plugin install two-axis-review@agentic-mode
 /plugin install review-response@agentic-mode
 /plugin install fable5@agentic-mode
+/plugin install commander@agentic-mode
 ```
 
 Each plugin is independent and optional — install only what your team wants.
@@ -28,25 +30,29 @@ Each plugin is independent and optional — install only what your team wants.
 | --- | --- | --- |
 | [`agentic-bootstrap`](plugins/agentic-bootstrap) | The doc-contract bootstrapper: a skill that runs the RUNBOOK to bootstrap/adopt agentic-mode in any repo. | `RUNBOOK.md`, `doctrine/`, `templates/`, `checker/` (all vendored into the skill) |
 | [`gcm`](plugins/gcm) | Commit-message convention skill. | [`playbooks/COMMIT-MESSAGES.md`](../../playbooks/COMMIT-MESSAGES.md) |
+| [`doc-linter`](plugins/doc-linter) | Agent-doc linter skill: mechanical pass (`doc_lint.py`) + judgment rules. | [`playbooks/DOC-LINTER.md`](../../playbooks/DOC-LINTER.md) |
 | [`two-axis-review`](plugins/two-axis-review) | Dual-axis (Standards + Spec) review skill. | [`playbooks/TWO-AXIS-REVIEW.md`](../../playbooks/TWO-AXIS-REVIEW.md) |
 | [`review-response`](plugins/review-response) | Discipline for responding to review feedback. | [`playbooks/REVIEW-RESPONSE.md`](../../playbooks/REVIEW-RESPONSE.md) |
 | [`fable5`](plugins/fable5) | Commander-mode operating discipline + the strong-model founding prompt. | The plugin directory itself (self-canonical — see below) |
+| [`commander`](plugins/commander) | The runnable per-repo dispatch-and-score loop: constitution, report protocol, task template, dispatch + scoring scripts, ledger scaffold. | The plugin directory itself (self-canonical — see below) |
 
-`fable5` is deliberately different from the other four. It is a
-harness-specific operating discipline (it names model tiers, dispatches through a
-subagent tool, and writes its output into a per-user config home), so it has **no
-harness-neutral playbook counterpart** in `playbooks/` — unlike the doc-contract
-core, there is no neutral source it could be lifted from. Consequently its
-**plugin directory is its own canon**: nothing is vendored into it, and it is
-**not part of the `sync_plugins.py` MANIFEST** (there is no upstream canon that
-could drift from it).
+`fable5` and `commander` are deliberately different from the other five. Both
+are harness-specific (they name model tiers, dispatch through a subagent tool or
+CLI, and write output into a per-user config home or a per-repo ledger), so
+neither has a **harness-neutral playbook counterpart** in `playbooks/` — unlike
+the doc-contract core, there is no neutral source they could be lifted from.
+`fable5` is the machine-wide doctrine and founding prompt; `commander` is the
+runnable per-repo instance of it. Consequently each **plugin directory is its own
+canon**: nothing is vendored into them, and they are **not part of the
+`sync_plugins.py` MANIFEST** (there is no upstream canon that could drift from
+them).
 
 ## Vendoring and the sync relationship
 
 A Claude Code skill can only read files **under its own directory** — it cannot
 reach back into the repo with `../`. So every synced plugin carries a **vendored
-copy** of whatever canonical file it needs (`fable5` is self-canonical and is
-excluded from this sync):
+copy** of whatever canonical file it needs (`fable5` and `commander` are
+self-canonical and are excluded from this sync):
 
 - The three playbook plugins keep their own `SKILL.md` frontmatter (the `name` +
   `description` that drive skill triggering) and take their **body verbatim**
@@ -78,6 +84,6 @@ will fail the build if a vendored file drifts from its source.
 4. Add the plugin entry to `.claude-plugin/marketplace.json`.
 5. Run `python3 scripts/sync_plugins.py` and commit the vendored output.
 
-A **self-canonical** plugin (like `fable5`) has no neutral upstream source, so it
-skips steps 1, 3, and 5: author the skill directly in its plugin directory, and
+A **self-canonical** plugin (like `fable5` or `commander`) has no neutral
+upstream source, so it skips steps 1, 3, and 5: author the skill directly in its plugin directory, and
 add only the marketplace entry (step 4).

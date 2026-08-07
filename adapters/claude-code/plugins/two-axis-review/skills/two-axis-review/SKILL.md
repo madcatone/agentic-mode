@@ -1,6 +1,13 @@
 ---
 name: two-axis-review
-description: 雙軸 code review——Standards（寫得對不對）與 Spec（做得對不對）平行分審、不互相污染；當使用者要 review 一個 MR/PR/diff、說「two-axis review」「雙軸審查」「審這個 MR 對不對票」、或要對照 ticket 驗收實作時使用。多出「對票驗收（Spec 軸）」——把實作逐條核回 ticket 的要求。
+description: >
+  當使用者要 review 一個 MR/PR、或要對照 ticket 驗收實作時使用：雙軸 code review——Standards（寫得對不對）與
+  Spec（做得對不對）平行分審、不互相污染。與其他審查入口的分工：內建 /code-review（工作區 diff）與 /review（GitHub PR）只管 diff
+  本身的品質，沒有票可對照時（例如「幫我 review 這個 diff」）就用那兩個；本 skill 多出的是「對票驗收（Spec 軸）」——把實作逐條核回 ticket
+  的要求。方向限定：本 skill 是「既有實作 → 對照 ticket 判對錯」；若是反過來要回覆 reviewer 給你的意見、把回饋落成改動，請改用
+  review-response。Triggers on: "review this MR",
+  "two-axis review", "does this match the ticket", "審這個 MR 對不對票", "雙軸審查",
+  "照票驗收這個實作", "這個實作有照票做嗎".
 ---
 
 # Two-Axis Review — dual-axis code review (playbook)
@@ -35,6 +42,7 @@ rules (a review canon, a defect taxonomy) take precedence over this playbook.**
 - **固定點**＝MR 的 target branch（依 repo，如 `dev/row`、`main`）。diff 用**三點式** `git diff <base>...HEAD`（對 merge-base 比較），避免把 base 分支的無關改動也算進來。
 - **票號從 commit 訊息解析**——repo 若有 commit-msg hook 強制 `fix TICKET-123: ...` 格式最可靠；沒有的話從 branch 名與 MR 描述找。票號 prefix 因 repo 而異。
 - **ref 驗證先於派工**：先確認 base/HEAD 可解析（`git rev-parse`）、diff 非空。壞的定錨要在**這裡**失敗，而不是在兩個平行 agent 裡各自失敗一次。
+- **啟動規則：定錨完先讀 ledger**（§7，路徑由 MR 識別推導）。**ledger 已存在＝這個 MR 曾審到一半**——重跑雙軸審查本身無副作用，**重貼對外留言才是**，所以 ledger 記過的留言一律不再貼。重進時的第一步就是這件事，先於派工。
 
 ## 2. Standards 軸（寫得對不對）
 
@@ -86,4 +94,45 @@ rules (a review canon, a defect taxonomy) take precedence over this playbook.**
 ## 6. 回流（審查產出不是終點）
 
 - 審出**重複出現（≥2 次）的新模式** → 蒸餾進 repo 的知識庫（若有），落對應 module 頁；跨多 MR 成熟後提案進 repo 的審查正典（`CODE-REVIEW.md`／`AGENTS.md` pitfalls）。
-- Spec 軸審出「**票面指錯層**」→ 在票上留言記錄實際層別，餵未來 triage 統計。
+- Spec 軸審出「**票面指錯層**」→ 在票上留言記錄實際層別，餵未來 triage 統計——**留言前必走 §7 的人類閘與 ledger 查核**。
+
+## 7. 對外留言：人類閘 ＋ 已貼 ledger
+
+§6 的票上留言**對外可見、不可撤回、且 API 沒有唯一性約束**；而「重跑整個流程」正是恢復的常態走法（兩軸報告不落地就隨對話蒸發），**重跑必然重貼**。重複留言還會讓「症狀指錯層」在 triage 統計裡被重複計數，直接污染 §3 依賴的那份先驗——寫入的目的被自己的非冪等性侵蝕。
+
+**人類閘**：留言草稿（票號 ＋ 全文）先列給使用者，**明確說送出才貼**。聚合報告本身不需要閘，**只有對外寫入需要**。
+
+**ledger 路徑**（放 repo 外、跨 session 可推導；`<host>` 與 `<project-path>` 取自 `git remote get-url origin`，路徑分隔的 `/` 換成 `-`）。狀態根目錄取 `AGENT_STATE_HOME`，未設定時預設 `~/.agent-state`——**一個環境只挑一次、之後不再改**，冪等性靠這個路徑穩定：
+
+```
+$AGENT_STATE_HOME/two-axis-review/<host>--<project-path>--mr-<iid>.jsonl
+例：~/.agent-state/two-axis-review/gitlab.example.com--group-sub-proj--mr-412.jsonl
+GitHub 用 --pr-<number>。
+```
+
+**推導指令**（照抄可跑；ssh 與 https remote 必須推出同一個檔名，冪等性靠這點，不要即興改寫）：
+
+```sh
+IID=412   # 換成本次的 MR iid；GitHub PR 填 PR number，並把下面的 mr- 改成 pr-
+SLUG=$(git remote get-url origin | sed -E 's#^[A-Za-z0-9+.-]+://##; s#^[^@/]+@##; s#^([^/:]+):#\1/#; s#\.git$##; s#/+$##; s#/#--#; s#/#-#g')
+LEDGER="${AGENT_STATE_HOME:-$HOME/.agent-state}"/two-axis-review/"$SLUG"--mr-"$IID".jsonl
+mkdir -p "$(dirname "$LEDGER")"; touch "$LEDGER"; echo "$LEDGER"
+```
+
+七個 sed 步驟依序是：去 scheme（`https://`／`ssh://`）、去 `user@`、scp 式 `host:group/…` 的第一個 `:` 換成 `/`、去尾綴 `.git`、去尾綴 `/`、第一個 `/` 換 `--`（切開 host 與 project-path）、其餘 `/` 換 `-`。**不支援帶 port 的 remote**（`https://host:8443/…` 會把 port 併進 slug，且同一 repo 的 ssh／https port 不同時會算出兩個檔名）——遇到就手動寫死 `SLUG`。
+
+**格式**：一行一則 JSON，append-only，不改寫既有行：
+
+```
+{"ts":"2026-08-01T09:12:33Z","target":"<票號，如 PROJ-123>","hash":"<留言全文 sha256 前 12 碼>","summary":"<≤60 字摘要>","note":"<API 回傳的 comment id 或 url>"}
+```
+
+**每則留言的三步，順序不可換**（多則留言時逐則走完三步，**不要等整批貼完才記**）：
+
+1. **貼前查 ledger**——`mkdir -p "$(dirname "$LEDGER")"; touch "$LEDGER"; grep -Fc '"target":"<票號>"' "$LEDGER" || true`（`|| true` 不可省：grep 查無結果時印 `0` 但 exit 1，會被誤讀成指令失敗）。印出非 0 就**跳過**，並在報告寫「已於 `<ts>` 留言過」。若 target 命中但 hash 不同（結論後來改了）→ **停下來問使用者**，不要自行再貼一則。
+2. **貼**（使用者說送出之後）。
+3. **貼完立刻 append**：
+   `printf '%s\n' "{\"ts\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",\"target\":\"…\",\"hash\":\"…\",\"summary\":\"…\",\"note\":\"…\"}" >> "$LEDGER"`
+   hash 算法：`printf '%s' "<留言全文>" | shasum -a 256 | cut -c1-12`（Linux 用 `sha256sum`）。
+
+**恢復情境（重進時怎麼走）**：第一步是定錨後立刻讀 ledger（§1 最後一條），**先於派工**——包含使用者說「某一軸重跑一次」的情況：ledger 有記錄就只重跑審查、不重貼。「貼了但還沒 append」是唯一會漏記的窗口——ledger 存在但該票沒記錄時，貼之前先讀票的既有 comments 確認沒有自己貼的同內容，有就補寫 ledger 並跳過。

@@ -27,6 +27,7 @@ model, or dispatch to use. Read [`README.md`](README.md) first, then this.
 - `templates/`: fill-in skeletons for every generated doc + CI files.
 - `playbooks/`: harness-neutral collaboration canon (commit messages, two-axis
   review, review response, doc linting) — optional, local rules override them.
+- `playbooks/scripts/doc_lint.py`: the doc-linter's mechanical pass (pure stdlib).
 - `adapters/`: Claude Code plugins + marketplace, Devin IDE rule + review workflow.
 - `.claude-plugin/marketplace.json`: the Claude Code plugin marketplace manifest.
 - `scripts/sync_plugins.py`: one-way vendoring sync (canon → plugins) + `--check` gate.
@@ -52,6 +53,13 @@ python3 checker/check_agentic_docs.py --config examples/minimal-cli/agentic-mode
 grep -rn '{{' examples/minimal-cli && echo "FOUND" || echo "clean"
 ```
 
+- Byte-compile the doc linter and lint its own playbook (must exit 0):
+
+```bash
+python3 -m py_compile playbooks/scripts/doc_lint.py
+cd playbooks && python3 scripts/doc_lint.py DOC-LINTER.md
+```
+
 - Verify the plugin vendored copies are in sync with the canon (must exit 0):
 
 ```bash
@@ -72,12 +80,12 @@ python3 -m json.tool .claude-plugin/marketplace.json >/dev/null && echo ok
 3. If the doc-set changed, the templates and `RUNBOOK.md`'s layout/schema stay
    in sync (the config schema is stated in exactly one place — `RUNBOOK.md`).
 4. The worked example still passes the gate (see Development Commands).
-5. If a `playbooks/*.md` or a vendored core file (`RUNBOOK.md`, `doctrine/`,
+5. If a `playbooks/` file or a vendored core file (`RUNBOOK.md`, `doctrine/`,
    `templates/`, `checker/`) changed, `python3 scripts/sync_plugins.py` was run
    so the plugin copies match, and `--check` exits 0. Never hand-edit a vendored
-   copy under `adapters/claude-code/plugins/`. (Exception: the `fable5` plugin is
-   self-canonical — not vendored and not in the sync MANIFEST — so its files are
-   edited in place.)
+   copy under `adapters/claude-code/plugins/`. (Exception: the `fable5` and
+   `commander` plugins are self-canonical — not vendored and not in the sync
+   MANIFEST — so their files are edited in place.)
 6. `README.md` and `README-ZH.md` stay information-equivalent when either changes.
 
 ## Sign-Off Points

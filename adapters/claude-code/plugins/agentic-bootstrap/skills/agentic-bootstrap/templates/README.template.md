@@ -68,7 +68,16 @@ N. {{STEP_N_OUTPUT}}.
 
 ## Agent Onboarding Guide
 
-A cold-start collaborator (human or agent, no chat history) reads in this order: this README → `{{AGENTS_PATH}}` → `docs/architecture.json` (if present) → `{{REQUIREMENTS_PATH}}` → `{{SURFACE_DOC_PATH}}` → `{{VALIDATION_PATH}}` → `{{WORKFLOW_PATH}}`. Questions to answer before editing core logic: {{QUESTIONS_BEFORE_EDITING}}. Safe-change pattern: edit code → update the requirement ID + iteration history → update the surface doc → append a validation block → run the docs gate.
+A cold-start collaborator (human or agent, no chat history) reads in this order: this README → `{{AGENTS_PATH}}` → `docs/architecture.json` (if present) → `{{REQUIREMENTS_PATH}}` → `{{SURFACE_DOC_PATH}}` → `{{VALIDATION_PATH}}` → `{{WORKFLOW_PATH}}`.
+
+Before editing core logic, answer: {{QUESTIONS_BEFORE_EDITING}}.
+
+Safe-change pattern:
+1. Edit the code.
+2. Update the requirement ID and its iteration history.
+3. Update the surface doc.
+4. Append a validation block.
+5. Run the docs gate.
 
 ## Verification
 

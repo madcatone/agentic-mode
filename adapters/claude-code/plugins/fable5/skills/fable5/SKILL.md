@@ -1,6 +1,12 @@
 ---
 name: fable5
-description: 「主模型當 advisor/指揮官」的操作模式與其創始 prompt：主對話只做對話、決策、派工、整合，大量執行交給 subagent；並可用一次強模型 session 把判斷力外化成弱模型可長期沿用的制度檔。當使用者提到 fable5、立制度、commander mode、主模型當 advisor、建立派工規則、想用強模型 session 提升日後弱模型可靠度時使用。（要在單一 repo 內建立文件契約請改用 agentic-bootstrap。）
+description: >
+  當使用者想確立「主模型當 advisor／指揮官」的操作模式，或想用一次強模型 session
+  把判斷力外化成弱模型可長期沿用的制度檔時使用：主對話只做對話、決策、派工、整合，大量執行交給 subagent；本 skill 給的是這套模式的說明與其創始
+  prompt。交付物是機器層級的制度文字，不是可執行的迴圈——若使用者說 "commander mode"、「派工閉環」而要的是在 repo
+  裡真的跑得起來的派工＋三層評分＋失敗歸因迴圈，請改用 commander；若只是要在單一 repo 內建立文件契約與 CI gate，請改用
+  agentic-bootstrap。Triggers on: "fable5", "advisor mode", "main model as commander",
+  "write down my operating rules", "立制度", "主模型當 advisor", "建立派工規則", "把判斷力寫成制度檔".
 ---
 
 # fable5 — 用一次強模型 session，把判斷力寫成制度

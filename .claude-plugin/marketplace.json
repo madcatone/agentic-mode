@@ -1,6 +1,6 @@
 {
   "name": "agentic-mode",
-  "description": "Optional Claude Code plugins for the agentic-mode methodology: the doc-contract bootstrapper, four harness-neutral collaboration playbooks (commit messages, two-axis review, review response, document linting), and the fable5 commander-mode operating discipline. Install only the ones your team wants.",
+  "description": "Optional Claude Code plugins for the agentic-mode methodology: the doc-contract bootstrapper, four harness-neutral collaboration playbooks (commit messages, two-axis review, review response, document linting), the fable5 commander-mode operating discipline, and the commander dispatch-and-score loop. Install only the ones your team wants.",
   "owner": {
     "name": "agentic-mode maintainers"
   },
@@ -28,12 +28,17 @@
     {
       "name": "doc-linter",
       "source": "./adapters/claude-code/plugins/doc-linter",
-      "description": "Lint agent-facing documents (SKILL.md, CLAUDE.md, HANDOFF.md, README, runbooks, prompts) for ambiguity, terminology drift, passive voice, hedge words, stacked negations, and structure problems, using rules adapted from ASD-STE100 Simplified Technical English — a severity-ordered report with verbatim quotes and ready-to-paste rewrites. Harness-neutral (pure markdown, no scripts); writes only to a document you point it at, in fix mode, after you accept the rewrites."
+      "description": "Lint agent-facing documents (SKILL.md, CLAUDE.md, HANDOFF.md, README, runbooks, prompts) for ambiguity, terminology drift, passive voice, hedge words, stacked negations, and structure problems, using rules adapted from ASD-STE100 Simplified Technical English — a severity-ordered report with verbatim quotes and ready-to-paste rewrites. Harness-neutral: the mechanical pass ships as a stdlib script (doc_lint.py) and the judgment rules stay in markdown; writes only to a document you point it at, in fix mode, after you accept the rewrites."
     },
     {
       "name": "fable5",
       "source": "./adapters/claude-code/plugins/fable5",
       "description": "Commander-mode operating discipline: the main model stays an advisor/dispatcher that converses, decides, delegates, and integrates while subagents do the heavy execution — plus the founding prompt for spending one strong-model session to externalize judgment into rule files a weaker model can follow long-term. Harness-specific and self-canonical (no harness-neutral playbook counterpart, not part of the vendoring sync)."
+    },
+    {
+      "name": "commander",
+      "source": "./adapters/claude-code/plugins/commander",
+      "description": "Stand up a runnable dispatch-and-score loop inside a repo: a single-file constitution that turns any model into a commander who dispatches tasks to subagents, scores the output on a three-layer pyramid (mechanical gate → report contract → fresh-context judge), attributes every failure to the layer that let it through, and patches the harness so the next run is easier. Ships the constitution, the report protocol, the task template, a dispatch script and an L1 scorer, plus the run-ledger scaffold. Self-canonical (no harness-neutral playbook counterpart, not part of the vendoring sync)."
     }
   ]
 }

@@ -114,12 +114,12 @@ Alongside the doc contract, [`playbooks/`](playbooks/) holds a small set of
 | [`COMMIT-MESSAGES.md`](playbooks/COMMIT-MESSAGES.md) | A Conventional-Commits variant: type table with build/ci/chore adjudications, an optional on-demand ticket, and scope rules — deferring to a local commit-msg hook. |
 | [`TWO-AXIS-REVIEW.md`](playbooks/TWO-AXIS-REVIEW.md) | Dual-axis review — Standards (written right) and Spec (meets the ticket) audited on independent axes that never cross-rank. |
 | [`REVIEW-RESPONSE.md`](playbooks/REVIEW-RESPONSE.md) | Discipline for the author answering review feedback: verify before implementing, no sycophantic openers, push back with evidence. |
-| [`DOC-LINTER.md`](playbooks/DOC-LINTER.md) | Lint agent-facing documents for ambiguity — terminology drift, passive voice, hedge words, stacked negations, structure — with rules adapted from ASD-STE100 Simplified Technical English. |
+| [`DOC-LINTER.md`](playbooks/DOC-LINTER.md) | Lint agent-facing documents for ambiguity — terminology drift, passive voice, hedge words, stacked negations, structure — with rules adapted from ASD-STE100 Simplified Technical English. [`playbooks/scripts/doc_lint.py`](playbooks/scripts/doc_lint.py) decides the mechanical rules and prints the ones it leaves to the reader. |
 
 ## Install as Claude Code plugins
 
 This repo is also a **Claude Code plugin marketplace**. Once it is on GitHub,
-add the marketplace and install any subset of the six plugins — each is
+add the marketplace and install any subset of the seven plugins — each is
 independent and optional:
 
 ```
@@ -130,6 +130,7 @@ independent and optional:
 /plugin install review-response@agentic-mode
 /plugin install doc-linter@agentic-mode
 /plugin install fable5@agentic-mode
+/plugin install commander@agentic-mode
 ```
 
 | Plugin | Installs | Canonical source |
@@ -140,6 +141,7 @@ independent and optional:
 | `review-response` | Review-response discipline skill. | [`playbooks/REVIEW-RESPONSE.md`](playbooks/REVIEW-RESPONSE.md) |
 | `doc-linter` | Agent-facing document linter skill. | [`playbooks/DOC-LINTER.md`](playbooks/DOC-LINTER.md) |
 | `fable5` | Commander-mode operating discipline + the strong-model founding prompt. | The plugin directory itself (self-canonical) |
+| `commander` | The runnable per-repo dispatch-and-score loop: constitution, report protocol, task template, dispatch + scoring scripts, ledger scaffold. | The plugin directory itself (self-canonical) |
 
 The commit/review conventions differ from team to team, which is why they are
 optional plugins and policy-overridable playbooks rather than part of the core.
@@ -147,12 +149,14 @@ Each of those plugins vendors a self-contained copy of its canonical source; see
 [`adapters/claude-code/README.md`](adapters/claude-code/README.md) for the
 vendoring + anti-drift sync.
 
-`fable5` is the exception: it is **Claude Code-specific with no harness-neutral
-playbook counterpart** — it governs how you operate a *session* (the main model
-as advisor/dispatcher, subagent tiers, output written into a per-user config
-home) rather than a repo's document contract, so it cannot live in the neutral
-core. Its **plugin directory is its own canon**: nothing is vendored into it and
-it is not part of the `sync_plugins.py` sync.
+`fable5` and `commander` are the exceptions: both are **Claude Code-specific
+with no harness-neutral playbook counterpart**. `fable5` governs how you operate
+a *session* (the main model as advisor/dispatcher, subagent tiers, output written
+into a per-user config home); `commander` ships the runnable per-repo instance of
+that same doctrine (a constitution plus dispatch/scoring scripts a subagent CLI
+drives). Neither is a repo document contract, so neither can live in the neutral
+core. Their **plugin directories are their own canon**: nothing is vendored into
+them and they are not part of the `sync_plugins.py` sync.
 
 ## Repo map
 
@@ -178,7 +182,8 @@ packaging lives only under [`adapters/`](adapters/):
 
 - [`adapters/claude-code/`](adapters/claude-code/) — a Claude Code plugin
   marketplace: the `agentic-bootstrap` toolkit, the four playbooks, and the
-  self-canonical `fable5` commander-mode discipline packaged as optional,
+  self-canonical `fable5` commander-mode discipline and `commander`
+  dispatch-and-score loop packaged as optional,
   independently installable plugins (see
   [its README](adapters/claude-code/README.md) and [Install as Claude Code
   plugins](#install-as-claude-code-plugins) above).

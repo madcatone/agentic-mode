@@ -51,6 +51,8 @@ SKILL_SYNC = [
 
 # canon file -> byte-for-byte vendored copy.
 VERBATIM_FILES = [
+    ("playbooks/scripts/doc_lint.py",
+     "adapters/claude-code/plugins/doc-linter/skills/doc-linter/scripts/doc_lint.py"),
     ("RUNBOOK.md", f"{BOOTSTRAP}/RUNBOOK.md"),
     ("doctrine/BOOTSTRAP-CORE.md", f"{BOOTSTRAP}/reference/BOOTSTRAP-CORE.md"),
     ("checker/check_agentic_docs.py", f"{BOOTSTRAP}/checker/check_agentic_docs.py"),

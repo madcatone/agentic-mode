@@ -1,6 +1,11 @@
 ---
 name: review-response
-description: 收到 code review 回饋時的回應紀律——先查證後實作、反諂媚（不空泛討好）、反駁一律帶證據；當使用者要處理／回覆 reviewer 意見、address review feedback、收到 MR/PR 的 review comments、或要把 ticket 描述轉成改動時使用。核心：把每則回饋當外部訊號先對 codebase 查證，再決定採納、反駁、或先問。
+description: >
+  當使用者收到 code review 回饋、要回應或處理 reviewer 意見時使用：先查證後實作、反諂媚（不空泛討好）、反駁一律帶證據——把每則回饋當外部訊號先對
+  codebase 查證，再決定採納、反駁、或先問。本 skill 的方向是「回饋／票上的要求 → 改動」；反方向的「拿 ticket 逐條驗收既有實作、對票判對錯」是
+  two-axis-review，不要用本 skill。Triggers on: "address
+  review feedback", "respond to review comments", "reviewer said", "回覆 reviewer", "處理
+  review 意見", "review 說要改", "MR 上的 comment 怎麼回".
 ---
 
 # Review Response — responding to code-review feedback (playbook)
@@ -17,6 +22,8 @@ installation as an optional plugin is described under `adapters/`. **Local repo
 rules take precedence over this playbook.**
 
 被審者側的六步流程與措辭規則。目標：**不盲從、不諂媚、不硬拗**——每則回饋先查證，再採納或有據反駁。
+
+**啟動規則（重進時的第一步，不可跳）**：動手前先讀 §8 的 ledger 檔。**ledger 已存在＝這個 MR 曾處理到一半**——先把已貼清單列出來、與 API 抓回的 thread 全集對帳，已貼的一律跳過，只處理剩下的。沒讀過 ledger 就不准貼任何 comment。
 
 ## 1. 六步（不可跳 VERIFY）
 
@@ -69,3 +76,45 @@ rules take precedence over this playbook.**
 
 - **GitLab**：inline 討論回在**原 discussion thread**（`POST /projects/:id/merge_requests/:iid/discussions/:discussion_id/notes`），不開新的 top-level note——讓對話留在被討論的程式碼旁。
 - **GitHub**：對應做法是**在該 review comment 的 thread 內 reply**，同樣不另開頂層 comment。
+- 兩者**貼出前都必須走 §8**（人類閘 ＋ ledger 查核）。
+
+## 8. 貼出前：人類閘 ＋ 已貼 ledger
+
+對外 comment **不可逆、且 API 沒有唯一性約束**——重貼一次不會報錯，只會讓同一條 thread 多出一則一字不差的回覆，對所有 watcher 可見。
+
+**人類閘（先草稿、後送出）**：所有回覆先產成草稿**一次列給使用者看**（每則標 `thread id ＋ 回覆全文`），**使用者明確說送出才 POST**。沒有這句話就停在草稿，不要邊寫邊貼。
+
+**ledger 路徑**（放 repo 外、跨 session 可推導；`<host>` 與 `<project-path>` 取自 `git remote get-url origin`，路徑分隔的 `/` 換成 `-`）。狀態根目錄取 `AGENT_STATE_HOME`，未設定時預設 `~/.agent-state`——**一個環境只挑一次、之後不再改**，冪等性靠這個路徑穩定：
+
+```
+$AGENT_STATE_HOME/review-response/<host>--<project-path>--mr-<iid>.jsonl
+例：~/.agent-state/review-response/gitlab.example.com--group-sub-proj--mr-412.jsonl
+GitHub 用 --pr-<number>。
+```
+
+**推導指令**（照抄可跑；ssh 與 https remote 必須推出同一個檔名，冪等性靠這點，不要即興改寫）：
+
+```sh
+IID=412   # 換成本次的 MR iid；GitHub PR 填 PR number，並把下面的 mr- 改成 pr-
+SLUG=$(git remote get-url origin | sed -E 's#^[A-Za-z0-9+.-]+://##; s#^[^@/]+@##; s#^([^/:]+):#\1/#; s#\.git$##; s#/+$##; s#/#--#; s#/#-#g')
+LEDGER="${AGENT_STATE_HOME:-$HOME/.agent-state}"/review-response/"$SLUG"--mr-"$IID".jsonl
+mkdir -p "$(dirname "$LEDGER")"; touch "$LEDGER"; echo "$LEDGER"
+```
+
+七個 sed 步驟依序是：去 scheme（`https://`／`ssh://`）、去 `user@`、scp 式 `host:group/…` 的第一個 `:` 換成 `/`、去尾綴 `.git`、去尾綴 `/`、第一個 `/` 換 `--`（切開 host 與 project-path）、其餘 `/` 換 `-`。**不支援帶 port 的 remote**（`https://host:8443/…` 會把 port 併進 slug，且同一 repo 的 ssh／https port 不同時會算出兩個檔名）——遇到就手動寫死 `SLUG`。
+
+**格式**：一行一則 JSON，append-only，不改寫既有行：
+
+```
+{"ts":"2026-08-01T09:12:33Z","target":"<discussion_id>","hash":"<回覆全文 sha256 前 12 碼>","summary":"<≤60 字摘要>","note":"<API 回傳的 note id 或 url>"}
+```
+
+**每則回覆的三步，順序不可換**：
+
+1. **貼前查 ledger**——`mkdir -p "$(dirname "$LEDGER")"; touch "$LEDGER"; grep -Fc '"target":"<discussion_id>"' "$LEDGER" || true`（`|| true` 不可省：grep 查無結果時印 `0` 但 exit 1，會被誤讀成指令失敗）。印出非 0 就**跳過這則**，並在收尾說明「已於 `<ts>` 貼過」。若 target 命中但 hash 不同（回覆內容後來改過）→ **停下來問使用者**要不要補貼，不要自行再貼一則。
+2. **POST**（位置依 §7）。
+3. **貼完立刻 append**（同一輪就寫，不要等整批做完）：
+   `printf '%s\n' "{\"ts\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",\"target\":\"…\",\"hash\":\"…\",\"summary\":\"…\",\"note\":\"…\"}" >> "$LEDGER"`
+   hash 算法：`printf '%s' "<回覆全文>" | shasum -a 256 | cut -c1-12`（Linux 用 `sha256sum`）。
+
+**恢復情境（重進時怎麼走）**：第一步永遠是算出上面的 ledger 路徑並讀它，第二步才是抓 thread 全集對帳。「POST 成功但還沒 append」是唯一會漏記的窗口——所以這輪若是恢復（ledger 已存在且未處理完），對**尚未記錄**的 thread 在貼之前先 `GET .../discussions/:discussion_id`，看最後一則 note 是不是自己貼的同內容：是就補寫 ledger 並跳過，不要重貼。

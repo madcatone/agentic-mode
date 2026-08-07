@@ -100,12 +100,12 @@ playbook**——任何協作者（人或 agent、用哪個工具）都能直接�
 | [`COMMIT-MESSAGES.md`](playbooks/COMMIT-MESSAGES.md) | Conventional-Commits 變體：type 表（含 build/ci/chore 裁決）、按需附加的票號、scope 規則——本地 commit-msg hook 優先。 |
 | [`TWO-AXIS-REVIEW.md`](playbooks/TWO-AXIS-REVIEW.md) | 雙軸 review——Standards（寫得對不對）與 Spec（做得對不對）平行分審、不跨軸挑贏家。 |
 | [`REVIEW-RESPONSE.md`](playbooks/REVIEW-RESPONSE.md) | 被審者回應回饋的紀律：先查證後實作、不空泛討好、反駁帶證據。 |
-| [`DOC-LINTER.md`](playbooks/DOC-LINTER.md) | lint 給 agent 看的文件的模糊性——術語漂移、被動語態、hedge word、疊加否定、結構問題，規則改編自 ASD-STE100 Simplified Technical English。 |
+| [`DOC-LINTER.md`](playbooks/DOC-LINTER.md) | lint 給 agent 看的文件的模糊性——術語漂移、被動語態、hedge word、疊加否定、結構問題，規則改編自 ASD-STE100 Simplified Technical English。[`playbooks/scripts/doc_lint.py`](playbooks/scripts/doc_lint.py) 判定機械可決的規則，並列出它留給讀者的那些。 |
 
 ## 安裝為 Claude Code plugin
 
 本 repo 同時是一個 **Claude Code plugin marketplace**。發佈到 GitHub 後，加入
-marketplace 即可安裝六個 plugin 中的任意子集——每個都獨立、可選：
+marketplace 即可安裝七個 plugin 中的任意子集——每個都獨立、可選：
 
 ```
 /plugin marketplace add madcatone/agentic-mode
@@ -115,6 +115,7 @@ marketplace 即可安裝六個 plugin 中的任意子集——每個都獨立、
 /plugin install review-response@agentic-mode
 /plugin install doc-linter@agentic-mode
 /plugin install fable5@agentic-mode
+/plugin install commander@agentic-mode
 ```
 
 | Plugin | 安裝什麼 | 正典來源 |
@@ -125,15 +126,18 @@ marketplace 即可安裝六個 plugin 中的任意子集——每個都獨立、
 | `review-response` | review-response 紀律 skill。 | [`playbooks/REVIEW-RESPONSE.md`](playbooks/REVIEW-RESPONSE.md) |
 | `doc-linter` | 給 agent 看的文件 linter skill。 | [`playbooks/DOC-LINTER.md`](playbooks/DOC-LINTER.md) |
 | `fable5` | 指揮官操作模式 + 強模型創始 prompt。 | plugin 目錄本身（self-canonical） |
+| `commander` | 可實跑的 per-repo 派工評分迴圈：憲章、回報協議、任務模板、派工與評分腳本、台帳 scaffold。 | plugin 目錄本身（self-canonical） |
 
 commit／review 慣例每個團隊偏好不同，所以做成可選 plugin 與可覆寫 playbook，而非併入
 core。上述這些 plugin 都 vendor 一份自足的正典拷貝；vendoring 與防漂移同步見
 [`adapters/claude-code/README.md`](adapters/claude-code/README.md)。
 
-`fable5` 是例外：它是 **Claude Code 專屬、沒有 harness-neutral playbook 對應**的——
-它管的是你怎麼操作一個 *session*（主模型當 advisor／指揮官、subagent 分階、產出寫進
-使用者層級的 config home），而非某個 repo 的文件契約，所以無法放進中性 core。它的
-**plugin 目錄即正典**：不 vendor 任何東西進來，也不納入 `sync_plugins.py` 同步。
+`fable5` 與 `commander` 是例外：兩者都是 **Claude Code 專屬、沒有 harness-neutral
+playbook 對應**的。`fable5` 管的是你怎麼操作一個 *session*（主模型當 advisor／指揮官、
+subagent 分階、產出寫進使用者層級的 config home）；`commander` 出的是同一套教義**可實跑
+的 per-repo 實例**（一份憲章加上由 subagent CLI 驅動的派工／評分腳本）。兩者都不是某個
+repo 的文件契約，所以無法放進中性 core。它們的 **plugin 目錄即正典**：不 vendor 任何東西
+進來，也不納入 `sync_plugins.py` 同步。
 
 ## Repo 地圖
 
@@ -158,7 +162,8 @@ core。上述這些 plugin 都 vendor 一份自足的正典拷貝；vendoring �
 
 - [`adapters/claude-code/`](adapters/claude-code/)——一個 Claude Code plugin
   marketplace：`agentic-bootstrap` 工具包、四份 playbook，加上 self-canonical 的
-  `fable5` 指揮官操作模式，各自封裝成可選、可獨立安裝的 plugin（見[它的
+  `fable5` 指揮官操作模式與 `commander` 派工評分迴圈，各自封裝成可選、可獨立安裝的
+  plugin（見[它的
   README](adapters/claude-code/README.md)與上面的
   [安裝為 Claude Code plugin](#安裝為-claude-code-plugin)）。
   - 除了 plugin，[`adapters/claude-code/dispatch/`](adapters/claude-code/dispatch/)
