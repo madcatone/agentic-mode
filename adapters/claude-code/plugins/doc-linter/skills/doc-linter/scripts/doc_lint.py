@@ -193,6 +193,14 @@ NEG_FALSE_FRIENDS = ["非常", "非同步", "未來", "不僅", "不但", "不�
 CJK_CLAUSE_BREAK_RE = re.compile(
     r"[、|；：（）()【】\[\]／/]|——|[且並也又而或]|(?=除非)"
 )
+# English clause boundaries, same principle as the CJK ones but deliberately
+# narrower: only the exception opener, which is the English 除非. A prohibition
+# and the exception it hangs off negate different predicates (do not merge
+# unless the build is green), so each side is its own clause. The opener stays
+# with the clause it introduces, so "unless ... not ..." still stacks.
+EN_CLAUSE_BREAK_RE = re.compile(
+    r"(?=\bunless\b)|(?=\bexcept\s+(?:when|if)\b)", re.IGNORECASE
+)
 
 # N1 -- a prohibition with no stated alternative.
 PROHIBIT_RE = re.compile(r"\b(?:do\s+not|don't|never|avoid)\b|不要|不得|禁止|勿",
@@ -318,29 +326,36 @@ def count_negations(sentence: str) -> List[str]:
     """Negations that force the reader to compute the polarity.
 
     A repeated ASCII negator is an enumeration ("no network, no installs"), so
-    those count once. Mixed negators stack ("do not ... unless ... not").
+    those count once. Mixed negators stack ("do not run it without a review").
 
     CJK negators count every time *within one clause*, because a repeated one
     there is the double negative itself (不要不做). Across clause boundaries
     (CJK_CLAUSE_BREAK_RE) they are separate statements -- an enumerated list of
     prohibitions, one table row after another -- so the sentence is scored by
     its worst clause rather than by its total.
+
+    ASCII negators are scored the same way across the exception openers of
+    EN_CLAUSE_BREAK_RE, so "do not merge unless the build is green" reads as a
+    prohibition plus its exception rather than as a stack, matching how the CJK
+    side reads 不要合併，除非 build 是綠的. Both sides are counted per clause but
+    on their own clause boundaries, so a sentence with neither opener is scored
+    exactly as before.
     """
     cleaned = sentence
     for friend in NEG_FALSE_FRIENDS:
         cleaned = cleaned.replace(friend, " ")
-    ascii_forms = set()
+    worst_ascii = set()
+    for clause in EN_CLAUSE_BREAK_RE.split(cleaned):
+        ascii_forms = {m.lower() for m in NEG_RE.findall(clause)
+                       if not CJK_RE.search(m)}
+        if len(ascii_forms) > len(worst_ascii):
+            worst_ascii = ascii_forms
     worst_cjk = []
     for clause in CJK_CLAUSE_BREAK_RE.split(cleaned):
-        cjk_forms = []
-        for match in NEG_RE.findall(clause):
-            if CJK_RE.search(match):
-                cjk_forms.append(match)
-            else:
-                ascii_forms.add(match.lower())
+        cjk_forms = [m for m in NEG_RE.findall(clause) if CJK_RE.search(m)]
         if len(cjk_forms) > len(worst_cjk):
             worst_cjk = cjk_forms
-    return sorted(ascii_forms) + worst_cjk
+    return sorted(worst_ascii) + worst_cjk
 
 
 def scan_frontmatter(lines: Sequence[str]) -> Tuple[List[str], int]:
@@ -598,9 +613,18 @@ N2_CASES = [
     ("非做不可", 2),
     ("不得不改寫這段", 2),
     ("不要提交，除非測試沒失敗", 2),
-    # ASCII behaviour is unchanged by the clause split.
+    # ASCII enumerations behave as before.
     ("no network, no installs", 1),
-    ("do not merge unless the build is green", 2),
+    # A prohibition plus the exception it hangs off -- the English 不要 X，除非 Y.
+    ("do not merge unless the build is green", 1),
+    ("do not commit unless the reviewer asked for the change", 1),
+    ("do not deploy except when there is no rollback plan", 1),
+    # Real ASCII stacks -- the reader has to compute the polarity.
+    ("never not run the scheduled check", 2),
+    ("do not leave the branch without a review", 2),
+    ("you cannot merge without a second approval", 2),
+    # The stack sits inside the exception clause, so it still counts.
+    ("do not commit unless the tests did not fail", 2),
 ]
 
 
