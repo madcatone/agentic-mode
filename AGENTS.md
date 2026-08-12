@@ -15,6 +15,13 @@ model, or dispatch to use. Read [`README.md`](README.md) first, then this.
   proprietary tool. Harness-specific content lives **only** under `adapters/`.
 - **Project-neutral.** No hardcoded brands, hosts, IP literals, or absolute
   machine paths anywhere. The worked example uses a fictional project.
+- **Portable skills (iron rule).** Every `SKILL.md` under
+  `adapters/claude-code/plugins/*/skills/` and every file it references must
+  resolve by paths **relative to its own skill directory**. Never use a
+  harness-injected variable (`${CLAUDE_PLUGIN_ROOT}` and the like) or an absolute
+  path: the open skills CLI installs these same directories into other agents'
+  skill folders, where such a variable is undefined. See Development Commands for
+  the check.
 
 ## Key Files
 
@@ -70,6 +77,12 @@ python3 scripts/sync_plugins.py --check
 
 ```bash
 python3 -m json.tool .claude-plugin/marketplace.json >/dev/null && echo ok
+```
+
+- Prove the skills carry no harness-injected path variable (must print `clean`):
+
+```bash
+grep -rn 'PLUGIN_ROOT' adapters/claude-code/plugins && echo "FOUND" || echo "clean"
 ```
 
 ## Change Flow (What "Done" Requires)

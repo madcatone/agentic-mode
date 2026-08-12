@@ -158,6 +158,35 @@ drives). Neither is a repo document contract, so neither can live in the neutral
 core. Their **plugin directories are their own canon**: nothing is vendored into
 them and they are not part of the `sync_plugins.py` sync.
 
+## Install as skills in any agent (`npx skills`)
+
+The same seven skills install into **any agent the open skills CLI supports** —
+not just Claude Code — because that CLI reads
+[`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json) and follows
+each plugin's `source` to its conventional `skills/` directory. There is no
+second manifest to maintain: the plugin directories are the only source of truth.
+
+```bash
+npx skills add madcatone/agentic-mode --list          # see the seven skills
+npx skills add madcatone/agentic-mode                 # pick interactively
+npx skills add madcatone/agentic-mode --skill commander --skill doc-linter
+npx skills add madcatone/agentic-mode --all           # every skill, every agent
+```
+
+Useful flags: `-a <agent>` targets one agent (repeatable), `-g` installs at user
+level instead of project level, and `--copy` writes real files instead of
+symlinks. A project-level install records what it added in `skills-lock.json`.
+
+Skills that ship supporting files (`commander`'s scripts and reference docs,
+`agentic-bootstrap`'s checker, templates, and RUNBOOK) are installed whole —
+their subdirectories come along.
+
+> **Constraint for contributors.** Because these directories get copied into
+> other agents' skill folders, every `SKILL.md` and every file it references must
+> resolve by paths **relative to its own skill directory**. A harness-injected
+> variable such as `${CLAUDE_PLUGIN_ROOT}`, or an absolute path, breaks the
+> install everywhere except Claude Code. See [`AGENTS.md`](AGENTS.md).
+
 ## Repo map
 
 | Path | What it is |

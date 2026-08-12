@@ -139,6 +139,30 @@ subagent 分階、產出寫進使用者層級的 config home）；`commander` �
 repo 的文件契約，所以無法放進中性 core。它們的 **plugin 目錄即正典**：不 vendor 任何東西
 進來，也不納入 `sync_plugins.py` 同步。
 
+## 安裝為任何 agent 的 skill（`npx skills`）
+
+同樣這七個 skill 也能裝進**開放 skills CLI 支援的任何 agent**，不限 Claude Code：該 CLI
+會讀 [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json)，沿著每個 plugin
+的 `source` 找到它慣例的 `skills/` 目錄。不需要維護第二份清單——plugin 目錄就是唯一真相。
+
+```bash
+npx skills add madcatone/agentic-mode --list          # 列出這七個 skill
+npx skills add madcatone/agentic-mode                 # 互動挑選
+npx skills add madcatone/agentic-mode --skill commander --skill doc-linter
+npx skills add madcatone/agentic-mode --all           # 全部 skill、全部 agent
+```
+
+常用旗標：`-a <agent>` 指定單一 agent（可重複）、`-g` 裝在使用者層級而非專案層級、
+`--copy` 實體複製而非 symlink。專案層級安裝會把裝了什麼記在 `skills-lock.json`。
+
+帶附屬檔案的 skill（`commander` 的腳本與 reference 文件、`agentic-bootstrap` 的 checker、
+templates 與 RUNBOOK）會整包安裝——子目錄一併帶過去。
+
+> **貢獻者的約束。** 因為這些目錄會被複製進其他 agent 的 skill 資料夾，每份 `SKILL.md`
+> 以及它引用的每個檔案都必須用**相對於自己 skill 目錄**的路徑解析。用 harness 注入的變數
+> （例如 `${CLAUDE_PLUGIN_ROOT}`）或絕對路徑，會讓 Claude Code 以外的安裝全部失效。
+> 見 [`AGENTS.md`](AGENTS.md)。
+
 ## Repo 地圖
 
 | 路徑 | 是什麼 |
