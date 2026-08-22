@@ -105,7 +105,7 @@ playbook**——任何協作者（人或 agent、用哪個工具）都能直接�
 ## 安裝為 Claude Code plugin
 
 本 repo 同時是一個 **Claude Code plugin marketplace**。發佈到 GitHub 後，加入
-marketplace 即可安裝七個 plugin 中的任意子集——每個都獨立、可選：
+marketplace 即可安裝八個 plugin 中的任意子集——每個都獨立、可選：
 
 ```
 /plugin marketplace add madcatone/agentic-mode
@@ -116,6 +116,7 @@ marketplace 即可安裝七個 plugin 中的任意子集——每個都獨立、
 /plugin install doc-linter@agentic-mode
 /plugin install fable5@agentic-mode
 /plugin install commander@agentic-mode
+/plugin install idea-to-spec@agentic-mode
 ```
 
 | Plugin | 安裝什麼 | 正典來源 |
@@ -127,26 +128,28 @@ marketplace 即可安裝七個 plugin 中的任意子集——每個都獨立、
 | `doc-linter` | 給 agent 看的文件 linter skill。 | [`playbooks/DOC-LINTER.md`](playbooks/DOC-LINTER.md) |
 | `fable5` | 指揮官操作模式 + 強模型創始 prompt。 | plugin 目錄本身（self-canonical） |
 | `commander` | 可實跑的 per-repo 派工評分迴圈：憲章、回報協議、任務模板、派工與評分腳本、台帳 scaffold。 | plugin 目錄本身（self-canonical） |
+| `idea-to-spec` | 規格合成 skill：一次性批次訪談、規模三級 triage、12 節 SPEC 模板。 | plugin 目錄本身（self-canonical） |
 
 commit／review 慣例每個團隊偏好不同，所以做成可選 plugin 與可覆寫 playbook，而非併入
 core。上述這些 plugin 都 vendor 一份自足的正典拷貝；vendoring 與防漂移同步見
 [`adapters/claude-code/README.md`](adapters/claude-code/README.md)。
 
-`fable5` 與 `commander` 是例外：兩者都是 **Claude Code 專屬、沒有 harness-neutral
-playbook 對應**的。`fable5` 管的是你怎麼操作一個 *session*（主模型當 advisor／指揮官、
-subagent 分階、產出寫進使用者層級的 config home）；`commander` 出的是同一套教義**可實跑
-的 per-repo 實例**（一份憲章加上由 subagent CLI 驅動的派工／評分腳本）。兩者都不是某個
-repo 的文件契約，所以無法放進中性 core。它們的 **plugin 目錄即正典**：不 vendor 任何東西
-進來，也不納入 `sync_plugins.py` 同步。
+`fable5`、`commander`、`idea-to-spec` 是例外：三者都**沒有 harness-neutral playbook
+對應**。`fable5` 管的是你怎麼操作一個 *session*（主模型當 advisor／指揮官、subagent 分階、
+產出寫進使用者層級的 config home）；`commander` 出的是同一套教義**可實跑的 per-repo 實例**
+（一份憲章加上由 subagent CLI 驅動的派工／評分腳本）；`idea-to-spec` 是一套產出「某個專案的
+SPEC」的互動式撰寫流程，正典就是這道程序本身，而非一份讀者能自行套用的規則文件。三者都不是
+某個 repo 的文件契約，所以無法放進中性 core。它們的 **plugin 目錄即正典**：不 vendor 任何
+東西進來，也不納入 `sync_plugins.py` 同步。
 
 ## 安裝為任何 agent 的 skill（`npx skills`）
 
-同樣這七個 skill 也能裝進**開放 skills CLI 支援的任何 agent**，不限 Claude Code：該 CLI
+同樣這八個 skill 也能裝進**開放 skills CLI 支援的任何 agent**，不限 Claude Code：該 CLI
 會讀 [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json)，沿著每個 plugin
 的 `source` 找到它慣例的 `skills/` 目錄。不需要維護第二份清單——plugin 目錄就是唯一真相。
 
 ```bash
-npx skills add madcatone/agentic-mode --list          # 列出這七個 skill
+npx skills add madcatone/agentic-mode --list          # 列出這八個 skill
 npx skills add madcatone/agentic-mode                 # 互動挑選
 npx skills add madcatone/agentic-mode --skill commander --skill doc-linter
 npx skills add madcatone/agentic-mode --all           # 全部 skill、全部 agent
@@ -186,8 +189,8 @@ templates 與 RUNBOOK）會整包安裝——子目錄一併帶過去。
 
 - [`adapters/claude-code/`](adapters/claude-code/)——一個 Claude Code plugin
   marketplace：`agentic-bootstrap` 工具包、四份 playbook，加上 self-canonical 的
-  `fable5` 指揮官操作模式與 `commander` 派工評分迴圈，各自封裝成可選、可獨立安裝的
-  plugin（見[它的
+  `fable5` 指揮官操作模式、`commander` 派工評分迴圈與 `idea-to-spec` 規格合成器，
+  各自封裝成可選、可獨立安裝的 plugin（見[它的
   README](adapters/claude-code/README.md)與上面的
   [安裝為 Claude Code plugin](#安裝為-claude-code-plugin)）。
   - 除了 plugin，[`adapters/claude-code/dispatch/`](adapters/claude-code/dispatch/)

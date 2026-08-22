@@ -20,6 +20,7 @@ this repo is on GitHub, a user adds it and installs any subset of plugins:
 /plugin install review-response@agentic-mode
 /plugin install fable5@agentic-mode
 /plugin install commander@agentic-mode
+/plugin install idea-to-spec@agentic-mode
 ```
 
 Each plugin is independent and optional — install only what your team wants.
@@ -35,14 +36,18 @@ Each plugin is independent and optional — install only what your team wants.
 | [`review-response`](plugins/review-response) | Discipline for responding to review feedback. | [`playbooks/REVIEW-RESPONSE.md`](../../playbooks/REVIEW-RESPONSE.md) |
 | [`fable5`](plugins/fable5) | Commander-mode operating discipline + the strong-model founding prompt. | The plugin directory itself (self-canonical — see below) |
 | [`commander`](plugins/commander) | The runnable per-repo dispatch-and-score loop: constitution, report protocol, task template, dispatch + scoring scripts, ledger scaffold. | The plugin directory itself (self-canonical — see below) |
+| [`idea-to-spec`](plugins/idea-to-spec) | The spec synthesizer: turn rough idea material into a development SPEC — batch interview, size triage, 12-section template. | The plugin directory itself (self-canonical — see below) |
 
-`fable5` and `commander` are deliberately different from the other five. Both
-are harness-specific (they name model tiers, dispatch through a subagent tool or
-CLI, and write output into a per-user config home or a per-repo ledger), so
-neither has a **harness-neutral playbook counterpart** in `playbooks/` — unlike
-the doc-contract core, there is no neutral source they could be lifted from.
-`fable5` is the machine-wide doctrine and founding prompt; `commander` is the
-runnable per-repo instance of it. Consequently each **plugin directory is its own
+`fable5`, `commander`, and `idea-to-spec` are deliberately different from the
+other five: none of the three has a **harness-neutral playbook counterpart** in
+`playbooks/` — unlike the doc-contract core, there is no neutral source they
+could be lifted from. `fable5` and `commander` are harness-specific (they name
+model tiers, dispatch through a subagent tool or CLI, and write output into a
+per-user config home or a per-repo ledger); `fable5` is the machine-wide doctrine
+and founding prompt, and `commander` is the runnable per-repo instance of it.
+`idea-to-spec` is an interactive authoring workflow whose product is one
+project's SPEC, so its canon is the procedure itself rather than a rules document
+a reader could apply by hand. Consequently each **plugin directory is its own
 canon**: nothing is vendored into them, and they are **not part of the
 `sync_plugins.py` MANIFEST** (there is no upstream canon that could drift from
 them).
@@ -51,10 +56,10 @@ them).
 
 A Claude Code skill can only read files **under its own directory** — it cannot
 reach back into the repo with `../`. So every synced plugin carries a **vendored
-copy** of whatever canonical file it needs (`fable5` and `commander` are
-self-canonical and are excluded from this sync):
+copy** of whatever canonical file it needs (`fable5`, `commander`, and
+`idea-to-spec` are self-canonical and are excluded from this sync):
 
-- The three playbook plugins keep their own `SKILL.md` frontmatter (the `name` +
+- The four playbook plugins keep their own `SKILL.md` frontmatter (the `name` +
   `description` that drive skill triggering) and take their **body verbatim**
   from the matching `playbooks/*.md` canon file.
 - `agentic-bootstrap` vendors the RUNBOOK, the doctrine (`reference/BOOTSTRAP-CORE.md`),

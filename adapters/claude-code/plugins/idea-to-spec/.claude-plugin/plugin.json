@@ -1,0 +1,8 @@
+{
+  "name": "idea-to-spec",
+  "description": "Turn rough idea material — a draft note, an HTML mock, screenshots, pasted text — into a development SPEC that a human and a coding agent can both execute from: one batch interview instead of a multi-round interrogation, a small/medium/large triage that sets the spec's depth, and a 12-section template whose section numbers are a stable cross-language key, carrying quantified success metrics, product invariants, vertical slices, and an acceptance contract that names the cheapest layer able to judge each row. Handles both a brand-new project and a new feature inside an existing repo, where it first reads the ground it must not break. Produces WHAT and WHEN IT IS DONE, never HOW. Self-canonical (no harness-neutral playbook counterpart, not part of the vendoring sync).",
+  "version": "1.0.0",
+  "author": {
+    "name": "agentic-mode maintainers"
+  }
+}
