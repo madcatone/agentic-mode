@@ -1,6 +1,6 @@
 {
   "name": "agentic-mode",
-  "description": "Optional Claude Code plugins for the agentic-mode methodology: the doc-contract bootstrapper, four harness-neutral collaboration playbooks (commit messages, two-axis review, review response, document linting), the fable5 commander-mode operating discipline, the commander dispatch-and-score loop, and the idea-to-spec spec synthesizer that turns rough idea material into an executable development SPEC. Install only the ones your team wants.",
+  "description": "Optional Claude Code plugins for the agentic-mode methodology: the doc-contract bootstrapper, four harness-neutral collaboration playbooks (commit messages, two-axis review, review response, document linting), the fable5 commander-mode operating discipline, the commander dispatch-and-score loop, the idea-to-spec spec synthesizer that turns rough idea material into an executable development SPEC, and the pstack pack of 31 third-party engineering skills ported under MIT. Install only the ones your team wants.",
   "owner": {
     "name": "agentic-mode maintainers"
   },
@@ -44,6 +44,11 @@
       "name": "idea-to-spec",
       "source": "./adapters/claude-code/plugins/idea-to-spec",
       "description": "Turn rough idea material — a draft note, an HTML mock, screenshots, pasted text — into a development SPEC that a human and a coding agent can both execute from: one batch interview, a small/medium/large triage that sets the spec's depth, and a 12-section template with quantified success metrics, product invariants, vertical slices, and an acceptance contract naming the cheapest layer able to judge each row. Covers a brand-new project and a new feature inside an existing repo. Self-canonical (no harness-neutral playbook counterpart, not part of the vendoring sync)."
+    },
+    {
+      "name": "pstack",
+      "source": "./adapters/claude-code/plugins/pstack",
+      "description": "Thirty-one portable engineering skills ported from the pstack collection under MIT: 24 named principles that steer design and execution decisions, plus the seven workflow skills benchmark-checklist, blast-radius, figure-it-out, tdd, technical-writing, typescript-best-practices, and unslop. Each skill is self-contained and loads on demand. Self-canonical (no harness-neutral playbook counterpart, not part of the vendoring sync); see the plugin's THIRD-PARTY-NOTICE.md for the source and license."
     }
   ]
 }

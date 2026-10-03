@@ -21,6 +21,7 @@ this repo is on GitHub, a user adds it and installs any subset of plugins:
 /plugin install fable5@agentic-mode
 /plugin install commander@agentic-mode
 /plugin install idea-to-spec@agentic-mode
+/plugin install pstack@agentic-mode
 ```
 
 Each plugin is independent and optional — install only what your team wants.
@@ -37,9 +38,10 @@ Each plugin is independent and optional — install only what your team wants.
 | [`fable5`](plugins/fable5) | Commander-mode operating discipline + the strong-model founding prompt. | The plugin directory itself (self-canonical — see below) |
 | [`commander`](plugins/commander) | The runnable per-repo dispatch-and-score loop: constitution, report protocol, task template, dispatch + scoring scripts, ledger scaffold. | The plugin directory itself (self-canonical — see below) |
 | [`idea-to-spec`](plugins/idea-to-spec) | The spec synthesizer: turn rough idea material into a development SPEC — batch interview, size triage, 12-section template. | The plugin directory itself (self-canonical — see below) |
+| [`pstack`](plugins/pstack) | Thirty-one third-party engineering skills under MIT: 24 design/execution principles plus benchmark-checklist, blast-radius, figure-it-out, tdd, technical-writing, typescript-best-practices, and unslop. | The plugin directory itself (self-canonical — see below; third-party, see its `THIRD-PARTY-NOTICE.md`) |
 
-`fable5`, `commander`, and `idea-to-spec` are deliberately different from the
-other five: none of the three has a **harness-neutral playbook counterpart** in
+`fable5`, `commander`, `idea-to-spec`, and `pstack` are deliberately different
+from the other five: none of the four has a **harness-neutral playbook counterpart** in
 `playbooks/` — unlike the doc-contract core, there is no neutral source they
 could be lifted from. `fable5` and `commander` are harness-specific (they name
 model tiers, dispatch through a subagent tool or CLI, and write output into a
@@ -47,7 +49,10 @@ per-user config home or a per-repo ledger); `fable5` is the machine-wide doctrin
 and founding prompt, and `commander` is the runnable per-repo instance of it.
 `idea-to-spec` is an interactive authoring workflow whose product is one
 project's SPEC, so its canon is the procedure itself rather than a rules document
-a reader could apply by hand. Consequently each **plugin directory is its own
+a reader could apply by hand. `pstack` is a third-party skill pack — 31 skills
+ported under MIT from an external collection (see its `THIRD-PARTY-NOTICE.md`) —
+so its canon is the imported collection itself, which this repo does not author.
+Consequently each **plugin directory is its own
 canon**: nothing is vendored into them, and they are **not part of the
 `sync_plugins.py` MANIFEST** (there is no upstream canon that could drift from
 them).
@@ -56,8 +61,8 @@ them).
 
 A Claude Code skill can only read files **under its own directory** — it cannot
 reach back into the repo with `../`. So every synced plugin carries a **vendored
-copy** of whatever canonical file it needs (`fable5`, `commander`, and
-`idea-to-spec` are self-canonical and are excluded from this sync):
+copy** of whatever canonical file it needs (`fable5`, `commander`, `idea-to-spec`,
+and `pstack` are self-canonical and are excluded from this sync):
 
 - The four playbook plugins keep their own `SKILL.md` frontmatter (the `name` +
   `description` that drive skill triggering) and take their **body verbatim**
