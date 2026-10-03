@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "id": {"prefix": "DEM"},
+  "docs": {
+    "agents": "AGENTS.md",
+    "requirements": "docs/REQUIREMENTS.md",
+    "user_guide": "docs/USER_GUIDE.md",
+    "validation": "docs/VALIDATION.md",
+    "architecture": null
+  },
+  "bilingual": {"enabled": false},
+  "checks": {
+    "line_limits": {"agents": "200"},
+    "deny_words": [],
+    "harness_neutrality": {"enabled": false},
+    "url_allowlist": [],
+    "iteration_history": {"enabled": false},
+    "commands": [],
+    "entrypoints": []
+  }
+}
