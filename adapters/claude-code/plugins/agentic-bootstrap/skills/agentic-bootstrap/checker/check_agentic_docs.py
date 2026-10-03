@@ -27,20 +27,31 @@ trailing summary reports the finding count per category.
 Check categories
 ----------------
 1. ``id-continuity`` -- in the configured requirements doc: ``<prefix>-NNN``
-   IDs must be duplicate-free and gap-free from min to max. IDs cited in the
-   user-guide and validation docs must exist in the requirements doc. When
+   IDs must be duplicate-free and gap-free from min to max. IDs cited in every
+   other governed prose doc must exist in the requirements doc (the
+   requirements doc itself is the definition site and is skipped). When
    ``bilingual.enabled`` is true the two language regions must additionally
    carry identical ID sets; when false, no bilingual structure is required.
 2. ``command-consistency`` -- each rule in ``checks.commands`` requires its
    ``run`` string to appear verbatim (inside a fenced code block or inline
-   code) in every doc named by ``must_appear_in``.
-3. ``neutrality`` -- across the full text: config ``deny_words`` plus (when
-   ``harness_neutrality.enabled``) a conservative built-in harness deny list;
-   plus, when ``url_allowlist`` is non-empty, http(s) URLs whose host is not
-   on the allowlist; plus two opt-in leak sweeps -- ``checks.forbid_ipv4``
-   flags IPv4 literals outside ``checks.ipv4_allowlist`` (default loopback /
-   any-address), and ``checks.forbid_local_paths`` flags single-machine
-   absolute paths (``~/.`` , ``/Users/`` , ``/home/``).
+   code) in every doc named by ``must_appear_in``. The match is
+   identifier-bounded on both edges (leading and trailing reject
+   ``[A-Za-z0-9_]`` and ``-``): a longer token that merely contains the
+   ``run`` string (``build-all`` for ``build``, ``unit-test`` for ``test``)
+   does not satisfy the rule.
+3. ``neutrality`` -- deny-listed words (config ``deny_words`` plus, when
+   ``harness_neutrality.enabled``, a conservative built-in harness deny list)
+   are flagged in prose only: lines inside a backtick-fenced code block are
+   skipped and inline code spans are blanked before matching, so a CSS
+   ``cursor`` property inside a code sample is not a harness reference.
+   (``~~~`` fences are not recognized as code blocks.) A governed doc with
+   unbalanced code fences is itself flagged: an unclosed fence would make the
+   deny-word scan of the remainder unreliable. The remaining sweeps scan the
+   full line including code: when ``url_allowlist`` is non-empty, http(s) URLs
+   whose host is not on the allowlist; plus two opt-in leak sweeps --
+   ``checks.forbid_ipv4`` flags IPv4 literals outside ``checks.ipv4_allowlist``
+   (default loopback / any-address), and ``checks.forbid_local_paths`` flags
+   single-machine absolute paths (``~/.`` , ``/Users/`` , ``/home/``).
 4. ``line-limit`` -- per-file maximum line counts from ``checks.line_limits``.
 5. ``entrypoint`` -- each path in ``checks.entrypoints`` must exist; ``.py``
    files are additionally byte-compiled with ``py_compile``.
@@ -49,8 +60,36 @@ Check categories
 7. ``iteration-continuity`` -- opt-in via ``checks.iteration_history.enabled``.
    Inside the requirements doc's Iteration History section (heading configurable
    via ``checks.iteration_history.heading``, default ``Iteration History``) the
-   ``N.`` numbered entries must be duplicate-free and gap-free; when bilingual,
-   each language region's history is checked independently.
+   ``N.`` numbered entries must start at 1 (in document order) and be
+   duplicate-free and gap-free; when bilingual, each language region's history
+   is checked independently.
+
+Config validation
+-----------------
+Before any check runs, the config itself is validated; a violation exits ``2``
+with a message naming the offending key and an honest remedy:
+
+- Every field the checker reads must carry the right type: ``docs`` values are
+  strings or ``null``, ``checks.line_limits`` values are integers, list fields
+  are lists of strings, and the ``enabled`` / ``forbid_*`` switches are actual
+  booleans (a truthy ``"false"`` string cannot flip an opt-in check on, and a
+  falsy ``false`` cannot silently stand in for an empty list). A wrong type is
+  an error -- never a silent coercion and never a traceback. A ``null`` on an
+  optional field means "not provided": the optional list fields and the
+  ``harness_neutrality`` / ``iteration_history`` objects fall back to their
+  built-in default (empty lists and disabled objects -- except
+  ``checks.ipv4_allowlist``, whose default is the built-in loopback /
+  any-address allowlist), and the string fields with a built-in default
+  (``iteration_history.heading``, ``bilingual.primary_heading`` /
+  ``secondary_heading``) take that default. A ``null`` on a structural section
+  (``docs``, ``id``, ``bilingual``, ``checks``, ``line_limits``, ``commands``)
+  is itself a type error.
+- An active check's dependent doc must be declared under ``docs`` (a missing
+  key or ``null`` never silently disables a check): ``id-continuity`` requires
+  ``requirements``, ``user_guide`` and ``validation``; ``iteration-continuity``
+  (when enabled) requires ``requirements``. Checks without a disable switch
+  say the path must be declared; ``iteration-continuity`` offers its
+  ``enabled: false`` switch instead.
 
 Any line containing the marker ``agentic-gate: allow`` is skipped by every
 text-scanning check, so rule/spec docs can quote a bad example on purpose.
@@ -179,6 +218,175 @@ def resolve(root: str, rel_path: Optional[str]) -> Optional[str]:
     if not rel_path:
         return None
     return os.path.join(root, rel_path)
+
+
+def validate_config(config: Dict) -> None:
+    """Raise ConfigError (exit 2) on config errors a run must not survive.
+
+    Two families of error are caught here, both of which used to degrade a
+    run silently:
+
+    - Undeclared dependencies: an active check whose dependent doc is not
+      declared under ``docs`` (missing key or ``null``) used to skip the whole
+      check and the run still exited 0 -- dropping ``docs.requirements``
+      silently disabled id-continuity and iteration-continuity, degrading the
+      gate to doc-presence-only. Dependencies: id-continuity -> requirements,
+      user_guide, validation; iteration-continuity (when enabled) ->
+      requirements. A *declared* doc that cannot be read remains skippable
+      inside the checks themselves; doc-presence reports it as a finding.
+    - Type errors: a wrongly typed field the checker reads used to crash with
+      a traceback (exit 1), be coerced silently (``int(limit)`` accepted
+      ``"200"``; a falsy ``must_appear_in`` / ``deny_words`` silently became
+      an empty list and switched a check off), or flip an opt-in check on (a
+      truthy ``"false"`` string). Every read field is type-checked on its
+      *raw* value, before any ``or`` default is applied.
+
+    Remedies stay honest: only checks that actually have a disable switch
+    suggest one (iteration-continuity); the rest say the path must be declared.
+
+    A ``null`` on an optional field means "not provided": the optional list
+    fields and the ``harness_neutrality`` / ``iteration_history`` objects fall
+    back to their built-in default (empty lists and disabled objects --
+    except ``checks.ipv4_allowlist``, whose default is the built-in loopback /
+    any-address allowlist), and the string fields with a built-in default
+    (``iteration_history.heading``, ``bilingual.primary_heading`` /
+    ``secondary_heading``) are normalized to that default here, so no later
+    read ever sees ``None`` where a string is expected. A ``null`` on a
+    structural section (``docs``, ``id``, ``bilingual``, ``checks``,
+    ``line_limits``, ``commands``) is rejected as a type error, like any
+    other wrong type.
+    """
+    version = config.get("schema_version")
+    if not isinstance(version, int) or isinstance(version, bool):
+        raise ConfigError("config field schema_version must be an integer")
+
+    for section in ("docs", "id", "bilingual", "checks"):
+        if section in config and not isinstance(config[section], dict):
+            raise ConfigError(f"config field {section} must be an object")
+
+    docs = doc_paths(config)
+    checks = config.get("checks", {})
+
+    def require_str_list(value: object, label: str) -> None:
+        if not isinstance(value, list) or not all(
+            isinstance(item, str) for item in value
+        ):
+            raise ConfigError(f"config field {label} must be a list of strings")
+
+    def optional_str_list(raw: object, label: str) -> None:
+        # Validate the raw value. A null means "not provided" (the downstream
+        # ``or`` default then applies), but any other non-list -- including a
+        # falsy ``false``, which ``or`` would silently turn into ``[]`` and
+        # switch the check off -- is an error.
+        if raw is not None:
+            require_str_list(raw, label)
+
+    def require_bool(section: Dict, key: str, label: str) -> None:
+        # A truthy non-bool such as the string "false" would flip an opt-in
+        # check on; a falsy non-bool such as 0 would silently switch it off.
+        value = section.get(key)
+        if value is not None and not isinstance(value, bool):
+            raise ConfigError(f"config field {label} must be a boolean")
+
+    # Type checks on every field the checker reads.
+    for key, value in docs.items():
+        if value is not None and not isinstance(value, str):
+            raise ConfigError(f"config field docs.{key} must be a string or null")
+
+    prefix = config.get("id", {}).get("prefix", "")
+    if not isinstance(prefix, str):
+        raise ConfigError("config field id.prefix must be a string")
+
+    bilingual = config.get("bilingual") or {}
+    require_bool(bilingual, "enabled", "bilingual.enabled")
+    for key, default in (("primary_heading", "## English"),
+                         ("secondary_heading", "## 繁體中文")):
+        value = bilingual.get(key)
+        if value is not None and not isinstance(value, str):
+            raise ConfigError(
+                f"config field bilingual.{key} must be a string or null"
+            )
+        if value is None:
+            bilingual[key] = default  # null == not provided -> default
+
+    limits = checks.get("line_limits", {})
+    if not isinstance(limits, dict):
+        raise ConfigError("config field checks.line_limits must be an object")
+    for key, value in limits.items():
+        if not isinstance(value, int) or isinstance(value, bool):
+            raise ConfigError(
+                f"config field checks.line_limits.{key} must be an integer"
+            )
+
+    commands = checks.get("commands", [])
+    if not isinstance(commands, list):
+        raise ConfigError("config field checks.commands must be a list")
+    for index, rule in enumerate(commands):
+        if not isinstance(rule, dict) or not isinstance(rule.get("run", ""), str):
+            raise ConfigError(
+                f"config field checks.commands[{index}].run must be a string"
+            )
+        optional_str_list(
+            rule.get("must_appear_in"),
+            f"checks.commands[{index}].must_appear_in",
+        )
+
+    optional_str_list(checks.get("deny_words"), "checks.deny_words")
+    optional_str_list(checks.get("entrypoints"), "checks.entrypoints")
+    optional_str_list(checks.get("url_allowlist"), "checks.url_allowlist")
+    optional_str_list(checks.get("ipv4_allowlist"), "checks.ipv4_allowlist")
+    require_bool(checks, "forbid_ipv4", "checks.forbid_ipv4")
+    require_bool(checks, "forbid_local_paths", "checks.forbid_local_paths")
+
+    harness = checks.get("harness_neutrality")
+    if harness is not None and not isinstance(harness, dict):
+        raise ConfigError("config field checks.harness_neutrality must be an object")
+    harness = harness or {}
+    require_bool(harness, "enabled", "checks.harness_neutrality.enabled")
+    optional_str_list(
+        harness.get("extra_deny"), "checks.harness_neutrality.extra_deny"
+    )
+
+    iter_raw = checks.get("iteration_history")
+    if iter_raw is not None and not isinstance(iter_raw, dict):
+        raise ConfigError("config field checks.iteration_history must be an object")
+    iter_cfg = iter_raw or {}
+    require_bool(iter_cfg, "enabled", "checks.iteration_history.enabled")
+    heading = iter_cfg.get("heading")
+    if heading is not None and not isinstance(heading, str):
+        raise ConfigError(
+            "config field checks.iteration_history.heading must be a string or null"
+        )
+    if heading is None:
+        iter_cfg["heading"] = "Iteration History"  # null == not provided
+
+    # Declared-dependency checks. The opt-in check is verified first so its
+    # remedy (the disable switch) is the one shown when it applies; checks
+    # without a disable switch never suggest one.
+    def require(key: str, check: str, remedy: str) -> None:
+        if not docs.get(key):
+            raise ConfigError(
+                f"check '{check}' is active but docs.{key} is not declared; {remedy}"
+            )
+
+    if iter_cfg.get("enabled"):
+        require(
+            "requirements", "iteration-continuity",
+            "declare it as a path, or set checks.iteration_history.enabled "
+            "to false",
+        )
+    require(
+        "requirements", "id-continuity",
+        "declare it as a path (this check has no disable switch)",
+    )
+    require(
+        "user_guide", "id-continuity (cross-doc references)",
+        "declare it as a path (this check has no disable switch)",
+    )
+    require(
+        "validation", "id-continuity (cross-doc references)",
+        "declare it as a path (this check has no disable switch)",
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -415,9 +623,14 @@ def check_id_continuity(root: str, config: Dict, rel,
         findings.extend(_gap_findings(ids, rel, req_path, prefix, "", 0))
         defined = set(ids)
 
-    # Cross-doc references: every <prefix>-NNN cited in user_guide / validation
-    # must be defined in the requirements doc.
-    for key in ("user_guide", "validation"):
+    # Cross-doc references: every <prefix>-NNN cited in any governed prose doc
+    # must be defined in the requirements doc. The requirements doc itself is
+    # skipped -- its IDs are the definitions. A doc that is declared but
+    # unreadable stays skippable here (doc-presence reports it); an undeclared
+    # dependency exits 2 in validate_config.
+    for key in PROSE_DOC_KEYS:
+        if key == "requirements":
+            continue
         ref_path = resolve(root, docs.get(key))
         if not ref_path or ref_path not in contents:
             continue
@@ -450,9 +663,10 @@ def check_iteration_history(root: str, config: Dict, rel,
 
     Opt-in via ``checks.iteration_history.enabled``. Each section is bounded by
     a heading whose text contains the configured phrase (default
-    ``Iteration History``) and runs until the next heading. Within a section the
-    numbered items must be duplicate-free and gap-free from min to max. Multiple
-    sections (e.g. one per bilingual region) are each checked independently.
+    ``Iteration History``) and runs until the next heading. Within a section
+    the first numbered item in document order must be 1, and the items must be
+    duplicate-free and gap-free from min to max. Multiple sections (e.g. one
+    per bilingual region) are each checked independently.
     """
     findings: List[Finding] = []
     checks = config.get("checks", {})
@@ -506,7 +720,18 @@ def check_iteration_history(root: str, config: Dict, rel,
             else:
                 seen[value] = lineno
         if seen:
+            first = next(iter(seen))  # dicts preserve insertion == document order
             lo, hi = min(seen), max(seen)
+            # A history whose first entry in document order is not 1 was
+            # renumbered or rewritten, which the append-only rule forbids --
+            # 3..5 with no 1 or 2 is a self-consistent sequence, and even
+            # 3./1./2. passed when the test looked at min(seen) instead.
+            if first != 1:
+                findings.append(Finding(
+                    rel(req_path), start + 1, "iteration-continuity",
+                    f"iteration history must start at entry 1 "
+                    f"(first entry found is {first})",
+                ))
             for value in range(lo, hi + 1):
                 if value not in seen:
                     findings.append(Finding(
@@ -529,8 +754,11 @@ def check_command_consistency(root: str, config: Dict, rel,
         {"run": "<literal>", "must_appear_in": ["agents", "readme", ...]}
 
     The literal must occur inside a fenced code block or an inline code span in
-    each named doc. A finding (scoped to the doc, line 0) is emitted per doc
-    where it is absent.
+    each named doc, and must not be embedded in a longer identifier: both
+    edges reject the identifier characters ``[A-Za-z0-9_]`` plus ``-``, so a
+    longer token that merely contains the ``run`` string (``build-all`` for
+    ``build``, ``unit-test`` for ``test``) does not satisfy the rule. A
+    finding (scoped to the doc, line 0) is emitted per doc where it is absent.
     """
     findings: List[Finding] = []
     checks = config.get("checks", {})
@@ -547,6 +775,9 @@ def check_command_consistency(root: str, config: Dict, rel,
         targets = rule.get("must_appear_in", []) or []
         if not run:
             continue
+        run_re = re.compile(
+            r"(?<![A-Za-z0-9_-])" + re.escape(run) + r"(?![A-Za-z0-9_-])"
+        )
         for key in targets:
             doc_path = resolve(root, docs.get(key))
             if not doc_path or doc_path not in spans_by_path:
@@ -556,7 +787,7 @@ def check_command_consistency(root: str, config: Dict, rel,
                     f"required command not found (doc '{key}' is missing): {run!r}",
                 ))
                 continue
-            if not any(run in span for span in spans_by_path[doc_path]):
+            if not any(run_re.search(span) for span in spans_by_path[doc_path]):
                 findings.append(Finding(
                     rel(doc_path), 0, "command-consistency",
                     f"required command missing from a code block: {run!r}",
@@ -578,7 +809,8 @@ def _build_deny_words(config: Dict) -> List[Tuple[str, re.Pattern]]:
     checks = config.get("checks", {})
     words: List[str] = list(checks.get("deny_words", []) or [])
 
-    harness = checks.get("harness_neutrality", {})
+    # validate_config guarantees this is a dict or None (null == not provided).
+    harness = checks.get("harness_neutrality") or {}
     if harness.get("enabled"):
         words.extend(HARNESS_DENY_WORDS)
         words.extend(harness.get("extra_deny", []) or [])
@@ -601,6 +833,17 @@ def check_neutrality(config: Dict, rel, path: str,
                      deny: List[Tuple[str, re.Pattern]]) -> List[Finding]:
     """Flag deny-listed words and (when configured) non-allowlisted URL hosts.
 
+    The deny-word sweep governs prose, not code samples: lines inside a
+    backtick-fenced code block are skipped and inline ``code`` spans are
+    blanked before matching, so a CSS property named like a deny word inside
+    inline code is not a harness reference. Only triple-backtick fences are
+    recognized as code blocks -- a ``~~~`` fence is not, and its content is
+    scanned as prose. The URL / IPv4 / machine-path sweeps below keep scanning
+    the full line -- example commands can still leak those. A doc whose code
+    fences are unbalanced (an unclosed fence flips the in-block state for the
+    rest of the file) is itself flagged here: silently skipping the remainder
+    would make the deny-word sweep unreliable.
+
     Two further sweeps are opt-in per config (both default off, so existing
     configs are unaffected): ``checks.forbid_ipv4`` flags IPv4 literals not on
     ``checks.ipv4_allowlist`` (default loopback / any-address), and
@@ -617,13 +860,33 @@ def check_neutrality(config: Dict, rel, path: str,
     }
     forbid_local_paths = bool(checks.get("forbid_local_paths"))
 
+    code_flags = in_code_block_flags(lines)
+    # Lines carrying the allow marker are skipped by every text-scanning
+    # check, so a quoted bad-example fence never counts toward the parity
+    # decision either.
+    fence_lines = [
+        idx for idx, line in enumerate(lines)
+        if line.lstrip().startswith("```") and ALLOW_MARKER not in line
+    ]
+    if len(fence_lines) % 2 == 1:
+        # The last fence opened a block that is never closed; everything after
+        # it reads as code and the deny-word scan skips it. Never silent.
+        findings.append(Finding(
+            rel(path), fence_lines[-1] + 1, "neutrality",
+            "unclosed code fence makes the deny-word scan of the remainder "
+            "unreliable",
+        ))
+    inline_code_re = re.compile(r"`[^`]*`")
+
     for idx, line in enumerate(lines, start=1):
         if ALLOW_MARKER in line:
             continue
 
-        # (a) deny-list words (case-insensitive, word-boundary).
+        prose = "" if code_flags[idx - 1] else inline_code_re.sub(" ", line)
+
+        # (a) deny-list words (case-insensitive, word-boundary) -- prose only.
         for original, pattern in deny:
-            if pattern.search(line):
+            if pattern.search(prose):
                 findings.append(Finding(
                     rel(path), idx, "neutrality",
                     f"deny-list word '{original}' found",
@@ -758,6 +1021,7 @@ def check_doc_presence(root: str, config: Dict, rel) -> List[Finding]:
 # ---------------------------------------------------------------------------
 def run(config_path: str, root_override: Optional[str]) -> int:
     config = load_config(config_path)
+    validate_config(config)
     root = root_override or os.path.dirname(os.path.abspath(config_path)) or "."
     # If the config lives in agentic-mode/, the repo root is its parent.
     if root_override is None:

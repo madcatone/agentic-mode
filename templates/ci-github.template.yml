@@ -12,6 +12,11 @@ on:
   push:
     branches: [{{DEFAULT_BRANCH}}]
 
+# Least privilege: the gate only reads the checked-out repository, so
+# read-only access to contents is all it ever needs.
+permissions:
+  contents: read
+
 jobs:
   agentic-docs-gate:
     runs-on: ubuntu-latest
