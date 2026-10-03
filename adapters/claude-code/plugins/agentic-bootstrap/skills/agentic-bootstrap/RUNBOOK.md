@@ -74,6 +74,38 @@ The checker is invoked exactly one way:
 continuity sweeps — see [`checker/config.example.json`](checker/config.example.json)
 and the checker's module docstring.)
 
+The config is validated before any check runs; a violation exits `2` naming the
+offending key and a remedy. Two families are rejected:
+
+- **Wrong types.** Every field the checker reads must carry the right type:
+  `docs.*` is a string or `null`, `checks.line_limits.*` an integer, list
+  fields lists of strings, and every `enabled` / `forbid_*` switch an actual
+  boolean — a truthy `"false"` string cannot flip an opt-in check on, and a
+  falsy `false` cannot silently stand in for an empty list. A wrong type is
+  an error — never a silent coercion and never a traceback. A `null` on an
+  optional field means "not provided": the optional list fields and the
+  `harness_neutrality` / `iteration_history` objects fall back to their
+  built-in default (empty lists and disabled objects — except
+  `checks.ipv4_allowlist`, whose default is the built-in loopback /
+  any-address allowlist), and the string fields with a built-in default
+  (`iteration_history.heading`, `bilingual.primary_heading` /
+  `secondary_heading`) take that default. A `null` on a structural section
+  (`docs`, `id`, `bilingual`, `checks`, `line_limits`, `commands`) is itself
+  a type error.
+- **Undeclared dependencies.** An active check's dependent docs must be
+  declared under `docs` — a missing key or `null` silently disabling a check
+  is how a gate degrades to nothing. `id-continuity` requires
+  `docs.requirements`, `docs.user_guide`, and `docs.validation`;
+  `iteration_history` (when enabled) requires `docs.requirements`. Checks
+  without a disable switch tell you to declare the path; `iteration_history`
+  offers its `enabled: false` switch instead.
+
+On the doc side, an unbalanced code fence in a governed prose doc is itself a
+`neutrality` finding — an unclosed fence would make the deny-word scan of the
+remainder unreliable, so it is never skipped silently. Only backtick fences
+are recognized as code blocks (`~~~` fences are not), for that exemption and
+this finding alike.
+
 ## Tooling preference for file inspection
 
 Prefer simple shell tools first: `echo`, `jq`, `sed`, `head`, `grep`, `sort`,

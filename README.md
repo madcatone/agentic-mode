@@ -89,10 +89,10 @@ It reports `<file>:<line>: [<category>] <message>` and exits `0` (clean), `1`
 
 | Category | What it enforces |
 | --- | --- |
-| `id-continuity` | `PREFIX-NNN` IDs are gap-free and duplicate-free; IDs cited in the surface/validation docs are defined; bilingual regions share identical ID sets. |
-| `iteration-continuity` | *(opt-in)* the numbered Iteration History entries are gap-free. |
-| `command-consistency` | each configured command string appears verbatim in every doc that must carry it. |
-| `neutrality` | deny-listed words, a built-in harness deny list, non-allowlisted URL hosts, and *(opt-in)* IPv4 literals / single-machine paths. |
+| `id-continuity` | `PREFIX-NNN` IDs are gap-free and duplicate-free; IDs cited in every other governed prose doc are defined; bilingual regions share identical ID sets. |
+| `iteration-continuity` | *(opt-in)* the numbered Iteration History entries start at 1 (in document order) and are gap-free. |
+| `command-consistency` | each configured command string appears verbatim — not embedded in a longer identifier (`build-all` does not satisfy `build`) — in every doc that must carry it. |
+| `neutrality` | deny-listed words in prose (backtick-fenced code blocks and inline code spans are exempt; `~~~` fences are not recognized), a built-in harness deny list, non-allowlisted URL hosts, *(opt-in)* IPv4 literals / single-machine paths, and unbalanced code fences. |
 | `line-limit` | per-file maximum line counts (e.g. `AGENTS.md`). |
 | `entrypoint` | declared entry points exist; `.py` ones byte-compile. |
 | `doc-presence` | every declared doc path exists. |
