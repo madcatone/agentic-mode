@@ -71,9 +71,11 @@ with a message naming the offending key and an honest remedy:
 
 - Every field the checker reads must carry the right type: ``docs`` values are
   strings or ``null``, ``checks.line_limits`` values are integers, list fields
-  are lists of strings, and the ``enabled`` / ``forbid_*`` switches are actual
+  are lists of strings, the ``enabled`` / ``forbid_*`` switches are actual
   booleans (a truthy ``"false"`` string cannot flip an opt-in check on, and a
-  falsy ``false`` cannot silently stand in for an empty list). A wrong type is
+  falsy ``false`` cannot silently stand in for an empty list), and
+  ``project.type`` is one of ``cli`` / ``library`` / ``web-service`` /
+  ``docs-only``. A wrong type is
   an error -- never a silent coercion and never a traceback. A ``null`` on an
   optional field means "not provided": the optional list fields and the
   ``harness_neutrality`` / ``iteration_history`` objects fall back to their
@@ -86,13 +88,20 @@ with a message naming the offending key and an honest remedy:
   is itself a type error.
 - An active check's dependent doc must be declared under ``docs`` (a missing
   key or ``null`` never silently disables a check): ``id-continuity`` requires
-  ``requirements``, ``user_guide`` and ``validation``; ``iteration-continuity``
+  ``requirements``, ``user_guide`` and ``validation`` -- ``user_guide`` is
+  waived when ``project.type`` is ``docs-only`` (no surface doc; REQUIREMENTS
+  carries the surface), and an absent ``project.type`` takes the strict
+  reading (not docs-only); ``iteration-continuity``
   (when enabled) requires ``requirements``. Checks without a disable switch
   say the path must be declared; ``iteration-continuity`` offers its
   ``enabled: false`` switch instead.
 
-Any line containing the marker ``agentic-gate: allow`` is skipped by every
+The marker ``agentic-gate: allow`` exempts a line's *content* from every
 text-scanning check, so rule/spec docs can quote a bad example on purpose.
+It does not exempt fence structure: a fence line carrying the marker still
+opens or closes a code block -- for the fence-parity finding, the
+inside/outside state, and command-span collection alike -- so a marked fence
+left unclosed is flagged exactly like an unmarked one.
 
 Pure standard library, Python 3.8+.
 """
@@ -232,8 +241,12 @@ def validate_config(config: Dict) -> None:
       silently disabled id-continuity and iteration-continuity, degrading the
       gate to doc-presence-only. Dependencies: id-continuity -> requirements,
       user_guide, validation; iteration-continuity (when enabled) ->
-      requirements. A *declared* doc that cannot be read remains skippable
-      inside the checks themselves; doc-presence reports it as a finding.
+      requirements. ``user_guide`` is waived for a ``project.type:
+      "docs-only"`` config -- such projects have no observable-surface doc
+      (REQUIREMENTS carries the surface); an absent ``project.type`` takes the
+      strict reading (not docs-only), so the dependency stays. A *declared*
+      doc that cannot be read remains skippable inside the checks themselves;
+      doc-presence reports it as a finding.
     - Type errors: a wrongly typed field the checker reads used to crash with
       a traceback (exit 1), be coerced silently (``int(limit)`` accepted
       ``"200"``; a falsy ``must_appear_in`` / ``deny_words`` silently became
@@ -260,12 +273,27 @@ def validate_config(config: Dict) -> None:
     if not isinstance(version, int) or isinstance(version, bool):
         raise ConfigError("config field schema_version must be an integer")
 
-    for section in ("docs", "id", "bilingual", "checks"):
+    for section in ("docs", "id", "bilingual", "checks", "project"):
         if section in config and not isinstance(config[section], dict):
             raise ConfigError(f"config field {section} must be an object")
 
     docs = doc_paths(config)
     checks = config.get("checks", {})
+
+    # project.type selects the observable-surface doc (strict enum). A
+    # docs-only project has no surface doc -- REQUIREMENTS carries the
+    # surface -- which waives the user_guide dependency below. An absent
+    # type takes the strict reading: not docs-only.
+    project = config.get("project") or {}
+    ptype = project.get("type")
+    if ptype is not None and (
+        not isinstance(ptype, str)
+        or ptype not in ("cli", "library", "web-service", "docs-only")
+    ):
+        raise ConfigError(
+            "config field project.type must be one of: "
+            "cli, library, web-service, docs-only"
+        )
 
     def require_str_list(value: object, label: str) -> None:
         if not isinstance(value, list) or not all(
@@ -379,10 +407,11 @@ def validate_config(config: Dict) -> None:
         "requirements", "id-continuity",
         "declare it as a path (this check has no disable switch)",
     )
-    require(
-        "user_guide", "id-continuity (cross-doc references)",
-        "declare it as a path (this check has no disable switch)",
-    )
+    if ptype != "docs-only":
+        require(
+            "user_guide", "id-continuity (cross-doc references)",
+            "declare it as a path (this check has no disable switch)",
+        )
     require(
         "validation", "id-continuity (cross-doc references)",
         "declare it as a path (this check has no disable switch)",
@@ -861,12 +890,14 @@ def check_neutrality(config: Dict, rel, path: str,
     forbid_local_paths = bool(checks.get("forbid_local_paths"))
 
     code_flags = in_code_block_flags(lines)
-    # Lines carrying the allow marker are skipped by every text-scanning
-    # check, so a quoted bad-example fence never counts toward the parity
-    # decision either.
+    # Parity uses the same fence-line set as in_code_block_flags and
+    # code_spans: every ``` line, marker or not. The allow marker exempts a
+    # line's *content* from the text scans; it never exempts fence structure
+    # -- filtering marked fences here would let a marked closing fence make a
+    # balanced doc count odd and fake an unclosed one.
     fence_lines = [
         idx for idx, line in enumerate(lines)
-        if line.lstrip().startswith("```") and ALLOW_MARKER not in line
+        if line.lstrip().startswith("```")
     ]
     if len(fence_lines) % 2 == 1:
         # The last fence opened a block that is never closed; everything after

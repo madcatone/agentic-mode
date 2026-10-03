@@ -85,7 +85,10 @@ python3 scripts/check_agentic_docs.py --config agentic-mode/config.json
 ```
 
 It reports `<file>:<line>: [<category>] <message>` and exits `0` (clean), `1`
-(findings), or `2` (bad config / I/O). Check categories:
+(findings), or `2` (bad config / I/O). The config itself is validated first:
+wrong field types, an unknown `project.type`, and undeclared check
+dependencies exit `2` (a `docs-only` project has no surface doc, so
+`docs.user_guide` is waived for it). Check categories:
 
 | Category | What it enforces |
 | --- | --- |
@@ -97,8 +100,10 @@ It reports `<file>:<line>: [<category>] <message>` and exits `0` (clean), `1`
 | `entrypoint` | declared entry points exist; `.py` ones byte-compile. |
 | `doc-presence` | every declared doc path exists. |
 
-A line carrying the marker `agentic-gate: allow` is skipped by the text scans, so
-rule/spec docs can quote a bad example on purpose. See
+A line carrying the marker `agentic-gate: allow` has its content skipped by
+the text scans, so rule/spec docs can quote a bad example on purpose. The
+marker exempts content only — a fence line carrying it still opens or closes
+a code block for every check. See
 [`checker/config.example.json`](checker/config.example.json) for every knob.
 
 ## Playbooks

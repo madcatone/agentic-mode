@@ -74,7 +74,9 @@ python3 scripts/check_agentic_docs.py --config agentic-mode/config.json
 ```
 
 輸出格式為 `<file>:<line>: [<category>] <message>`，exit `0`（乾淨）、`1`（有 finding）、
-`2`（config 壞掉／I/O 錯誤）。檢查類別：
+`2`（config 壞掉／I/O 錯誤）。config 本身會先被驗證：欄位型別錯誤、未知的
+`project.type`、未宣告的檢查依賴都 exit `2`（`docs-only` 專案沒有 surface doc，
+因此豁免 `docs.user_guide`）。檢查類別：
 
 | 類別 | 檢查什麼 |
 | --- | --- |
@@ -86,8 +88,9 @@ python3 scripts/check_agentic_docs.py --config agentic-mode/config.json
 | `entrypoint` | 宣告的 entry point 存在；`.py` 者可 byte-compile。 |
 | `doc-presence` | 每個宣告的文件路徑都存在。 |
 
-任何帶有 `agentic-gate: allow` 標記的行會被文字掃描略過，所以規則／規格文件可以刻意
-引用壞例子。所有旋鈕見 [`checker/config.example.json`](checker/config.example.json)。
+任何帶有 `agentic-gate: allow` 標記的行，其**內容**會被文字掃描略過，所以規則／規格
+文件可以刻意引用壞例子。標記只豁免內容——帶標記的 fence 行對每項檢查仍然照常
+開關 code block。所有旋鈕見 [`checker/config.example.json`](checker/config.example.json)。
 
 ## Playbooks
 
