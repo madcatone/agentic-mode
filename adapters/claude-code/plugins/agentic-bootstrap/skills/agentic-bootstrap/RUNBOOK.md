@@ -79,9 +79,11 @@ offending key and a remedy. Two families are rejected:
 
 - **Wrong types.** Every field the checker reads must carry the right type:
   `docs.*` is a string or `null`, `checks.line_limits.*` an integer, list
-  fields lists of strings, and every `enabled` / `forbid_*` switch an actual
+  fields lists of strings, every `enabled` / `forbid_*` switch an actual
   boolean — a truthy `"false"` string cannot flip an opt-in check on, and a
-  falsy `false` cannot silently stand in for an empty list. A wrong type is
+  falsy `false` cannot silently stand in for an empty list — and
+  `project.type` one of `cli` / `library` / `web-service` / `docs-only`.
+  A wrong type is
   an error — never a silent coercion and never a traceback. A `null` on an
   optional field means "not provided": the optional list fields and the
   `harness_neutrality` / `iteration_history` objects fall back to their
@@ -96,7 +98,11 @@ offending key and a remedy. Two families are rejected:
   declared under `docs` — a missing key or `null` silently disabling a check
   is how a gate degrades to nothing. `id-continuity` requires
   `docs.requirements`, `docs.user_guide`, and `docs.validation`;
-  `iteration_history` (when enabled) requires `docs.requirements`. Checks
+  `iteration_history` (when enabled) requires `docs.requirements`. A
+  `project.type: docs-only` project has no observable-surface doc
+  (REQUIREMENTS carries the surface), so the `docs.user_guide` dependency is
+  waived for it; when `project.type` is absent the checker takes the strict
+  reading (not docs-only) and `docs.user_guide` stays required. Checks
   without a disable switch tell you to declare the path; `iteration_history`
   offers its `enabled: false` switch instead.
 
