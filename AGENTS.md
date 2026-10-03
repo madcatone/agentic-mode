@@ -39,6 +39,8 @@ model, or dispatch to use. Read [`README.md`](README.md) first, then this.
 - `.claude-plugin/marketplace.json`: the Claude Code plugin marketplace manifest.
 - `scripts/sync_plugins.py`: one-way vendoring sync (canon → plugins) + `--check` gate.
 - `examples/minimal-cli/`: a complete contract that passes the checker.
+- `tests/fire-demos/`: regression fixtures proving each check fires when
+  violated and passes when satisfied (run via `tests/run_fire_demos.sh`).
 
 ## Development Commands
 
@@ -52,6 +54,12 @@ python3 -m py_compile checker/check_agentic_docs.py
 
 ```bash
 python3 checker/check_agentic_docs.py --config examples/minimal-cli/agentic-mode/config.json --root examples/minimal-cli
+```
+
+- Run the checker fire-demo suite (must exit 0):
+
+```bash
+sh tests/run_fire_demos.sh
 ```
 
 - Sweep for leftover template placeholders in the example:
@@ -107,7 +115,8 @@ grep -rn 'PLUGIN_ROOT' adapters/claude-code/plugins && echo "FOUND" || echo "cle
   Completion is proven by the checker's objective output or a fresh-context
   read-back — not by "looks fine."
 - A change to the checker must ship with both a passing example run and a
-  demonstration that the new/changed check fires when violated.
+  demonstration that the new/changed check fires when violated; the fire-demo
+  suite (`tests/run_fire_demos.sh`) provides this demonstration mechanically.
 
 ## Stop-and-Ask (do NOT proceed silently)
 
