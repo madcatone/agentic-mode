@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "id": {
+    "prefix": "DEM"
+  },
+  "docs": {
+    "agents": "AGENTS.md",
+    "requirements": "docs/REQUIREMENTS.md",
+    "user_guide": "docs/USER_GUIDE.md",
+    "validation": "docs/VALIDATION.md",
+    "architecture": null
+  },
+  "bilingual": {
+    "enabled": false
+  },
+  "checks": {
+    "line_limits": {},
+    "deny_words": [],
+    "harness_neutrality": {
+      "enabled": false,
+      "extra_deny": []
+    },
+    "url_allowlist": [],
+    "forbid_ipv4": false,
+    "ipv4_allowlist": [
+      "127.0.0.1",
+      "0.0.0.0"
+    ],
+    "forbid_local_paths": false,
+    "iteration_history": {
+      "enabled": false,
+      "heading": "Iteration History"
+    },
+    "commands": [],
+    "entrypoints": []
+  }
+}
