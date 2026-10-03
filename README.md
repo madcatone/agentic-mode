@@ -124,7 +124,7 @@ Alongside the doc contract, [`playbooks/`](playbooks/) holds a small set of
 ## Install as Claude Code plugins
 
 This repo is also a **Claude Code plugin marketplace**. Once it is on GitHub,
-add the marketplace and install any subset of the eight plugins — each is
+add the marketplace and install any subset of the nine plugins — each is
 independent and optional:
 
 ```
@@ -137,6 +137,7 @@ independent and optional:
 /plugin install fable5@agentic-mode
 /plugin install commander@agentic-mode
 /plugin install idea-to-spec@agentic-mode
+/plugin install pstack@agentic-mode
 ```
 
 | Plugin | Installs | Canonical source |
@@ -149,6 +150,7 @@ independent and optional:
 | `fable5` | Commander-mode operating discipline + the strong-model founding prompt. | The plugin directory itself (self-canonical) |
 | `commander` | The runnable per-repo dispatch-and-score loop: constitution, report protocol, task template, dispatch + scoring scripts, ledger scaffold. | The plugin directory itself (self-canonical) |
 | `idea-to-spec` | The spec-synthesizer skill: batch interview, size triage, 12-section SPEC template. | The plugin directory itself (self-canonical) |
+| `pstack` | Thirty-one third-party engineering skills under MIT: 24 design/execution principles plus benchmark-checklist, blast-radius, figure-it-out, tdd, technical-writing, typescript-best-practices, and unslop. | The plugin directory itself (self-canonical; third-party under MIT) |
 
 The commit/review conventions differ from team to team, which is why they are
 optional plugins and policy-overridable playbooks rather than part of the core.
@@ -156,28 +158,31 @@ Each of those plugins vendors a self-contained copy of its canonical source; see
 [`adapters/claude-code/README.md`](adapters/claude-code/README.md) for the
 vendoring + anti-drift sync.
 
-`fable5`, `commander`, and `idea-to-spec` are the exceptions: all three have
-**no harness-neutral playbook counterpart**. `fable5` governs how you operate a
+`fable5`, `commander`, `idea-to-spec`, and `pstack` are the exceptions: all four
+have **no harness-neutral playbook counterpart**. `fable5` governs how you operate a
 *session* (the main model as advisor/dispatcher, subagent tiers, output written
 into a per-user config home); `commander` ships the runnable per-repo instance of
 that same doctrine (a constitution plus dispatch/scoring scripts a subagent CLI
 drives); `idea-to-spec` is an interactive authoring workflow that produces one
 project's SPEC, so its canon is the skill procedure itself rather than a rules
-document a reader could apply by hand. None of the three is a repo document
+document a reader could apply by hand. `pstack` is a third-party skill pack — 31
+engineering skills ported under MIT from an external collection, attribution in
+its `THIRD-PARTY-NOTICE.md` — so its canon is the imported collection itself.
+None of the four is a repo document
 contract, so none can live in the neutral core. Their **plugin directories are
 their own canon**: nothing is vendored into them and they are not part of the
 `sync_plugins.py` sync.
 
 ## Install as skills in any agent (`npx skills`)
 
-The same eight skills install into **any agent the open skills CLI supports** —
+The same skills install into **any agent the open skills CLI supports** —
 not just Claude Code — because that CLI reads
 [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json) and follows
 each plugin's `source` to its conventional `skills/` directory. There is no
 second manifest to maintain: the plugin directories are the only source of truth.
 
 ```bash
-npx skills add madcatone/agentic-mode --list          # see the eight skills
+npx skills add madcatone/agentic-mode --list          # see all the skills
 npx skills add madcatone/agentic-mode                 # pick interactively
 npx skills add madcatone/agentic-mode --skill commander --skill doc-linter
 npx skills add madcatone/agentic-mode --all           # every skill, every agent
@@ -222,7 +227,8 @@ packaging lives only under [`adapters/`](adapters/):
 - [`adapters/claude-code/`](adapters/claude-code/) — a Claude Code plugin
   marketplace: the `agentic-bootstrap` toolkit, the four playbooks, and the
   self-canonical `fable5` commander-mode discipline, `commander`
-  dispatch-and-score loop, and `idea-to-spec` spec synthesizer packaged as
+  dispatch-and-score loop, `idea-to-spec` spec synthesizer, and `pstack`
+  third-party engineering-skill pack (31 skills under MIT) packaged as
   optional, independently installable plugins (see
   [its README](adapters/claude-code/README.md) and [Install as Claude Code
   plugins](#install-as-claude-code-plugins) above).
