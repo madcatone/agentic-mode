@@ -18,7 +18,7 @@
     "deny_words": [],
     "harness_neutrality": {
       "enabled": true,
-      "extra_deny": ["vexide"]
+      "extra_deny": ["vexide", "zorpal"]
     },
     "url_allowlist": [],
     "forbid_ipv4": false,

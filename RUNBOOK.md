@@ -108,11 +108,16 @@ offending key and a remedy. Two families are rejected:
   without a disable switch tell you to declare the path; `iteration_history`
   offers its `enabled: false` switch instead.
 
-On the doc side, an unbalanced code fence in a governed prose doc is itself a
-`neutrality` finding — an unclosed fence would make the deny-word scan of the
-remainder unreliable, so it is never skipped silently. Only backtick fences
-are recognized as code blocks (`~~~` fences are not), for that exemption and
-this finding alike.
+On the doc side, a governed prose doc whose fence scan ends inside a block is
+itself a `neutrality` finding at the opening fence line — an unclosed fence
+would make the deny-word scan of the remainder unreliable, so it is never
+skipped silently. Both backtick and tilde fences are recognized as code
+blocks, at any indentation (deliberately wider than CommonMark's three-space
+indent cap, so code samples nested in lists keep their exemption); a closing
+fence repeats the opening fence's character and may trail only spaces and
+tabs — for the deny-word exemption and this finding alike. The
+`agentic-gate: allow` marker exempts only a line's content: a fence line
+carrying it still opens or closes its block for every check.
 
 ## Tooling preference for file inspection
 
