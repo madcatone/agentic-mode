@@ -115,7 +115,10 @@ skipped silently. Both backtick and tilde fences are recognized as code
 blocks, at any indentation (deliberately wider than CommonMark's three-space
 indent cap, so code samples nested in lists keep their exemption); a closing
 fence repeats the opening fence's character and may trail only spaces and
-tabs — for the deny-word exemption and this finding alike. The
+tabs — for the deny-word exemption and this finding alike. The widening
+cuts both ways: prose between a stray deeply indented, balanced fence pair
+is silently exempt from the scan — balanced fences raise no finding. Treat
+an unexpected exemption as a cue to look for stray indented fences. The
 `agentic-gate: allow` marker exempts only a line's content: a fence line
 carrying it still opens or closes its block for every check.
 

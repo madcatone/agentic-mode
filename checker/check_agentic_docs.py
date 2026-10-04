@@ -47,8 +47,11 @@ Check categories
    tilde fences are both recognized, at any indentation (deliberately wider
    than CommonMark's three-space indent cap, so code samples nested in lists
    keep their exemption); a closing fence must repeat the opening fence's
-   character and may be followed only by spaces and tabs. One ``scan_fences``
-   state
+   character and may be followed only by spaces and tabs. The widening
+   cuts both ways: prose between a stray deeply indented, balanced fence
+   pair is silently exempt from the scan -- balanced fences raise no
+   finding. Treat an unexpected exemption as a cue to look for stray
+   indented fences. One ``scan_fences`` state
    machine feeds the deny-word scan, the command-span collection, and fence
    parity alike. A governed doc whose fence scan ends inside a block (an
    unclosed backtick or tilde fence) is flagged at the opening fence line:
@@ -507,17 +510,19 @@ def scan_fences(lines: Sequence[str]) -> FenceScan:
     three or more backticks or tildes (CommonMark caps the indent at three
     spaces; this scan does not, so a fence nested inside a list still counts
     and code samples nested in lists keep their exemption). A backtick
-    fence's info
-    string may not itself contain a backtick. An open block is closed only by
-    a fence of the *same* character, at least as long as the opening run,
-    followed only by spaces and tabs -- a fence of the other character, a
-    shorter run, or a run trailing anything else (even an exotic Unicode
-    space) is block content.
-    The allow marker exempts a line's *content* only, so it is ignored for the
-    blanks-only test: a marked closing fence still closes, and a marked
-    opening fence left unclosed is still reported. Fence parity is this
-    machine's terminal state -- the scan ended inside a block -- and the
-    deny-word scan and the command-span collection read the same flags.
+    fence's info string may not itself contain a backtick. An open block is
+    closed only by a fence of the *same* character, at least as long as the
+    opening run, followed only by spaces and tabs -- a fence of the other
+    character, a shorter run, or a run trailing anything else (even an exotic
+    Unicode space) is block content. The widening cuts both ways: prose
+    between a stray deeply indented, balanced fence pair is silently exempt
+    from the scan -- balanced fences raise no finding. Treat an unexpected
+    exemption as a cue to look for stray indented fences. The allow marker
+    exempts a line's *content* only, so it is ignored for the spaces-and-tabs
+    test: a marked closing fence still closes, and a marked opening fence
+    left unclosed is still reported. Fence parity is this machine's terminal
+    state -- the scan ended inside a block -- and the deny-word scan and the
+    command-span collection read the same flags.
     """
     flags: List[bool] = []
     fence_char: Optional[str] = None
