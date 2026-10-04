@@ -1,0 +1,5 @@
+# AGENTS
+
+```text
+vendor: vexide
+```　
