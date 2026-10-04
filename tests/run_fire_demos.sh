@@ -9,11 +9,15 @@
 #
 # Case-name families (ported from the #1 hardening rounds):
 #   c*  round 1 -- ported fixes C1-C7
-#   r*  round 2 -- review findings (#1-#7, r1r/r2r = follow-ups to #1/#2)
+#   r*  round 2 -- review findings (#1-#7, r1r = follow-up to #1; the r2r
+#       "~~~ not exempt" follow-up was retired when #5 recognized ~~~ fences
+#       -- t1 supersedes it with the flipped contract)
 #   s*  follow-up fence findings (S1/S2, code spans)
 #   b*  docs-only adoption findings
 #   a*  api_reference surface dependency (type-mapped surface doc)
 #   g*  coverage gaps found in read-back (one firing case per check family)
+#   t*  tilde fences + fence-engine edge cases (indent leniency, fake
+#       closers) (#5)
 #
 # Neutrality rule: deny words in these fixtures are fictional
 # (vexide/zorpal/novera/fictool) and reach the deny list only via
@@ -100,8 +104,6 @@ expect 1 r7-unclosed-fence-flagged \
     "unclosed fence announced; deny word after it not silently skipped"
 expect 1 r1r-unclosed-marker-fence-flagged \
     "marker exempts content only; unclosed marker fence still flagged"
-expect 1 r2r-tilde-fence-not-exempt \
-    "~~~ is not an exempt fence; deny word inside still reported"
 
 # ---- follow-up: marker fences and code spans -------------------------------
 expect 1 s1-marker-fence-degradation-announced \
@@ -134,6 +136,20 @@ expect 1 g2-entrypoint-missing \
     "declared entrypoint absent from the tree -> flagged"
 expect 1 g3-declared-doc-missing \
     "declared user_guide file missing while config is valid -> flagged"
+
+# ---- tilde fences + fence-engine edge cases (#5) -------------------------------
+expect 0 t1-tilde-fence-exempt-clean \
+    "closed ~~~ fence: deny word inside is exempt -> clean"
+expect 1 t2-unclosed-tilde-flagged \
+    "unclosed ~~~ fence announced at its opening line; tail not prose-scanned"
+expect 1 t3-backtick-block-swallows-tilde \
+    "~~~ inside a backtick block is content, not a close -> block left unclosed"
+expect 1 t4-tilde-not-closed-by-backticks \
+    "backticks do not close a ~~~ block -> unclosed; real prose deny word fires"
+expect 0 t5-list-nested-fence-exempt \
+    "fence indented 4 spaces inside a nested list still counts: deny word exempt"
+expect 1 t6-fake-close-ideographic-space \
+    "a closer followed only by U+3000 is not a closer -> unclosed flagged"
 
 printf '\n%d cases: %d pass, %d fail\n' "$((pass + fail))" "$pass" "$fail"
 [ "$fail" -eq 0 ]

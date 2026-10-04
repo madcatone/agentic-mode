@@ -41,12 +41,19 @@ Check categories
    does not satisfy the rule.
 3. ``neutrality`` -- deny-listed words (config ``deny_words`` plus, when
    ``harness_neutrality.enabled``, a conservative built-in harness deny list)
-   are flagged in prose only: lines inside a backtick-fenced code block are
-   skipped and inline code spans are blanked before matching, so a CSS
-   ``cursor`` property inside a code sample is not a harness reference.
-   (``~~~`` fences are not recognized as code blocks.) A governed doc with
-   unbalanced code fences is itself flagged: an unclosed fence would make the
-   deny-word scan of the remainder unreliable. The remaining sweeps scan the
+   are flagged in prose only: lines inside a fenced code block are skipped
+   and inline code spans are blanked before matching, so a CSS ``cursor``
+   property inside a code sample is not a harness reference. Backtick and
+   tilde fences are both recognized, at any indentation (deliberately wider
+   than CommonMark's three-space indent cap, so code samples nested in lists
+   keep their exemption); a closing fence must repeat the opening fence's
+   character and may be followed only by spaces and tabs. One ``scan_fences``
+   state
+   machine feeds the deny-word scan, the command-span collection, and fence
+   parity alike. A governed doc whose fence scan ends inside a block (an
+   unclosed backtick or tilde fence) is flagged at the opening fence line:
+   an unclosed fence would make the deny-word scan of the remainder
+   unreliable. The remaining sweeps scan the
    full line including code: when ``url_allowlist`` is non-empty, http(s) URLs
    whose host is not on the allowlist; plus two opt-in leak sweeps --
    ``checks.forbid_ipv4`` flags IPv4 literals outside ``checks.ipv4_allowlist``
@@ -169,6 +176,15 @@ IPV4_RE = re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}\b")
 LOCAL_PATH_RE = re.compile(
     r"(?:(?<![\w/])~/\.[^\s)\"'`]*|(?<![\w])/(?:Users|home)/[^\s)\"'`]*)"
 )
+
+# A fence line: any leading whitespace, then a run of three or more backticks
+# or tildes. Group 1 is the fence run; group 2 is the rest of the line -- an
+# opening fence's info string there, while a closing fence may be followed
+# only by spaces and tabs (the allow marker excepted: it exempts content
+# only, never fence structure). Indentation is deliberately wider than
+# CommonMark's three-space cap: a fence nested inside a list still counts, so
+# code samples nested in lists keep their exemption.
+FENCE_RE = re.compile(r"^\s*(`{3,}|~{3,})(.*)$")
 
 # Neutral IPv4 literals that never trip ``forbid_ipv4`` (loopback / any-address).
 DEFAULT_IPV4_ALLOWLIST: Tuple[str, ...] = ("127.0.0.1", "0.0.0.0")
@@ -470,22 +486,75 @@ def make_rel(root: str):
     return rel
 
 
-def in_code_block_flags(lines: Sequence[str]) -> List[bool]:
-    """Return a per-line flag marking whether the line sits inside a fenced
-    code block. Fence lines (``` ...) themselves are marked False so the
-    delimiter itself is never treated as code content.
+class FenceScan(NamedTuple):
+    """One pass of the fence state machine over a document.
+
+    ``inside_flags`` marks per line whether the line is *content* inside a
+    fenced code block (fence lines themselves are False). ``open_lineno`` is
+    the 1-based line of the opening fence the scan ended inside of -- a fence
+    left unclosed at end of file -- or None when every block closed.
+    """
+
+    inside_flags: List[bool]
+    open_lineno: Optional[int]
+
+
+def scan_fences(lines: Sequence[str]) -> FenceScan:
+    """The single fence state machine every fence decision derives from.
+
+    Recognition follows the CommonMark fence rules with one deliberate
+    widening: a fence opens with any amount of leading whitespace followed by
+    three or more backticks or tildes (CommonMark caps the indent at three
+    spaces; this scan does not, so a fence nested inside a list still counts
+    and code samples nested in lists keep their exemption). A backtick
+    fence's info
+    string may not itself contain a backtick. An open block is closed only by
+    a fence of the *same* character, at least as long as the opening run,
+    followed only by spaces and tabs -- a fence of the other character, a
+    shorter run, or a run trailing anything else (even an exotic Unicode
+    space) is block content.
+    The allow marker exempts a line's *content* only, so it is ignored for the
+    blanks-only test: a marked closing fence still closes, and a marked
+    opening fence left unclosed is still reported. Fence parity is this
+    machine's terminal state -- the scan ended inside a block -- and the
+    deny-word scan and the command-span collection read the same flags.
     """
     flags: List[bool] = []
-    inside = False
-    for line in lines:
-        is_fence = line.lstrip().startswith("```")
-        if is_fence:
-            # The fence line itself is a boundary, not code content.
-            flags.append(False)
-            inside = not inside
+    fence_char: Optional[str] = None
+    fence_len = 0
+    open_lineno: Optional[int] = None
+    for lineno, line in enumerate(lines, start=1):
+        match = FENCE_RE.match(line)
+        if fence_char is None:
+            if match is not None and (
+                match.group(1)[0] == "~" or "`" not in match.group(2)
+            ):
+                fence_char = match.group(1)[0]
+                fence_len = len(match.group(1))
+                open_lineno = lineno
+            flags.append(False)  # prose, or the opening fence itself
+        elif (
+            match is not None
+            and match.group(1)[0] == fence_char
+            and len(match.group(1)) >= fence_len
+            and match.group(2).replace(ALLOW_MARKER, "").rstrip(" \t") == ""
+        ):
+            fence_char = None
+            fence_len = 0
+            open_lineno = None
+            flags.append(False)  # the closing fence itself
         else:
-            flags.append(inside)
-    return flags
+            flags.append(True)  # block content
+    return FenceScan(flags, open_lineno)
+
+
+def in_code_block_flags(lines: Sequence[str]) -> List[bool]:
+    """Return a per-line flag marking whether the line sits inside a fenced
+    code block (backtick or tilde). Fence lines themselves are marked False
+    so the delimiter is never treated as code content. Thin wrapper over
+    ``scan_fences`` -- the one state machine behind every fence decision.
+    """
+    return scan_fences(lines).inside_flags
 
 
 def code_spans(lines: Sequence[str]) -> List[str]:
@@ -880,15 +949,17 @@ def check_neutrality(config: Dict, rel, path: str,
     """Flag deny-listed words and (when configured) non-allowlisted URL hosts.
 
     The deny-word sweep governs prose, not code samples: lines inside a
-    backtick-fenced code block are skipped and inline ``code`` spans are
-    blanked before matching, so a CSS property named like a deny word inside
-    inline code is not a harness reference. Only triple-backtick fences are
-    recognized as code blocks -- a ``~~~`` fence is not, and its content is
-    scanned as prose. The URL / IPv4 / machine-path sweeps below keep scanning
-    the full line -- example commands can still leak those. A doc whose code
-    fences are unbalanced (an unclosed fence flips the in-block state for the
-    rest of the file) is itself flagged here: silently skipping the remainder
-    would make the deny-word sweep unreliable.
+    fenced code block are skipped and inline ``code`` spans are blanked
+    before matching, so a CSS property named like a deny word inside inline
+    code is not a harness reference. Backtick and tilde fences are both
+    recognized, at any indentation, and a closing fence must repeat the
+    opening fence's character and trail only spaces and tabs -- all from the
+    single ``scan_fences`` state machine.
+    The URL / IPv4 / machine-path sweeps below keep scanning the full line
+    -- example commands can still leak those. A doc whose fence scan ends
+    inside a block -- an unclosed backtick or tilde fence -- is itself
+    flagged here at its opening line: silently skipping the remainder would
+    make the deny-word sweep unreliable.
 
     Two further sweeps are opt-in per config (both default off, so existing
     configs are unaffected): ``checks.forbid_ipv4`` flags IPv4 literals not on
@@ -906,21 +977,19 @@ def check_neutrality(config: Dict, rel, path: str,
     }
     forbid_local_paths = bool(checks.get("forbid_local_paths"))
 
-    code_flags = in_code_block_flags(lines)
-    # Parity uses the same fence-line set as in_code_block_flags and
-    # code_spans: every ``` line, marker or not. The allow marker exempts a
-    # line's *content* from the text scans; it never exempts fence structure
-    # -- filtering marked fences here would let a marked closing fence make a
-    # balanced doc count odd and fake an unclosed one.
-    fence_lines = [
-        idx for idx, line in enumerate(lines)
-        if line.lstrip().startswith("```")
-    ]
-    if len(fence_lines) % 2 == 1:
-        # The last fence opened a block that is never closed; everything after
-        # it reads as code and the deny-word scan skips it. Never silent.
+    # One state machine behind every fence decision: the deny-word scan here,
+    # the command-span collection (``code_spans``), and fence parity below all
+    # read ``scan_fences``. The allow marker exempts a line's *content* from
+    # the text scans; it never exempts fence structure -- the machine ignores
+    # it when testing a closing fence, so a marked closing fence keeps a doc
+    # balanced and a marked opening fence left unclosed is still flagged.
+    scan = scan_fences(lines)
+    code_flags = scan.inside_flags
+    if scan.open_lineno is not None:
+        # The scan ended inside a fence: everything after its opening line
+        # reads as code and the deny-word scan skips it. Never silent.
         findings.append(Finding(
-            rel(path), fence_lines[-1] + 1, "neutrality",
+            rel(path), scan.open_lineno, "neutrality",
             "unclosed code fence makes the deny-word scan of the remainder "
             "unreliable",
         ))

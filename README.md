@@ -96,7 +96,7 @@ dependencies exit `2` (the surface doc is required by type: `cli` /
 | `id-continuity` | `PREFIX-NNN` IDs are gap-free and duplicate-free; IDs cited in every other governed prose doc are defined; bilingual regions share identical ID sets. |
 | `iteration-continuity` | *(opt-in)* the numbered Iteration History entries start at 1 (in document order) and are gap-free. |
 | `command-consistency` | each configured command string appears verbatim — not embedded in a longer identifier (`build-all` does not satisfy `build`) — in every doc that must carry it. |
-| `neutrality` | deny-listed words in prose (backtick-fenced code blocks and inline code spans are exempt; `~~~` fences are not recognized), a built-in harness deny list, non-allowlisted URL hosts, *(opt-in)* IPv4 literals / single-machine paths, and unbalanced code fences. |
+| `neutrality` | deny-listed words in prose (fenced code blocks — backtick or `~~~`, closed by the same character — and inline code spans are exempt), a built-in harness deny list, non-allowlisted URL hosts, *(opt-in)* IPv4 literals / single-machine paths, and unclosed code fences (flagged at the opening fence line; the remainder then reads as code and is not prose-scanned — announced by the finding, never silently skipped). |
 | `line-limit` | per-file maximum line counts (e.g. `AGENTS.md`). |
 | `entrypoint` | declared entry points exist; `.py` ones byte-compile. |
 | `doc-presence` | every declared doc path exists. |
