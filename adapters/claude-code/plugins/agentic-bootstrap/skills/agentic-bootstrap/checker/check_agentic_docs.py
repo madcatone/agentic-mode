@@ -88,10 +88,12 @@ with a message naming the offending key and an honest remedy:
   is itself a type error.
 - An active check's dependent doc must be declared under ``docs`` (a missing
   key or ``null`` never silently disables a check): ``id-continuity`` requires
-  ``requirements``, ``user_guide`` and ``validation`` -- ``user_guide`` is
-  waived when ``project.type`` is ``docs-only`` (no surface doc; REQUIREMENTS
-  carries the surface), and an absent ``project.type`` takes the strict
-  reading (not docs-only); ``iteration-continuity``
+  ``requirements``, ``validation``, and the observable-surface doc selected by
+  ``project.type`` -- ``cli`` / ``web-service`` require ``user_guide``,
+  ``library`` requires ``api_reference``, and ``docs-only`` requires neither
+  (no surface doc; REQUIREMENTS carries the surface). An absent
+  ``project.type`` takes the strict reading (a surface project, so
+  ``user_guide``); ``iteration-continuity``
   (when enabled) requires ``requirements``. Checks without a disable switch
   say the path must be declared; ``iteration-continuity`` offers its
   ``enabled: false`` switch instead.
@@ -150,6 +152,7 @@ PROSE_DOC_KEYS: Tuple[str, ...] = (
     "agents",
     "requirements",
     "user_guide",
+    "api_reference",
     "validation",
     "workflow",
 )
@@ -240,11 +243,13 @@ def validate_config(config: Dict) -> None:
       check and the run still exited 0 -- dropping ``docs.requirements``
       silently disabled id-continuity and iteration-continuity, degrading the
       gate to doc-presence-only. Dependencies: id-continuity -> requirements,
-      user_guide, validation; iteration-continuity (when enabled) ->
-      requirements. ``user_guide`` is waived for a ``project.type:
-      "docs-only"`` config -- such projects have no observable-surface doc
-      (REQUIREMENTS carries the surface); an absent ``project.type`` takes the
-      strict reading (not docs-only), so the dependency stays. A *declared*
+      validation, and the surface doc selected by ``project.type`` (cli /
+      web-service -> user_guide, library -> api_reference, docs-only -> none);
+      iteration-continuity (when enabled) -> requirements. ``docs-only``
+      projects have no observable-surface doc (REQUIREMENTS carries the
+      surface), so neither surface key is required for them; an absent
+      ``project.type`` takes the strict reading (a surface project, so
+      ``user_guide``), so the dependency stays. A *declared*
       doc that cannot be read remains skippable inside the checks themselves;
       doc-presence reports it as a finding.
     - Type errors: a wrongly typed field the checker reads used to crash with
@@ -280,10 +285,11 @@ def validate_config(config: Dict) -> None:
     docs = doc_paths(config)
     checks = config.get("checks", {})
 
-    # project.type selects the observable-surface doc (strict enum). A
-    # docs-only project has no surface doc -- REQUIREMENTS carries the
-    # surface -- which waives the user_guide dependency below. An absent
-    # type takes the strict reading: not docs-only.
+    # project.type selects the observable-surface doc (strict enum): cli /
+    # web-service -> user_guide, library -> api_reference, docs-only -> none
+    # (REQUIREMENTS carries the surface). The dependency rule below follows
+    # this mapping; an absent type takes the strict reading (a surface
+    # project, so user_guide).
     project = config.get("project") or {}
     ptype = project.get("type")
     if ptype is not None and (
@@ -407,10 +413,20 @@ def validate_config(config: Dict) -> None:
         "requirements", "id-continuity",
         "declare it as a path (this check has no disable switch)",
     )
-    if ptype != "docs-only":
+    # The observable-surface doc is required by project type: cli /
+    # web-service -> user_guide, library -> api_reference, docs-only -> none
+    # (REQUIREMENTS carries the surface). An absent type keeps the strict
+    # reading (a surface project, so user_guide) -- never silently docs-only.
+    surface_key = {
+        "library": "api_reference",
+        "docs-only": None,
+    }.get(ptype, "user_guide")
+    if surface_key is not None:
         require(
-            "user_guide", "id-continuity (cross-doc references)",
-            "declare it as a path (this check has no disable switch)",
+            surface_key, "id-continuity (cross-doc references)",
+            "declare it as a path, or set project.type to match the "
+            "project (the required surface doc follows project.type; "
+            "this check has no disable switch)",
         )
     require(
         "validation", "id-continuity (cross-doc references)",
@@ -425,7 +441,8 @@ def discover_targets(root: str, config: Dict) -> List[str]:
     """Return absolute paths of the prose docs in scope, de-duplicated.
 
     Scope is exactly the prose doc paths declared in the config (index,
-    readme, agents, requirements, user_guide, validation, workflow). Only
+    readme, agents, requirements, user_guide, api_reference, validation,
+    workflow). Only
     existing files are returned; ``null`` / missing declarations are skipped.
     Unlike the original repo-specific version this does not walk directories
     -- the config is the single source of truth for which files are governed.

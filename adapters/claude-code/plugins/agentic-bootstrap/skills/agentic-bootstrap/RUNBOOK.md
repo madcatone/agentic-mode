@@ -49,6 +49,7 @@ scripts/check_agentic_docs.py  # the checker, copied verbatim from TOOLKIT/check
   "id": {"prefix": "[A-Z]{2,6}"},
   "docs": {"index": "AGENTIC-MODE.md", "readme": "README.md", "agents": "AGENTS.md",
            "requirements": "docs/REQUIREMENTS.md", "user_guide": "docs/USER_GUIDE.md",
+           "api_reference": "docs/API_REFERENCE.md or null",
            "validation": "docs/VALIDATION.md", "workflow": "docs/WORKFLOW.md",
            "architecture": "docs/architecture.json or null"},
   "bilingual": {"enabled": false, "secondary_language": "zh-TW"},
@@ -97,12 +98,13 @@ offending key and a remedy. Two families are rejected:
 - **Undeclared dependencies.** An active check's dependent docs must be
   declared under `docs` — a missing key or `null` silently disabling a check
   is how a gate degrades to nothing. `id-continuity` requires
-  `docs.requirements`, `docs.user_guide`, and `docs.validation`;
-  `iteration_history` (when enabled) requires `docs.requirements`. A
-  `project.type: docs-only` project has no observable-surface doc
-  (REQUIREMENTS carries the surface), so the `docs.user_guide` dependency is
-  waived for it; when `project.type` is absent the checker takes the strict
-  reading (not docs-only) and `docs.user_guide` stays required. Checks
+  `docs.requirements`, `docs.validation`, and the observable-surface doc
+  selected by `project.type`: `cli` / `web-service` require
+  `docs.user_guide`, `library` requires `docs.api_reference`, and
+  `docs-only` requires neither (no surface doc — REQUIREMENTS carries the
+  surface). `iteration_history` (when enabled) requires `docs.requirements`.
+  When `project.type` is absent the checker takes the strict reading (a
+  surface project, so `docs.user_guide`) and the dependency stays. Checks
   without a disable switch tell you to declare the path; `iteration_history`
   offers its `enabled: false` switch instead.
 
