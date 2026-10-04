@@ -87,8 +87,9 @@ python3 scripts/check_agentic_docs.py --config agentic-mode/config.json
 It reports `<file>:<line>: [<category>] <message>` and exits `0` (clean), `1`
 (findings), or `2` (bad config / I/O). The config itself is validated first:
 wrong field types, an unknown `project.type`, and undeclared check
-dependencies exit `2` (a `docs-only` project has no surface doc, so
-`docs.user_guide` is waived for it). Check categories:
+dependencies exit `2` (the surface doc is required by type: `cli` /
+`web-service` need `docs.user_guide`, `library` needs `docs.api_reference`,
+`docs-only` needs neither). Check categories:
 
 | Category | What it enforces |
 | --- | --- |

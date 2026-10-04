@@ -75,8 +75,9 @@ python3 scripts/check_agentic_docs.py --config agentic-mode/config.json
 
 輸出格式為 `<file>:<line>: [<category>] <message>`，exit `0`（乾淨）、`1`（有 finding）、
 `2`（config 壞掉／I/O 錯誤）。config 本身會先被驗證：欄位型別錯誤、未知的
-`project.type`、未宣告的檢查依賴都 exit `2`（`docs-only` 專案沒有 surface doc，
-因此豁免 `docs.user_guide`）。檢查類別：
+`project.type`、未宣告的檢查依賴都 exit `2`（surface doc 依型別而定：`cli`／
+`web-service` 需要 `docs.user_guide`、`library` 需要 `docs.api_reference`、
+`docs-only` 兩者皆免）。檢查類別：
 
 | 類別 | 檢查什麼 |
 | --- | --- |
