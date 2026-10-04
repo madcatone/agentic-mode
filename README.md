@@ -150,7 +150,7 @@ independent and optional:
 | `fable5` | Commander-mode operating discipline + the strong-model founding prompt. | The plugin directory itself (self-canonical) |
 | `commander` | The runnable per-repo dispatch-and-score loop: constitution, report protocol, task template, dispatch + scoring scripts, ledger scaffold. | The plugin directory itself (self-canonical) |
 | `idea-to-spec` | The spec-synthesizer skill: batch interview, size triage, 12-section SPEC template. | The plugin directory itself (self-canonical) |
-| `pstack` | Thirty-one third-party engineering skills under MIT: 24 design/execution principles plus benchmark-checklist, blast-radius, figure-it-out, tdd, technical-writing, typescript-best-practices, and unslop. | The plugin directory itself (self-canonical; third-party under MIT) |
+| `pstack` | Thirty-six third-party engineering skills under MIT: 24 design/execution principles plus architect, arena, benchmark-checklist, blast-radius, create-verification-skill, figure-it-out, interrogate, maintain-verification-skill, tdd, technical-writing, typescript-best-practices, and unslop. | The plugin directory itself (self-canonical; third-party under MIT) |
 
 The commit/review conventions differ from team to team, which is why they are
 optional plugins and policy-overridable playbooks rather than part of the core.
@@ -165,7 +165,7 @@ into a per-user config home); `commander` ships the runnable per-repo instance o
 that same doctrine (a constitution plus dispatch/scoring scripts a subagent CLI
 drives); `idea-to-spec` is an interactive authoring workflow that produces one
 project's SPEC, so its canon is the skill procedure itself rather than a rules
-document a reader could apply by hand. `pstack` is a third-party skill pack — 31
+document a reader could apply by hand. `pstack` is a third-party skill pack — 36
 engineering skills ported under MIT from an external collection, attribution in
 its `THIRD-PARTY-NOTICE.md` — so its canon is the imported collection itself.
 None of the four is a repo document
@@ -228,7 +228,7 @@ packaging lives only under [`adapters/`](adapters/):
   marketplace: the `agentic-bootstrap` toolkit, the four playbooks, and the
   self-canonical `fable5` commander-mode discipline, `commander`
   dispatch-and-score loop, `idea-to-spec` spec synthesizer, and `pstack`
-  third-party engineering-skill pack (31 skills under MIT) packaged as
+  third-party engineering-skill pack (36 skills under MIT) packaged as
   optional, independently installable plugins (see
   [its README](adapters/claude-code/README.md) and [Install as Claude Code
   plugins](#install-as-claude-code-plugins) above).
