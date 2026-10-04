@@ -12,6 +12,7 @@
 #   r*  round 2 -- review findings (#1-#7, r1r/r2r = follow-ups to #1/#2)
 #   s*  follow-up fence findings (S1/S2, code spans)
 #   b*  docs-only adoption findings
+#   a*  api_reference surface dependency (type-mapped surface doc)
 #   g*  coverage gaps found in read-back (one firing case per check family)
 #
 # Neutrality rule: deny words in these fixtures are fictional
@@ -115,6 +116,16 @@ expect 0 b-docs-only-user-guide-null-clean \
     "docs-only project with user_guide null runs clean"
 expect 2 b-project-type-misspelled \
     "project.type \"docsonly\" (misspelled) -> enum config error"
+
+# ---- api_reference surface dependency (type-mapped) --------------------------
+expect 0 a1-library-api-reference-clean \
+    "library project with api_reference declared (user_guide null) runs clean"
+expect 2 a2-library-api-reference-null \
+    "library project with api_reference null -> config error naming docs.api_reference"
+expect 2 a3-cli-user-guide-null \
+    "cli project with user_guide null still -> config error naming docs.user_guide"
+expect 1 a4-api-reference-declared-missing \
+    "declared api_reference file missing while config is valid -> flagged"
 
 # ---- coverage gaps: one firing case per check family -------------------------
 expect 1 g1-line-limit-exceeded \

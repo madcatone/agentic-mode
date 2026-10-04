@@ -14,6 +14,7 @@
     "agents": "AGENTS.md",
     "requirements": "docs/REQUIREMENTS.md",
     "user_guide": "docs/USER_GUIDE.md",
+    "api_reference": null,
     "validation": "docs/VALIDATION.md",
     "workflow": "docs/WORKFLOW.md",
     "architecture": null
