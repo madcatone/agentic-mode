@@ -1,6 +1,6 @@
 {
   "name": "agentic-mode",
-  "description": "Optional Claude Code plugins for the agentic-mode methodology: the doc-contract bootstrapper, four harness-neutral collaboration playbooks (commit messages, two-axis review, review response, document linting), the fable5 commander-mode operating discipline, the commander dispatch-and-score loop, the idea-to-spec spec synthesizer that turns rough idea material into an executable development SPEC, and the pstack pack of 31 third-party engineering skills ported under MIT. Install only the ones your team wants.",
+  "description": "Optional Claude Code plugins for the agentic-mode methodology: the doc-contract bootstrapper, four harness-neutral collaboration playbooks (commit messages, two-axis review, review response, document linting), the fable5 commander-mode operating discipline, the commander dispatch-and-score loop, the idea-to-spec spec synthesizer that turns rough idea material into an executable development SPEC, and the pstack pack of 36 third-party engineering skills ported under MIT. Install only the ones your team wants.",
   "owner": {
     "name": "agentic-mode maintainers"
   },
@@ -48,7 +48,7 @@
     {
       "name": "pstack",
       "source": "./adapters/claude-code/plugins/pstack",
-      "description": "Thirty-one portable engineering skills ported from the pstack collection under MIT: 24 named principles that steer design and execution decisions, plus the seven workflow skills benchmark-checklist, blast-radius, figure-it-out, tdd, technical-writing, typescript-best-practices, and unslop. Each skill is self-contained and loads on demand. Self-canonical (no harness-neutral playbook counterpart, not part of the vendoring sync); see the plugin's THIRD-PARTY-NOTICE.md for the source and license."
+      "description": "Thirty-six portable engineering skills ported from the pstack collection under MIT: 24 named principles that steer design and execution decisions, plus the twelve workflow skills architect, arena, benchmark-checklist, blast-radius, create-verification-skill, figure-it-out, interrogate, maintain-verification-skill, tdd, technical-writing, typescript-best-practices, and unslop. Each skill is self-contained and loads on demand. Self-canonical (no harness-neutral playbook counterpart, not part of the vendoring sync); see the plugin's THIRD-PARTY-NOTICE.md for the source and license."
     }
   ]
 }

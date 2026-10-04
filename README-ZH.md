@@ -133,7 +133,7 @@ marketplace 即可安裝九個 plugin 中的任意子集——每個都獨立、
 | `fable5` | 指揮官操作模式 + 強模型創始 prompt。 | plugin 目錄本身（self-canonical） |
 | `commander` | 可實跑的 per-repo 派工評分迴圈：憲章、回報協議、任務模板、派工與評分腳本、台帳 scaffold。 | plugin 目錄本身（self-canonical） |
 | `idea-to-spec` | 規格合成 skill：一次性批次訪談、規模三級 triage、12 節 SPEC 模板。 | plugin 目錄本身（self-canonical） |
-| `pstack` | 31 個第三方工程 skill（MIT）：24 個設計／執行原則，加上 benchmark-checklist、blast-radius、figure-it-out、tdd、technical-writing、typescript-best-practices、unslop。 | plugin 目錄本身（self-canonical；第三方，MIT 授權） |
+| `pstack` | 36 個第三方工程 skill（MIT）：24 個設計／執行原則，加上 architect、arena、benchmark-checklist、blast-radius、create-verification-skill、figure-it-out、interrogate、maintain-verification-skill、tdd、technical-writing、typescript-best-practices、unslop。 | plugin 目錄本身（self-canonical；第三方，MIT 授權） |
 
 commit／review 慣例每個團隊偏好不同，所以做成可選 plugin 與可覆寫 playbook，而非併入
 core。上述這些 plugin 都 vendor 一份自足的正典拷貝；vendoring 與防漂移同步見
@@ -144,7 +144,7 @@ playbook 對應**。`fable5` 管的是你怎麼操作一個 *session*（主模�
 產出寫進使用者層級的 config home）；`commander` 出的是同一套教義**可實跑的 per-repo 實例**
 （一份憲章加上由 subagent CLI 驅動的派工／評分腳本）；`idea-to-spec` 是一套產出「某個專案的
 SPEC」的互動式撰寫流程，正典就是這道程序本身，而非一份讀者能自行套用的規則文件；`pstack`
-是第三方 skill 包——31 個工程 skill 以 MIT 授權移植自外部 collection（出處見其
+是第三方 skill 包——36 個工程 skill 以 MIT 授權移植自外部 collection（出處見其
 `THIRD-PARTY-NOTICE.md`），正典就是引進的 collection 本身。四者都不是
 某個 repo 的文件契約，所以無法放進中性 core。它們的 **plugin 目錄即正典**：不 vendor 任何
 東西進來，也不納入 `sync_plugins.py` 同步。
@@ -197,7 +197,7 @@ templates 與 RUNBOOK）會整包安裝——子目錄一併帶過去。
 - [`adapters/claude-code/`](adapters/claude-code/)——一個 Claude Code plugin
   marketplace：`agentic-bootstrap` 工具包、四份 playbook，加上 self-canonical 的
   `fable5` 指揮官操作模式、`commander` 派工評分迴圈、`idea-to-spec` 規格合成器與
-  `pstack` 第三方工程 skill 包（31 個 skill，MIT 授權），
+  `pstack` 第三方工程 skill 包（36 個 skill，MIT 授權），
   各自封裝成可選、可獨立安裝的 plugin（見[它的
   README](adapters/claude-code/README.md)與上面的
   [安裝為 Claude Code plugin](#安裝為-claude-code-plugin)）。
