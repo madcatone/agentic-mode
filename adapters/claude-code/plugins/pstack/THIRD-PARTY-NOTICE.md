@@ -1,16 +1,21 @@
 # Third-party notice: pstack
 
-The 31 skills in `skills/` of this plugin come from the pstack collection
+The 36 skills in `skills/` of this plugin come from the pstack collection
 published at https://github.com/cursor/plugins/tree/main/pstack. They are
 used under the MIT license reproduced verbatim at the end of this file.
 
 ## Included skills
 
-Seven workflow skills:
+Twelve workflow skills:
 
+- `architect` (with `references/`)
+- `arena`
 - `benchmark-checklist`
 - `blast-radius`
+- `create-verification-skill` (with `references/feature-map-example/`)
 - `figure-it-out`
+- `interrogate` (with `references/`)
+- `maintain-verification-skill`
 - `tdd`
 - `technical-writing`
 - `typescript-best-practices` (with `references/patterns.md`)
@@ -47,6 +52,8 @@ Twenty-four principle skills, each under `principle-<name>`:
 
 - The frontmatter of each `SKILL.md` keeps the `name` and `description` fields
   only; the harness-specific `disable-model-invocation` key is removed.
+- Model names, agent-tool identifiers, and personal configuration paths from
+  the source are rewritten in neutral, portable terms.
 - The wording in this copy passes this repo's ASD-STE100 doc check;
   modifications are permitted under the MIT license.
 
