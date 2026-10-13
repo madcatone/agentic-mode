@@ -54,8 +54,24 @@ CASES = [
      "---\ntype: T\nsources:\n  - resource: r\n    usage_count: 3\n"
      "    usage_window: { from: June, to: July }\n---\n", ["K4"]),
     ("nested index frontmatter", "sub/index.md",
-     '---\nokf_version: "0.2"\n---\n# L\n', ["K2"]),
-    ("root index extra keys", "root2/index.md", None, ["K2"]),
+     '---\nokf_version: "0.2"\n---\n# L\n', ["K2", "K3"]),
+    ("root index extra keys", "root2/index.md", None, ["K2", "K3"]),
+    ("unclosed flow mapping", "unclosed.md",
+     "---\ntype: T\ngenerated: { by: agent/1, at: 2026-01-01T00:00:00Z\n---\n",
+     ["K1"]),
+    ("unclosed flow list", "unclosed-list.md",
+     "---\ntype: T\ntags: [a, b\n---\n", ["K1"]),
+    ("mismatched flow delimiters", "mismatch.md",
+     "---\ntype: T\ntags: [a, b}\n---\n", ["K1"]),
+    ("unterminated flow quote", "unterm-quote.md",
+     '---\ntype: T\ngenerated: { by: "agent, at: 2026-01-01T00:00:00Z }\n---\n',
+     ["K1"]),
+    ("prose-only index body", "sub3/index.md", "# Just prose\n\nNo list here.\n",
+     ["K3"]),
+    ("log without date headings", "sub3/log.md", "# Log\n\nJust notes.\n", ["K3"]),
+    ("footnote label in fence", "fence.md",
+     "---\ntype: T\nsources:\n  - id: a\n    resource: r\n---\n```\nX.[^ghost]\n```\n",
+     []),
     ("log not newest first", "sub/log.md",
      "# Log\n\n## 2026-05-01\n\n## 2026-05-02\n", ["K3"]),
     ("non-ISO log heading", "sub2/log.md", "# Log\n\n## not-a-date\n\n## 2026-05-02\n",
@@ -63,8 +79,9 @@ CASES = [
 ]
 
 ROOT_FILES = {
-    "index.md": '---\nokf_version: "0.2"\n# a comment line\n---\n# Tables\n',
-    "log.md": "# Log\n\n## 2026-05-02\n",
+    "index.md": '---\nokf_version: "0.2"\n# a comment line\n---\n'
+                "# Tables\n\n* [Good](good.md) - A good concept.\n",
+    "log.md": "# Log\n\n## 2026-05-02\n\n* **Update**: Added Good.\n",
 }
 
 def run(scan_bundle):

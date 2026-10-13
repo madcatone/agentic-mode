@@ -103,25 +103,33 @@ def check_concept(rel, text):
                        % (rel, stamp))
     if unframed:
         out.append("%s: [K8] usage_count present with no usage_window" % rel)
-    for label in set(FOOTNOTE_LABEL_RE.findall(text)):
+    for label in set(FOOTNOTE_LABEL_RE.findall(_strip_fences(text))):
         if label not in ids:
             out.append("%s: [K6] footnote label %r matches no sources[].id"
                        % (rel, label))
     return out
 
 def check_index(rel, text, is_root):
+    out = []
     front = front_lines(text)
-    if not front:
-        return []
-    if not is_root:
-        return ["%s: [K2] index.md carries frontmatter outside the bundle root" % rel]
-    keys = {line.partition(":")[0].strip() for line in front
-            if line.strip() and not line.lstrip().startswith("#")}
-    extra = keys - {"okf_version"}
-    if extra:
-        return ["%s: [K2] index.md frontmatter beyond okf_version: %s"
-                % (rel, ", ".join(sorted(extra)))]
-    return []
+    if front and not is_root:
+        out.append("%s: [K2] index.md carries frontmatter outside the bundle root" % rel)
+    if front and is_root:
+        keys = {line.partition(":")[0].strip() for line in front
+                if line.strip() and not line.lstrip().startswith("#")}
+        extra = keys - {"okf_version"}
+        if extra:
+            out.append("%s: [K2] index.md frontmatter beyond okf_version: %s"
+                       % (rel, ", ".join(sorted(extra))))
+    body = text.splitlines()
+    if front:
+        closing = next(i for i in range(1, len(body)) if body[i].strip() == "---")
+        body = body[closing + 1:]
+    has_heading = any(line.startswith("#") for line in body)
+    has_entry = any(re.match(r"^\s*[-*]\s+\[", line) for line in body)
+    if not (has_heading and has_entry):
+        out.append("%s: [K3] index body lacks sections of bulleted links" % rel)
+    return out
 
 def check_log(rel, text):
     headings = HEADING_RE.findall(_strip_fences(text))
@@ -130,6 +138,8 @@ def check_log(rel, text):
     days = [d for d in headings if ISO_DAY_RE.match(d)]
     if days != sorted(days, reverse=True):
         out.append("%s: [K3] date headings are not newest first" % rel)
+    if not days:
+        out.append("%s: [K3] log carries no ISO YYYY-MM-DD date headings" % rel)
     return out
 
 def scan_bundle(root):
