@@ -110,7 +110,7 @@ playbook**——任何協作者（人或 agent、用哪個工具）都能直接�
 ## 安裝為 Claude Code plugin
 
 本 repo 同時是一個 **Claude Code plugin marketplace**。發佈到 GitHub 後，加入
-marketplace 即可安裝九個 plugin 中的任意子集——每個都獨立、可選：
+marketplace 即可安裝十個 plugin 中的任意子集——每個都獨立、可選：
 
 ```
 /plugin marketplace add madcatone/agentic-mode
@@ -119,6 +119,7 @@ marketplace 即可安裝九個 plugin 中的任意子集——每個都獨立、
 /plugin install two-axis-review@agentic-mode
 /plugin install review-response@agentic-mode
 /plugin install doc-linter@agentic-mode
+/plugin install okf-doc-style@agentic-mode
 /plugin install fable5@agentic-mode
 /plugin install commander@agentic-mode
 /plugin install idea-to-spec@agentic-mode
@@ -132,6 +133,7 @@ marketplace 即可安裝九個 plugin 中的任意子集——每個都獨立、
 | `two-axis-review` | 雙軸 review skill。 | [`playbooks/TWO-AXIS-REVIEW.md`](playbooks/TWO-AXIS-REVIEW.md) |
 | `review-response` | review-response 紀律 skill。 | [`playbooks/REVIEW-RESPONSE.md`](playbooks/REVIEW-RESPONSE.md) |
 | `doc-linter` | 給 agent 看的文件 linter skill。 | [`playbooks/DOC-LINTER.md`](playbooks/DOC-LINTER.md) |
+| `okf-doc-style` | OKF v0.2 知識 bundle 撰寫＋lint skill。 | [`playbooks/OKF-DOC-STYLE.md`](playbooks/OKF-DOC-STYLE.md) |
 | `fable5` | 指揮官操作模式 + 強模型創始 prompt。 | plugin 目錄本身（self-canonical） |
 | `commander` | 可實跑的 per-repo 派工評分迴圈：憲章、回報協議、任務模板、派工與評分腳本、台帳 scaffold。 | plugin 目錄本身（self-canonical） |
 | `idea-to-spec` | 規格合成 skill：一次性批次訪談、規模三級 triage、12 節 SPEC 模板。 | plugin 目錄本身（self-canonical） |
@@ -197,7 +199,7 @@ templates 與 RUNBOOK）會整包安裝——子目錄一併帶過去。
 特定 agent 產品、model 或專有工具。harness 專屬的包裝只放在 [`adapters/`](adapters/)：
 
 - [`adapters/claude-code/`](adapters/claude-code/)——一個 Claude Code plugin
-  marketplace：`agentic-bootstrap` 工具包、四份 playbook，加上 self-canonical 的
+  marketplace：`agentic-bootstrap` 工具包、五份 playbook，加上 self-canonical 的
   `fable5` 指揮官操作模式、`commander` 派工評分迴圈、`idea-to-spec` 規格合成器與
   `pstack` 第三方工程 skill 包（36 個 skill，MIT 授權），
   各自封裝成可選、可獨立安裝的 plugin（見[它的

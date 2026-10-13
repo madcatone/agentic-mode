@@ -47,12 +47,20 @@ SKILL_SYNC = [
      "adapters/claude-code/plugins/review-response/skills/review-response/SKILL.md"),
     ("playbooks/DOC-LINTER.md",
      "adapters/claude-code/plugins/doc-linter/skills/doc-linter/SKILL.md"),
+    ("playbooks/OKF-DOC-STYLE.md",
+     "adapters/claude-code/plugins/okf-doc-style/skills/okf-doc-style/SKILL.md"),
 ]
 
 # canon file -> byte-for-byte vendored copy.
 VERBATIM_FILES = [
     ("playbooks/scripts/doc_lint.py",
      "adapters/claude-code/plugins/doc-linter/skills/doc-linter/scripts/doc_lint.py"),
+    ("playbooks/scripts/okf_parse.py",
+     "adapters/claude-code/plugins/okf-doc-style/skills/okf-doc-style/scripts/okf_parse.py"),
+    ("playbooks/scripts/okf_lint.py",
+     "adapters/claude-code/plugins/okf-doc-style/skills/okf-doc-style/scripts/okf_lint.py"),
+    ("playbooks/scripts/okf_selftest.py",
+     "adapters/claude-code/plugins/okf-doc-style/skills/okf-doc-style/scripts/okf_selftest.py"),
     ("RUNBOOK.md", f"{BOOTSTRAP}/RUNBOOK.md"),
     ("doctrine/BOOTSTRAP-CORE.md", f"{BOOTSTRAP}/reference/BOOTSTRAP-CORE.md"),
     ("checker/check_agentic_docs.py", f"{BOOTSTRAP}/checker/check_agentic_docs.py"),

@@ -126,7 +126,7 @@ Alongside the doc contract, [`playbooks/`](playbooks/) holds a small set of
 ## Install as Claude Code plugins
 
 This repo is also a **Claude Code plugin marketplace**. Once it is on GitHub,
-add the marketplace and install any subset of the nine plugins — each is
+add the marketplace and install any subset of the ten plugins — each is
 independent and optional:
 
 ```
@@ -136,6 +136,7 @@ independent and optional:
 /plugin install two-axis-review@agentic-mode
 /plugin install review-response@agentic-mode
 /plugin install doc-linter@agentic-mode
+/plugin install okf-doc-style@agentic-mode
 /plugin install fable5@agentic-mode
 /plugin install commander@agentic-mode
 /plugin install idea-to-spec@agentic-mode
@@ -149,6 +150,7 @@ independent and optional:
 | `two-axis-review` | Dual-axis review skill. | [`playbooks/TWO-AXIS-REVIEW.md`](playbooks/TWO-AXIS-REVIEW.md) |
 | `review-response` | Review-response discipline skill. | [`playbooks/REVIEW-RESPONSE.md`](playbooks/REVIEW-RESPONSE.md) |
 | `doc-linter` | Agent-facing document linter skill. | [`playbooks/DOC-LINTER.md`](playbooks/DOC-LINTER.md) |
+| `okf-doc-style` | OKF v0.2 knowledge-bundle authoring + lint skill. | [`playbooks/OKF-DOC-STYLE.md`](playbooks/OKF-DOC-STYLE.md) |
 | `fable5` | Commander-mode operating discipline + the strong-model founding prompt. | The plugin directory itself (self-canonical) |
 | `commander` | The runnable per-repo dispatch-and-score loop: constitution, report protocol, task template, dispatch + scoring scripts, ledger scaffold. | The plugin directory itself (self-canonical) |
 | `idea-to-spec` | The spec-synthesizer skill: batch interview, size triage, 12-section SPEC template. | The plugin directory itself (self-canonical) |
@@ -227,7 +229,7 @@ names a specific agent product, model, or proprietary tool. Harness-specific
 packaging lives only under [`adapters/`](adapters/):
 
 - [`adapters/claude-code/`](adapters/claude-code/) — a Claude Code plugin
-  marketplace: the `agentic-bootstrap` toolkit, the four playbooks, and the
+  marketplace: the `agentic-bootstrap` toolkit, the five playbooks, and the
   self-canonical `fable5` commander-mode discipline, `commander`
   dispatch-and-score loop, `idea-to-spec` spec synthesizer, and `pstack`
   third-party engineering-skill pack (36 skills under MIT) packaged as

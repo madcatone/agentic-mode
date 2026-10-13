@@ -33,6 +33,7 @@ Each plugin is independent and optional — install only what your team wants.
 | [`agentic-bootstrap`](plugins/agentic-bootstrap) | The doc-contract bootstrapper: a skill that runs the RUNBOOK to bootstrap/adopt agentic-mode in any repo. | `RUNBOOK.md`, `doctrine/`, `templates/`, `checker/` (all vendored into the skill) |
 | [`gcm`](plugins/gcm) | Commit-message convention skill. | [`playbooks/COMMIT-MESSAGES.md`](../../playbooks/COMMIT-MESSAGES.md) |
 | [`doc-linter`](plugins/doc-linter) | Agent-doc linter skill: mechanical pass (`doc_lint.py`) + judgment rules. | [`playbooks/DOC-LINTER.md`](../../playbooks/DOC-LINTER.md) |
+| [`okf-doc-style`](plugins/okf-doc-style) | OKF v0.2 knowledge-bundle skill: 9-step runbook + mechanical pass (`okf_lint.py`). | [`playbooks/OKF-DOC-STYLE.md`](../../playbooks/OKF-DOC-STYLE.md) |
 | [`two-axis-review`](plugins/two-axis-review) | Dual-axis (Standards + Spec) review skill. | [`playbooks/TWO-AXIS-REVIEW.md`](../../playbooks/TWO-AXIS-REVIEW.md) |
 | [`review-response`](plugins/review-response) | Discipline for responding to review feedback. | [`playbooks/REVIEW-RESPONSE.md`](../../playbooks/REVIEW-RESPONSE.md) |
 | [`fable5`](plugins/fable5) | Commander-mode operating discipline + the strong-model founding prompt. | The plugin directory itself (self-canonical — see below) |
@@ -41,7 +42,7 @@ Each plugin is independent and optional — install only what your team wants.
 | [`pstack`](plugins/pstack) | Thirty-six third-party engineering skills under MIT: 24 design/execution principles plus architect, arena, benchmark-checklist, blast-radius, create-verification-skill, figure-it-out, interrogate, maintain-verification-skill, tdd, technical-writing, typescript-best-practices, and unslop. | The plugin directory itself (self-canonical — see below; third-party, see its `THIRD-PARTY-NOTICE.md`) |
 
 `fable5`, `commander`, `idea-to-spec`, and `pstack` are deliberately different
-from the other five: none of the four has a **harness-neutral playbook counterpart** in
+from the other six: none of the four has a **harness-neutral playbook counterpart** in
 `playbooks/` — unlike the doc-contract core, there is no neutral source they
 could be lifted from. `fable5` and `commander` are harness-specific (they name
 model tiers, dispatch through a subagent tool or CLI, and write output into a
@@ -64,7 +65,7 @@ reach back into the repo with `../`. So every synced plugin carries a **vendored
 copy** of whatever canonical file it needs (`fable5`, `commander`, `idea-to-spec`,
 and `pstack` are self-canonical and are excluded from this sync):
 
-- The four playbook plugins keep their own `SKILL.md` frontmatter (the `name` +
+- The five playbook plugins keep their own `SKILL.md` frontmatter (the `name` +
   `description` that drive skill triggering) and take their **body verbatim**
   from the matching `playbooks/*.md` canon file.
 - `agentic-bootstrap` vendors the RUNBOOK, the doctrine (`reference/BOOTSTRAP-CORE.md`),

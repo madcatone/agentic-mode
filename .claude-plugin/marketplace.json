@@ -46,6 +46,11 @@
       "description": "Turn rough idea material — a draft note, an HTML mock, screenshots, pasted text — into a development SPEC that a human and a coding agent can both execute from: one batch interview, a small/medium/large triage that sets the spec's depth, and a 12-section template with quantified success metrics, product invariants, vertical slices, and an acceptance contract naming the cheapest layer able to judge each row. Covers a brand-new project and a new feature inside an existing repo. Self-canonical (no harness-neutral playbook counterpart, not part of the vendoring sync)."
     },
     {
+      "name": "okf-doc-style",
+      "source": "./adapters/claude-code/plugins/okf-doc-style",
+      "description": "Author or convert a knowledge corpus into Open Knowledge Format (OKF) v0.2: a 9-step runbook covering bundle layout, frontmatter families (provenance, trust, lifecycle, attested computation), actor and path conventions, and index/log files, plus a mechanical conformance pass (K1–K8) shipped as stdlib scripts (okf_lint.py + okf_parse.py). Reads and writes markdown documents only; executes nothing."
+    },
+    {
       "name": "pstack",
       "source": "./adapters/claude-code/plugins/pstack",
       "description": "Thirty-six portable engineering skills ported from the pstack collection under MIT: 24 named principles that steer design and execution decisions, plus the twelve workflow skills architect, arena, benchmark-checklist, blast-radius, create-verification-skill, figure-it-out, interrogate, maintain-verification-skill, tdd, technical-writing, typescript-best-practices, and unslop. Each skill is self-contained and loads on demand. Self-canonical (no harness-neutral playbook counterpart, not part of the vendoring sync); see the plugin's THIRD-PARTY-NOTICE.md for the source and license."
