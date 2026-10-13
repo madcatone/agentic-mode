@@ -135,8 +135,9 @@ depend on it. No frontmatter, with one
 exception — the bundle-root `index.md` may declare `okf_version: "0.2"`.
 
 `log.md`, at any level: date-grouped entries, newest first, with headings in
-exactly the `## YYYY-MM-DD` form. Entries are prose; a leading bold word
-(`**Update**`, `**Creation**`, `**Deprecation**`) is convention.
+exactly the `## YYYY-MM-DD` form. Entries are bulleted; the entry text is
+prose, and a leading bold word (`**Update**`, `**Creation**`,
+`**Deprecation**`) is convention.
 
 ## Workflow
 
@@ -243,8 +244,9 @@ A bundle is conformant with OKF v0.2 exactly when all three hold:
 
 1. [K1] Every non-reserved `.md` file in the tree carries a parseable YAML
    frontmatter block with a non-empty `type`.
-2. [K3] Every `index.md` present is sections of bulleted links, and every
-   `log.md` present is date-headed (`## YYYY-MM-DD`), newest-first entries.
+2. [K3] Every `index.md` present is headings plus bulleted link entries with
+   no free prose lines, and every `log.md` present is date-headed
+   (`## YYYY-MM-DD`), newest-first, with bulleted entries.
 3. [K2] Only the bundle-root `index.md` carries frontmatter, and it carries
    only `okf_version`.
 

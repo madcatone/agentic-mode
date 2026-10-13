@@ -13,9 +13,8 @@ K6 body footnote labels (references and definitions) match a ``sources[].id``
 K7 ``status`` is draft / stable / deprecated
 K8 ``sources[].usage_count`` framed by ``usage_window`` (shared or per-entry)
 
-Findings print as ``<path>: [K1] message``; exit 0 clean, 1 violations,
-2 usage/I/O error (including non-UTF-8 files). Pure stdlib; the judgment
-half stays with the reader.
+Findings print as ``<path>: [K1] message``; exit 0 clean, 1 violations, 2
+usage/I/O error (including non-UTF-8). Pure stdlib; judgment stays with you.
 """
 
 import argparse
@@ -29,20 +28,11 @@ ISO_TS_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:?\d{
 ISO_DAY_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 ACTOR_RE = re.compile(r"^(?:human:.+|process:.+|[^:\s]+/\S+)$")
 FOOTNOTE_LABEL_RE = re.compile(r"\[\^([^\]]+)\]")
-HEADING_RE = re.compile(r"^##\s+(.+?)\s*$", re.MULTILINE)
-FENCE_RE = re.compile(r"^\s*(?:```|~~~)", re.MULTILINE)
+HEADING_RE = re.compile(r"^##\s+(.+?)\s*$")
+FENCE_RE = re.compile(r"^\s*(?:```|~~~)")
+BULLET_LINK_RE = re.compile(r"^\s*[-*]\s+\[[^\]]+\]\([^)]*\)")
+BULLET_RE = re.compile(r"^\s*[-*]\s+")
 STATUS_VALUES = {"draft", "stable", "deprecated"}
-
-def _events(fm):
-    """generated and verified entries as a flat list of dicts."""
-    out = []
-    for key in ("generated", "verified"):
-        value = fm.get(key)
-        if isinstance(value, dict):
-            out.append(value)
-        elif isinstance(value, list):
-            out += [e for e in value if isinstance(e, dict)]
-    return out
 
 def _strip_fences(text):
     out, fence = [], False
@@ -67,15 +57,19 @@ def check_concept(rel, text):
     if isinstance(status, str) and status and status not in STATUS_VALUES:
         out.append("%s: [K7] status %r is not draft/stable/deprecated" % (rel, status))
     stamps = []
-    generated = fm.get("generated")
-    if isinstance(generated, dict) and not generated.get("by"):
-        out.append("%s: [K5] generated carries no `by` actor" % rel)
-    for event in _events(fm):
-        stamps.append(event.get("at", ""))
-        by = event.get("by", "")
-        if by and not ACTOR_RE.match(by):
-            out.append("%s: [K5] actor %r is not producer/version, human:, or process:"
-                       % (rel, by))
+    for key in ("generated", "verified"):
+        value = fm.get(key)
+        events = [value] if isinstance(value, dict) else []
+        if isinstance(value, list):
+            events = [e for e in value if isinstance(e, dict)]
+        for event in events:
+            stamps.append(event.get("at", ""))
+            by = event.get("by", "")
+            if by and not ACTOR_RE.match(by):
+                out.append("%s: [K5] actor %r is not producer/version, human:, or process:"
+                           % (rel, by))
+            if key == "generated" and not by:
+                out.append("%s: [K5] generated carries no `by` actor" % rel)
     stale = fm.get("stale_after")
     if isinstance(stale, str) and stale:
         stamps.append(stale)
@@ -123,19 +117,34 @@ def check_index(rel, text, is_root):
                        % (rel, ", ".join(sorted(extra))))
     body = text.splitlines()
     if front:
-        closing = next(i for i in range(1, len(body)) if body[i].strip() == "---")
-        body = body[closing + 1:]
+        cut = next(i for i in range(1, len(body)) if body[i].strip() == "---")
+        body = body[cut + 1:]
+    body = _strip_fences("\n".join(body)).splitlines()
     has_heading = any(line.startswith("#") for line in body)
-    has_entry = any(re.match(r"^\s*[-*]\s+\[", line) for line in body)
-    if not (has_heading and has_entry):
-        out.append("%s: [K3] index body lacks sections of bulleted links" % rel)
+    has_entry = any(BULLET_LINK_RE.match(line) for line in body)
+    free = [line for line in body if line.strip() and not line.startswith("#")
+            and not BULLET_LINK_RE.match(line)]
+    if not has_heading or not has_entry or free:
+        out.append("%s: [K3] index body is not sections of bulleted links "
+                   "(needs a heading and entries, every line a heading or "
+                   "bulleted link)" % rel)
     return out
 
 def check_log(rel, text):
-    headings = HEADING_RE.findall(_strip_fences(text))
-    out = ["%s: [K3] heading %r is not an ISO YYYY-MM-DD date" % (rel, day)
-           for day in headings if not ISO_DAY_RE.match(day)]
-    days = [d for d in headings if ISO_DAY_RE.match(d)]
+    out, days, seen_date = [], [], False
+    for line in _strip_fences(text).splitlines():
+        heading = HEADING_RE.match(line)
+        if heading:
+            day = heading.group(1)
+            if ISO_DAY_RE.match(day):
+                days.append(day)
+                seen_date = True
+            else:
+                out.append("%s: [K3] heading %r is not an ISO YYYY-MM-DD date"
+                           % (rel, day))
+        elif seen_date and line.strip() and not BULLET_RE.match(line):
+            out.append("%s: [K3] log entry %r is not a bulleted entry"
+                       % (rel, line.strip()[:40]))
     if days != sorted(days, reverse=True):
         out.append("%s: [K3] date headings are not newest first" % rel)
     if not days:
@@ -167,12 +176,10 @@ def main(argv=None):
     if args.selftest:
         from okf_selftest import run
         return run(scan_bundle)
-    if not args.root:
-        print("okf_lint: no bundle root given", file=sys.stderr)
-        return 2
-    root = Path(args.root)
-    if not root.is_dir():
-        print("okf_lint: not a directory: %s" % root, file=sys.stderr)
+    root = Path(args.root) if args.root else None
+    if root is None or not root.is_dir():
+        print("okf_lint: missing or invalid bundle root: %s" % args.root,
+              file=sys.stderr)
         return 2
     try:
         findings = scan_bundle(root)

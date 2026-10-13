@@ -76,7 +76,7 @@ def parse_flow(text: str) -> Value:
     quote) raises :class:`MalformedFlowError` so the caller reports K1.
     """
     t = text.strip()
-    if t[:1] in "{[":
+    if t[:1] in ("{", "["):
         closer = "}" if t[0] == "{" else "]"
         inner = t[1:-1] if t.endswith(closer) else None
         if inner is None or not _balanced(inner):
