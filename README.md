@@ -121,6 +121,7 @@ Alongside the doc contract, [`playbooks/`](playbooks/) holds a small set of
 | [`TWO-AXIS-REVIEW.md`](playbooks/TWO-AXIS-REVIEW.md) | Dual-axis review — Standards (written right) and Spec (meets the ticket) audited on independent axes that never cross-rank. |
 | [`REVIEW-RESPONSE.md`](playbooks/REVIEW-RESPONSE.md) | Discipline for the author answering review feedback: verify before implementing, no sycophantic openers, push back with evidence. |
 | [`DOC-LINTER.md`](playbooks/DOC-LINTER.md) | Lint agent-facing documents for ambiguity — terminology drift, passive voice, hedge words, stacked negations, structure — with rules adapted from ASD-STE100 Simplified Technical English. [`playbooks/scripts/doc_lint.py`](playbooks/scripts/doc_lint.py) decides the mechanical rules and prints the ones it leaves to the reader. |
+| [`OKF-DOC-STYLE.md`](playbooks/OKF-DOC-STYLE.md) | Author or convert a knowledge corpus into Open Knowledge Format (OKF) v0.2 — bundle layout, frontmatter families (provenance, trust, lifecycle, attested computation), actor and path conventions, index/log files, and a conformance checklist. Canon-only; no plugin counterpart. |
 
 ## Install as Claude Code plugins
 
@@ -212,7 +213,7 @@ their subdirectories come along.
 | [`doctrine/FIELD-NOTES.md`](doctrine/FIELD-NOTES.md) | Field lessons from the origin project that shaped the doctrine. |
 | [`checker/`](checker/) | The config-driven checker and an annotated example config. |
 | [`templates/`](templates/) | The fill-in skeletons for every generated doc + CI files. |
-| [`playbooks/`](playbooks/) | Harness-neutral collaboration canon (commit messages, two-axis review, review response, doc linting) — optional, local rules override. |
+| [`playbooks/`](playbooks/) | Harness-neutral collaboration canon (commit messages, two-axis review, review response, doc linting, OKF doc style) — optional, local rules override. |
 | [`adapters/`](adapters/) | Harness-specific packaging (Claude Code plugins + marketplace, Devin IDE rule + review workflow). |
 | [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json) | The Claude Code plugin marketplace manifest. |
 | [`scripts/sync_plugins.py`](scripts/sync_plugins.py) | One-way vendoring sync (canon → plugins) with a `--check` drift gate. |
