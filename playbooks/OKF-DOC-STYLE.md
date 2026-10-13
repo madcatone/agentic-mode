@@ -8,7 +8,9 @@ follow the spec. This file names no address for the spec: the local repository's
 configuration supplies the authoritative OKF v0.2 source. **Local repo rules
 (an existing doc contract, a house style guide) take precedence over this
 playbook.** This playbook reads and writes knowledge documents; it executes
-nothing.
+nothing. Its only companion is `scripts/okf_lint.py` — pure standard library,
+no network, no installs — which decides the mechanical half of the conformance
+checklist (K1–K8) before you read.
 
 OKF represents *knowledge*: the metadata, context, and curated insight that
 surrounds data and systems. A corpus is a **bundle** — a directory tree of UTF-8
@@ -215,8 +217,9 @@ its own source; an agent-edited computation can no longer attest.
 
 ### Step 9 — Run the conformance checklist
 
-Check the bundle against the checklist below. Fix every failure, then re-check
-until the list is clean.
+Run `python3 scripts/okf_lint.py <bundle-root>` from this playbook's directory
+first; it decides the mechanical rules (K1–K8 below). Then read the bundle for
+the judgment half. Fix every failure, then re-check until the list is clean.
 
 ## Reading a bundle
 
@@ -238,23 +241,24 @@ When you consume an OKF bundle, hold this discipline:
 
 A bundle is conformant with OKF v0.2 exactly when all three hold:
 
-1. Every non-reserved `.md` file in the tree carries a parseable YAML
-   frontmatter block.
-2. Every frontmatter block carries a non-empty `type`.
-3. Every `index.md` present is sections of bulleted links, and every `log.md`
-   present is date-headed, newest-first entries.
+1. [K1] Every non-reserved `.md` file in the tree carries a parseable YAML
+   frontmatter block with a non-empty `type`.
+2. [K3] Every `index.md` present is sections of bulleted links, and every
+   `log.md` present is date-headed (`## YYYY-MM-DD`), newest-first entries.
+3. [K2] Only the bundle-root `index.md` carries frontmatter, and it carries
+   only `okf_version`.
 
-Producer discipline — check these before you call the corpus done:
+Producer discipline — `okf_lint.py` decides K1 through K8 mechanically; you
+read for the rest:
 
-- Every timestamp is ISO 8601 with an explicit UTC offset
+- [K4] Every timestamp is ISO 8601 with an explicit UTC offset
   (`2026-06-30T14:00:00Z`).
-- Every `generated.by` and `verified[].by` follows the actor convention, and
-  `human:` names an actual person.
-- Every footnote label matches a `sources[].id`.
-- Every `usage_count` is measured over a stated `usage_window`.
-- No concept file is named `index.md` or `log.md`.
-- Only the bundle-root `index.md` carries frontmatter, and it carries only
-  `okf_version`.
+- [K5] Every `generated.by` and `verified[].by` follows the actor convention;
+  reading confirms `human:` names an actual person.
+- [K6] Every footnote label matches a `sources[].id`.
+- [K7] `status`, when written, is `draft`, `stable`, or `deprecated`.
+- [K8] Every `usage_count` is measured over a stated `usage_window`; reading
+  confirms the number was actually measured.
 
 ## Converting from OKF v0.1
 

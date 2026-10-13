@@ -36,6 +36,8 @@ model, or dispatch to use. Read [`README.md`](README.md) first, then this.
   review, review response, doc linting, OKF doc style) — optional, local rules
   override them.
 - `playbooks/scripts/doc_lint.py`: the doc-linter's mechanical pass (pure stdlib).
+- `playbooks/scripts/okf_lint.py` (+ `okf_parse.py`): the OKF bundle linter's
+  mechanical pass (pure stdlib).
 - `adapters/`: Claude Code plugins + marketplace, Devin IDE rule + review workflow.
 - `.claude-plugin/marketplace.json`: the Claude Code plugin marketplace manifest.
 - `scripts/sync_plugins.py`: one-way vendoring sync (canon → plugins) + `--check` gate.
@@ -74,6 +76,13 @@ grep -rn '{{' examples/minimal-cli && echo "FOUND" || echo "clean"
 ```bash
 python3 -m py_compile playbooks/scripts/doc_lint.py
 cd playbooks && python3 scripts/doc_lint.py DOC-LINTER.md
+```
+
+- Byte-compile the OKF linter and run its selftest (must exit 0):
+
+```bash
+python3 -m py_compile playbooks/scripts/okf_parse.py playbooks/scripts/okf_lint.py playbooks/scripts/okf_selftest.py
+python3 playbooks/scripts/okf_lint.py --selftest
 ```
 
 - Verify the plugin vendored copies are in sync with the canon (must exit 0):
