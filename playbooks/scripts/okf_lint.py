@@ -1,0 +1,200 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""Mechanical half of the OKF doc-style playbook's conformance checklist.
+
+Usage: ``python3 scripts/okf_lint.py <bundle-root>`` or ``--selftest``.
+
+K1 parseable frontmatter with non-empty ``type`` on every non-reserved .md
+K2 ``index.md`` frontmatter only at bundle root, ``okf_version`` only
+K3 ``log.md`` headings ISO ``YYYY-MM-DD``, newest first
+K4 timestamps ISO 8601 with explicit UTC offset
+K5 ``generated.by`` / ``verified[].by`` follow the actor convention
+K6 body footnote labels (references and definitions) match a ``sources[].id``
+K7 ``status`` is draft / stable / deprecated
+K8 ``sources[].usage_count`` framed by ``usage_window`` (shared or per-entry)
+
+Findings print as ``<path>: [K1] message``; exit 0 clean, 1 violations, 2 usage/I/O
+error (including non-UTF-8). Pure stdlib; judgment stays with you.
+"""
+
+import argparse
+import re
+import sys
+from pathlib import Path
+
+from okf_parse import front_lines, is_iso8601, parse_frontmatter
+
+ISO_DAY_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+ACTOR_RE = re.compile(r"^(?:human:.+|process:.+|[^:\s]+/\S+)$")
+FOOTNOTE_LABEL_RE = re.compile(r"\[\^([^\]]+)\]")
+HEADING_RE = re.compile(r"^##\s+(.+?)\s*$")
+FENCE_RE = re.compile(r"^\s*(?:```|~~~)")
+BULLET_LINK_RE = re.compile(r"^\s*[-*]\s+\[[^\]]+\]\([^)]*\)")
+BULLET_RE = re.compile(r"^\s*[-*]\s+")
+STATUS_VALUES = {"draft", "stable", "deprecated"}
+
+def _strip_fences(text):
+    out, fence = [], False
+    for line in text.splitlines():
+        if FENCE_RE.match(line):
+            fence = not fence
+        elif not fence:
+            out.append(line)
+    return "\n".join(out)
+
+def check_concept(rel, text):
+    front = front_lines(text)
+    fm = parse_frontmatter(front) if front else None
+    if fm is None:
+        return ["%s: [K1] no parseable frontmatter block" % rel]
+    out = []
+    type_value = fm.get("type")
+    if not isinstance(type_value, str) or not type_value.strip():
+        out.append("%s: [K1] frontmatter lacks a non-empty `type`" % rel)
+    status = fm.get("status")
+    if status not in (None, "", []) and not (isinstance(status, str) and status in STATUS_VALUES):
+        out.append("%s: [K7] status %r is not draft/stable/deprecated" % (rel, status))
+    stamps = []
+    for key in ("generated", "verified"):
+        value = fm.get(key)
+        if isinstance(value, dict):
+            events = [value]
+        elif isinstance(value, list):
+            events = [e for e in value if isinstance(e, dict)]
+            if len(events) != len(value):
+                out.append("%s: [K5] %s entry is not a {by, at} mapping" % (rel, key))
+        else:
+            events = []
+            if value:
+                out.append("%s: [K5] %s must be a {by, at} mapping or list of them"
+                           % (rel, key))
+        for event in events:
+            stamps.append(event.get("at", ""))
+            by = event.get("by", "")
+            if not isinstance(by, str) or not ACTOR_RE.match(by):
+                out.append("%s: [K5] %s actor %r is not a valid actor" % (rel, key, by))
+    stale = fm.get("stale_after")
+    if stale:
+        stamps.append(stale)
+    window = fm.get("usage_window")
+    if isinstance(window, dict):
+        stamps += [window.get("from", ""), window.get("to", "")]
+    sources = fm.get("sources")
+    sources = sources if isinstance(sources, list) else []
+    ids, unframed = set(), 0
+    for source in sources:
+        if not isinstance(source, dict):
+            continue
+        ids.add(source.get("id") or "")
+        stamps.append(source.get("last_modified", ""))
+        entry_window = source.get("usage_window")
+        if isinstance(entry_window, dict):
+            stamps += [entry_window.get("from", ""), entry_window.get("to", "")]
+        if source.get("usage_count") and not isinstance(entry_window, dict) \
+                and not isinstance(window, dict):
+            unframed += 1
+    ids.discard("")
+    for stamp in (s for s in stamps if s):
+        if not is_iso8601(stamp):
+            out.append("%s: [K4] timestamp %r is not a calendar-valid ISO 8601 "
+                       "datetime with a UTC offset" % (rel, stamp))
+    if unframed:
+        out.append("%s: [K8] usage_count present with no usage_window" % rel)
+    for label in set(FOOTNOTE_LABEL_RE.findall(_strip_fences(text))):
+        if label not in ids:
+            out.append("%s: [K6] footnote label %r matches no sources[].id"
+                       % (rel, label))
+    return out
+
+def check_index(rel, text, is_root):
+    out = []
+    front = front_lines(text)
+    if front and not is_root:
+        out.append("%s: [K2] index.md carries frontmatter outside the bundle root" % rel)
+    if front and is_root:
+        keys = {line.partition(":")[0].strip() for line in front
+                if line.strip() and not line.lstrip().startswith("#")}
+        extra = keys - {"okf_version"}
+        if extra:
+            out.append("%s: [K2] index.md frontmatter beyond okf_version: %s"
+                       % (rel, ", ".join(sorted(extra))))
+    body = text.splitlines()
+    if front:
+        cut = next(i for i in range(1, len(body)) if body[i].strip() == "---")
+        body = body[cut + 1:]
+    body = _strip_fences("\n".join(body)).splitlines()
+    has_heading = any(line.startswith("#") for line in body)
+    has_entry = any(BULLET_LINK_RE.match(line) for line in body)
+    free = [line for line in body if line.strip() and not line.startswith("#")
+            and not BULLET_LINK_RE.match(line)]
+    if not has_heading or not has_entry or free:
+        out.append("%s: [K3] index body is not sections of bulleted links "
+                   "(needs a heading and entries, every line a heading or "
+                   "bulleted link)" % rel)
+    return out
+
+def check_log(rel, text):
+    out, days, seen_date = [], [], False
+    for line in _strip_fences(text).splitlines():
+        heading = HEADING_RE.match(line)
+        if heading:
+            day = heading.group(1)
+            if ISO_DAY_RE.match(day):
+                days.append(day)
+                seen_date = True
+            else:
+                out.append("%s: [K3] heading %r is not an ISO YYYY-MM-DD date"
+                           % (rel, day))
+        elif seen_date and line.strip() and not BULLET_RE.match(line):
+            out.append("%s: [K3] log entry %r is not bulleted"
+                       % (rel, line.strip()[:40]))
+    if days != sorted(days, reverse=True):
+        out.append("%s: [K3] date headings are not newest first" % rel)
+    if not days:
+        out.append("%s: [K3] log carries no ISO YYYY-MM-DD date headings" % rel)
+    return out
+
+def scan_bundle(root):
+    out = []
+    for path in sorted(root.rglob("*.md")):
+        if not path.is_file():
+            continue
+        rel = str(path.relative_to(root))
+        text = path.read_text(encoding="utf-8-sig")
+        if path.name == "log.md":
+            out += check_log(rel, text)
+        elif path.name == "index.md":
+            out += check_index(rel, text, path.parent == root)
+        else:
+            out += check_concept(rel, text)
+    return out
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(prog="okf_lint.py",
+                                     description="Mechanical OKF v0.2 bundle checks.")
+    parser.add_argument("root", nargs="?", help="bundle root directory")
+    parser.add_argument("--selftest", action="store_true", help="run built-in fixtures")
+    args = parser.parse_args(sys.argv[1:] if argv is None else list(argv))
+    if args.selftest:
+        from okf_selftest import run
+        return run(scan_bundle)
+    root = Path(args.root) if args.root else None
+    if root is None or not root.is_dir():
+        print("okf_lint: missing or invalid bundle root: %s" % args.root,
+              file=sys.stderr)
+        return 2
+    try:
+        findings = scan_bundle(root)
+    except OSError as exc:
+        print("okf_lint: I/O error: %s" % exc, file=sys.stderr)
+        return 2
+    except UnicodeDecodeError as exc:
+        print("okf_lint: bundle contains non-UTF-8 markdown: %s" % exc, file=sys.stderr)
+        return 2
+    print("okf-lint: %s (%d findings)" % (root, len(findings)))
+    for finding in findings:
+        print("  " + finding)
+    return 1 if findings else 0
+
+if __name__ == "__main__":
+    sys.exit(main())

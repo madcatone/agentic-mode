@@ -1,0 +1,8 @@
+{
+  "name": "okf-doc-style",
+  "description": "Author or convert a knowledge corpus into Open Knowledge Format (OKF) v0.2: a 9-step runbook covering bundle layout, frontmatter families (provenance, trust, lifecycle, attested computation), actor and path conventions, and index/log files, plus a mechanical conformance pass (K1–K8) shipped as stdlib scripts (okf_lint.py + okf_parse.py). Reads and writes markdown documents only; executes nothing.",
+  "version": "1.0.0",
+  "author": {
+    "name": "agentic-mode maintainers"
+  }
+}
