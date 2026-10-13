@@ -9,12 +9,13 @@ K2 ``index.md`` frontmatter only at bundle root, ``okf_version`` only
 K3 ``log.md`` headings ISO ``YYYY-MM-DD``, newest first
 K4 timestamps ISO 8601 with explicit UTC offset
 K5 ``generated.by`` / ``verified[].by`` follow the actor convention
-K6 body footnote labels match a ``sources[].id``
+K6 body footnote labels (references and definitions) match a ``sources[].id``
 K7 ``status`` is draft / stable / deprecated
-K8 ``sources[].usage_count`` framed by a ``usage_window``
+K8 ``sources[].usage_count`` framed by ``usage_window`` (shared or per-entry)
 
 Findings print as ``<path>: [K1] message``; exit 0 clean, 1 violations,
-2 usage/I/O error. Pure stdlib; the judgment half stays with the reader.
+2 usage/I/O error (including non-UTF-8 files). Pure stdlib; the judgment
+half stays with the reader.
 """
 
 import argparse
@@ -27,8 +28,9 @@ from okf_parse import front_lines, parse_frontmatter
 ISO_TS_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:?\d{2})$")
 ISO_DAY_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 ACTOR_RE = re.compile(r"^(?:human:.+|process:.+|[^:\s]+/\S+)$")
-FOOTNOTE_DEF_RE = re.compile(r"^\[\^([^\]]+)\]:", re.MULTILINE)
+FOOTNOTE_LABEL_RE = re.compile(r"\[\^([^\]]+)\]")
 HEADING_RE = re.compile(r"^##\s+(.+?)\s*$", re.MULTILINE)
+FENCE_RE = re.compile(r"^\s*(?:```|~~~)", re.MULTILINE)
 STATUS_VALUES = {"draft", "stable", "deprecated"}
 
 def _events(fm):
@@ -41,6 +43,16 @@ def _events(fm):
         elif isinstance(value, list):
             out += [e for e in value if isinstance(e, dict)]
     return out
+
+def _strip_fences(text):
+    out, fence = [], False
+    for line in text.splitlines():
+        if FENCE_RE.match(line):
+            fence = not fence
+            continue
+        if not fence:
+            out.append(line)
+    return "\n".join(out)
 
 def check_concept(rel, text):
     front = front_lines(text)
@@ -55,6 +67,9 @@ def check_concept(rel, text):
     if isinstance(status, str) and status and status not in STATUS_VALUES:
         out.append("%s: [K7] status %r is not draft/stable/deprecated" % (rel, status))
     stamps = []
+    generated = fm.get("generated")
+    if isinstance(generated, dict) and not generated.get("by"):
+        out.append("%s: [K5] generated carries no `by` actor" % rel)
     for event in _events(fm):
         stamps.append(event.get("at", ""))
         by = event.get("by", "")
@@ -69,20 +84,26 @@ def check_concept(rel, text):
         stamps += [window.get("from", ""), window.get("to", "")]
     sources = fm.get("sources")
     sources = sources if isinstance(sources, list) else []
-    ids, counted = set(), False
+    ids, unframed = set(), 0
     for source in sources:
-        if isinstance(source, dict):
-            ids.add(source.get("id") or "")
-            stamps.append(source.get("last_modified", ""))
-            counted = counted or bool(source.get("usage_count"))
+        if not isinstance(source, dict):
+            continue
+        ids.add(source.get("id") or "")
+        stamps.append(source.get("last_modified", ""))
+        entry_window = source.get("usage_window")
+        if isinstance(entry_window, dict):
+            stamps += [entry_window.get("from", ""), entry_window.get("to", "")]
+        if source.get("usage_count") and not isinstance(entry_window, dict) \
+                and not isinstance(window, dict):
+            unframed += 1
     ids.discard("")
     for stamp in (s for s in stamps if s):
         if not ISO_TS_RE.match(stamp):
             out.append("%s: [K4] timestamp %r is not ISO 8601 with a UTC offset"
                        % (rel, stamp))
-    if counted and not isinstance(window, dict):
+    if unframed:
         out.append("%s: [K8] usage_count present with no usage_window" % rel)
-    for label in FOOTNOTE_DEF_RE.findall(text):
+    for label in set(FOOTNOTE_LABEL_RE.findall(text)):
         if label not in ids:
             out.append("%s: [K6] footnote label %r matches no sources[].id"
                        % (rel, label))
@@ -94,7 +115,8 @@ def check_index(rel, text, is_root):
         return []
     if not is_root:
         return ["%s: [K2] index.md carries frontmatter outside the bundle root" % rel]
-    keys = {line.partition(":")[0].strip() for line in front if line.strip()}
+    keys = {line.partition(":")[0].strip() for line in front
+            if line.strip() and not line.lstrip().startswith("#")}
     extra = keys - {"okf_version"}
     if extra:
         return ["%s: [K2] index.md frontmatter beyond okf_version: %s"
@@ -102,7 +124,7 @@ def check_index(rel, text, is_root):
     return []
 
 def check_log(rel, text):
-    headings = HEADING_RE.findall(text)
+    headings = HEADING_RE.findall(_strip_fences(text))
     out = ["%s: [K3] heading %r is not an ISO YYYY-MM-DD date" % (rel, day)
            for day in headings if not ISO_DAY_RE.match(day)]
     days = [d for d in headings if ISO_DAY_RE.match(d)]
@@ -113,8 +135,10 @@ def check_log(rel, text):
 def scan_bundle(root):
     out = []
     for path in sorted(root.rglob("*.md")):
+        if not path.is_file():
+            continue
         rel = str(path.relative_to(root))
-        text = path.read_text(encoding="utf-8")
+        text = path.read_text(encoding="utf-8-sig")
         if path.name == "log.md":
             out += check_log(rel, text)
         elif path.name == "index.md":
@@ -144,6 +168,9 @@ def main(argv=None):
         findings = scan_bundle(root)
     except OSError as exc:
         print("okf_lint: I/O error: %s" % exc, file=sys.stderr)
+        return 2
+    except UnicodeDecodeError as exc:
+        print("okf_lint: bundle contains non-UTF-8 markdown: %s" % exc, file=sys.stderr)
         return 2
     print("okf-lint: %s (%d findings)" % (root, len(findings)))
     for finding in findings:

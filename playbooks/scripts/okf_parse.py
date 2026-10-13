@@ -3,15 +3,17 @@
 """Frontmatter parser for the OKF field dialect (shared by okf_lint.py).
 
 Covers what OKF v0.2 concepts actually carry: scalars, flow ``{...}`` and
-``[...]`` values, and block lists of scalars or mappings. YAML outside that
-dialect is out of scope and returns ``None`` from ``parse_frontmatter``.
+``[...]`` values, block lists of scalars or mappings, block mappings under a
+bare key (``verified:`` followed by indented ``by``/``at``), quoted flow
+scalars, and producer-extension keys of any shape. YAML outside that dialect
+is out of scope and returns ``None`` from ``parse_frontmatter``.
 Pure standard library, Python 3.8+.
 """
 
 import re
 from typing import Dict, List, Optional, Sequence, Union
 
-KEY_RE = re.compile(r"^([A-Za-z_][\w-]*):\s*(.*)$")
+KEY_RE = re.compile(r"^([^:\s]+):\s*(.*)$")
 Value = Union[str, Dict[str, str], List[str], List[Dict[str, str]]]
 
 
@@ -23,13 +25,20 @@ def _unquote(text: str) -> str:
 
 
 def _split_flow(text: str) -> List[str]:
-    parts, depth, cur = [], 0, ""
+    parts, depth, cur, quote = [], 0, "", ""
     for ch in text:
-        if ch in "{[":
+        if quote:
+            if ch == quote:
+                quote = ""
+            cur += ch
+            continue
+        if ch in "\"'":
+            quote = ch
+        elif ch in "{[":
             depth += 1
         elif ch in "}]":
             depth -= 1
-        if ch == "," and depth == 0:
+        if ch == "," and depth == 0 and not quote:
             parts.append(cur)
             cur = ""
         else:
@@ -46,7 +55,7 @@ def parse_flow(text: str) -> Value:
         pairs = {}
         for part in _split_flow(t[1:-1]):
             key, _, value = part.partition(":")
-            pairs[key.strip()] = _unquote(value)
+            pairs[key.strip()] = parse_flow(value)
         return pairs
     if t.startswith("[") and t.endswith("]"):
         return [_unquote(part) for part in _split_flow(t[1:-1])]
@@ -83,9 +92,9 @@ def parse_frontmatter(lines: Sequence[str]) -> Optional[Dict[str, Value]]:
         if not line or line.startswith("#"):
             continue
         if line.startswith("- "):
-            flush()
-            if key is None:
+            if key is None or isinstance(fm.get(key), dict):
                 return None
+            flush()
             body = line[2:]
             match = KEY_RE.match(body)
             if match:
@@ -98,8 +107,17 @@ def parse_frontmatter(lines: Sequence[str]) -> Optional[Dict[str, Value]]:
         match = KEY_RE.match(line)
         if not match:
             return None
-        if isinstance(item, dict) and raw[:1].isspace() and match.group(2):
-            item[match.group(1)] = parse_flow(match.group(2))
+        if raw[:1].isspace():
+            # Indented lines continue a block list item, open a block mapping
+            # under a bare key, or extend an open block mapping.
+            if isinstance(item, dict):
+                item[match.group(1)] = parse_flow(match.group(2))
+            elif key is not None and fm.get(key) == []:
+                fm[key] = {match.group(1): parse_flow(match.group(2))}
+            elif isinstance(fm.get(key), dict):
+                fm[key][match.group(1)] = parse_flow(match.group(2))
+            else:
+                return None
             continue
         flush()
         key = match.group(1)
