@@ -11,10 +11,32 @@ Pure standard library, Python 3.8+.
 """
 
 import re
+from datetime import datetime
 from typing import Dict, List, Optional, Sequence, Union
 
 KEY_RE = re.compile(r"^([^:\s]+):\s*(.*)$")
+ISO_TS_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:?\d{2})$")
 Value = Union[str, Dict[str, str], List[str], List[Dict[str, str]]]
+
+
+def is_iso8601(value: Value) -> bool:
+    """True when value is a string holding a calendar-valid ISO 8601
+    datetime with an explicit UTC offset (``Z`` or ``±hh:mm``/``±hhmm``)."""
+    if not isinstance(value, str) or not ISO_TS_RE.match(value):
+        return False
+    if value.endswith("Z"):
+        core = value[:-1]
+    else:
+        core, offset = value[:-6], value[-6:]
+        if ":" not in offset:
+            offset = offset[:3] + ":" + offset[3:]
+        if int(offset[1:3]) > 23 or int(offset[4:6]) > 59:
+            return False
+    try:
+        datetime.strptime(core, "%Y-%m-%dT%H:%M:%S")
+        return True
+    except ValueError:
+        return False
 
 
 def _unquote(text: str) -> str:
@@ -76,6 +98,8 @@ def parse_flow(text: str) -> Value:
     quote) raises :class:`MalformedFlowError` so the caller reports K1.
     """
     t = text.strip()
+    if t[:1] in ("}", "]"):
+        raise MalformedFlowError(t)
     if t[:1] in ("{", "["):
         closer = "}" if t[0] == "{" else "]"
         inner = t[1:-1] if t.endswith(closer) else None

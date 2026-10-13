@@ -22,9 +22,8 @@ import re
 import sys
 from pathlib import Path
 
-from okf_parse import front_lines, parse_frontmatter
+from okf_parse import front_lines, is_iso8601, parse_frontmatter
 
-ISO_TS_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:?\d{2})$")
 ISO_DAY_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 ACTOR_RE = re.compile(r"^(?:human:.+|process:.+|[^:\s]+/\S+)$")
 FOOTNOTE_LABEL_RE = re.compile(r"\[\^([^\]]+)\]")
@@ -65,13 +64,11 @@ def check_concept(rel, text):
         for event in events:
             stamps.append(event.get("at", ""))
             by = event.get("by", "")
-            if by and not ACTOR_RE.match(by):
-                out.append("%s: [K5] actor %r is not producer/version, human:, or process:"
-                           % (rel, by))
-            if key == "generated" and not by:
-                out.append("%s: [K5] generated carries no `by` actor" % rel)
+            if not isinstance(by, str) or not ACTOR_RE.match(by):
+                out.append("%s: [K5] %s actor %r is not a producer/version, human:, "
+                           "or process: actor" % (rel, key, by))
     stale = fm.get("stale_after")
-    if isinstance(stale, str) and stale:
+    if stale:
         stamps.append(stale)
     window = fm.get("usage_window")
     if isinstance(window, dict):
@@ -92,9 +89,9 @@ def check_concept(rel, text):
             unframed += 1
     ids.discard("")
     for stamp in (s for s in stamps if s):
-        if not ISO_TS_RE.match(stamp):
-            out.append("%s: [K4] timestamp %r is not ISO 8601 with a UTC offset"
-                       % (rel, stamp))
+        if not is_iso8601(stamp):
+            out.append("%s: [K4] timestamp %r is not a calendar-valid ISO 8601 "
+                       "datetime with a UTC offset" % (rel, stamp))
     if unframed:
         out.append("%s: [K8] usage_count present with no usage_window" % rel)
     for label in set(FOOTNOTE_LABEL_RE.findall(_strip_fences(text))):
