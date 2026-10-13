@@ -121,7 +121,7 @@ Alongside the doc contract, [`playbooks/`](playbooks/) holds a small set of
 | [`TWO-AXIS-REVIEW.md`](playbooks/TWO-AXIS-REVIEW.md) | Dual-axis review — Standards (written right) and Spec (meets the ticket) audited on independent axes that never cross-rank. |
 | [`REVIEW-RESPONSE.md`](playbooks/REVIEW-RESPONSE.md) | Discipline for the author answering review feedback: verify before implementing, no sycophantic openers, push back with evidence. |
 | [`DOC-LINTER.md`](playbooks/DOC-LINTER.md) | Lint agent-facing documents for ambiguity — terminology drift, passive voice, hedge words, stacked negations, structure — with rules adapted from ASD-STE100 Simplified Technical English. [`playbooks/scripts/doc_lint.py`](playbooks/scripts/doc_lint.py) decides the mechanical rules and prints the ones it leaves to the reader. |
-| [`OKF-DOC-STYLE.md`](playbooks/OKF-DOC-STYLE.md) | Author or convert a knowledge corpus into Open Knowledge Format (OKF) v0.2 — bundle layout, frontmatter families (provenance, trust, lifecycle, attested computation), actor and path conventions, index/log files, and a conformance checklist. Canon-only; no plugin counterpart. |
+| [`OKF-DOC-STYLE.md`](playbooks/OKF-DOC-STYLE.md) | Author or convert a knowledge corpus into Open Knowledge Format (OKF) v0.2 — bundle layout, frontmatter families (provenance, trust, lifecycle, attested computation), actor and path conventions, index/log files, and a conformance checklist. Authoritative spec: [`okf/SPEC.md`](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md) (the playbook itself stays project-neutral and names no host). |
 
 ## Install as Claude Code plugins
 

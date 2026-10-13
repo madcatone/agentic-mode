@@ -105,7 +105,7 @@ playbook**——任何協作者（人或 agent、用哪個工具）都能直接�
 | [`TWO-AXIS-REVIEW.md`](playbooks/TWO-AXIS-REVIEW.md) | 雙軸 review——Standards（寫得對不對）與 Spec（做得對不對）平行分審、不跨軸挑贏家。 |
 | [`REVIEW-RESPONSE.md`](playbooks/REVIEW-RESPONSE.md) | 被審者回應回饋的紀律：先查證後實作、不空泛討好、反駁帶證據。 |
 | [`DOC-LINTER.md`](playbooks/DOC-LINTER.md) | lint 給 agent 看的文件的模糊性——術語漂移、被動語態、hedge word、疊加否定、結構問題，規則改編自 ASD-STE100 Simplified Technical English。[`playbooks/scripts/doc_lint.py`](playbooks/scripts/doc_lint.py) 判定機械可決的規則，並列出它留給讀者的那些。 |
-| [`OKF-DOC-STYLE.md`](playbooks/OKF-DOC-STYLE.md) | 以 Open Knowledge Format（OKF）v0.2 撰寫或轉換知識 corpus 的 runbook——bundle 佈局、frontmatter 家族（provenance、trust、lifecycle、attested computation）、actor 與路徑慣例、index／log 檔、conformance 檢查表。僅正典，無 plugin 對應。 |
+| [`OKF-DOC-STYLE.md`](playbooks/OKF-DOC-STYLE.md) | 以 Open Knowledge Format（OKF）v0.2 撰寫或轉換知識 corpus 的 runbook——bundle 佈局、frontmatter 家族（provenance、trust、lifecycle、attested computation）、actor 與路徑慣例、index／log 檔、conformance 檢查表。權威 spec：[`okf/SPEC.md`](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md)（playbook 本身維持專案中立、不指名 host）。 |
 
 ## 安裝為 Claude Code plugin
 
