@@ -2,13 +2,13 @@
 
 **About this playbook.** This file is the canonical, harness-neutral version.
 Any collaborator — human or agent, in any tool — can read it directly as a rules
-file. It applies **Open Knowledge Format (OKF) v0.2**, specified self-containedly
-at
-<https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md>.
-That spec is authoritative; when this playbook and the spec disagree, follow the
-spec. **Local repo rules (an existing doc contract, a house style guide) take
-precedence over this playbook.** This playbook reads and writes knowledge
-documents; it executes nothing.
+file. It applies **Open Knowledge Format (OKF) v0.2**; that spec is
+self-contained and authoritative, and when this playbook and the spec disagree,
+follow the spec. This file names no address for the spec: the local repository's
+configuration supplies the authoritative OKF v0.2 source. **Local repo rules
+(an existing doc contract, a house style guide) take precedence over this
+playbook.** This playbook reads and writes knowledge documents; it executes
+nothing.
 
 OKF represents *knowledge*: the metadata, context, and curated insight that
 surrounds data and systems. A corpus is a **bundle** — a directory tree of UTF-8
