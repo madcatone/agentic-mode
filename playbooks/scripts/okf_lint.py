@@ -13,8 +13,8 @@ K6 body footnote labels (references and definitions) match a ``sources[].id``
 K7 ``status`` is draft / stable / deprecated
 K8 ``sources[].usage_count`` framed by ``usage_window`` (shared or per-entry)
 
-Findings print as ``<path>: [K1] message``; exit 0 clean, 1 violations, 2
-usage/I/O error (including non-UTF-8). Pure stdlib; judgment stays with you.
+Findings print as ``<path>: [K1] message``; exit 0 clean, 1 violations, 2 usage/I/O
+error (including non-UTF-8). Pure stdlib; judgment stays with you.
 """
 
 import argparse
@@ -38,8 +38,7 @@ def _strip_fences(text):
     for line in text.splitlines():
         if FENCE_RE.match(line):
             fence = not fence
-            continue
-        if not fence:
+        elif not fence:
             out.append(line)
     return "\n".join(out)
 
@@ -53,20 +52,27 @@ def check_concept(rel, text):
     if not isinstance(type_value, str) or not type_value.strip():
         out.append("%s: [K1] frontmatter lacks a non-empty `type`" % rel)
     status = fm.get("status")
-    if isinstance(status, str) and status and status not in STATUS_VALUES:
+    if status not in (None, "", []) and not (isinstance(status, str) and status in STATUS_VALUES):
         out.append("%s: [K7] status %r is not draft/stable/deprecated" % (rel, status))
     stamps = []
     for key in ("generated", "verified"):
         value = fm.get(key)
-        events = [value] if isinstance(value, dict) else []
-        if isinstance(value, list):
+        if isinstance(value, dict):
+            events = [value]
+        elif isinstance(value, list):
             events = [e for e in value if isinstance(e, dict)]
+            if len(events) != len(value):
+                out.append("%s: [K5] %s entry is not a {by, at} mapping" % (rel, key))
+        else:
+            events = []
+            if value:
+                out.append("%s: [K5] %s must be a {by, at} mapping or list of them"
+                           % (rel, key))
         for event in events:
             stamps.append(event.get("at", ""))
             by = event.get("by", "")
             if not isinstance(by, str) or not ACTOR_RE.match(by):
-                out.append("%s: [K5] %s actor %r is not a producer/version, human:, "
-                           "or process: actor" % (rel, key, by))
+                out.append("%s: [K5] %s actor %r is not a valid actor" % (rel, key, by))
     stale = fm.get("stale_after")
     if stale:
         stamps.append(stale)
@@ -140,7 +146,7 @@ def check_log(rel, text):
                 out.append("%s: [K3] heading %r is not an ISO YYYY-MM-DD date"
                            % (rel, day))
         elif seen_date and line.strip() and not BULLET_RE.match(line):
-            out.append("%s: [K3] log entry %r is not a bulleted entry"
+            out.append("%s: [K3] log entry %r is not bulleted"
                        % (rel, line.strip()[:40]))
     if days != sorted(days, reverse=True):
         out.append("%s: [K3] date headings are not newest first" % rel)
@@ -167,8 +173,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(prog="okf_lint.py",
                                      description="Mechanical OKF v0.2 bundle checks.")
     parser.add_argument("root", nargs="?", help="bundle root directory")
-    parser.add_argument("--selftest", action="store_true",
-                        help="run the built-in fixture cases and exit")
+    parser.add_argument("--selftest", action="store_true", help="run built-in fixtures")
     args = parser.parse_args(sys.argv[1:] if argv is None else list(argv))
     if args.selftest:
         from okf_selftest import run
