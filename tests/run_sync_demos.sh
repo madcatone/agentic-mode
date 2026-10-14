@@ -5,8 +5,9 @@
 # vendored there or disclosed in SKILL.md. An assertion that stops firing
 # (or one that fires on a pristine tree) turns a PASS into a FAIL here.
 #
-# Each case plants its violation in a throwaway copy of the repo (sans .git
-# and __pycache__), so the working tree is never touched. The exit code alone
+# Each case plants its violation in a throwaway copy of the tracked files
+# (reading their current working-tree contents), so the working tree and any
+# untracked file never affect a case. The exit code alone
 # proves nothing, so the output must also name the planted path (a traceback
 # satisfies no contract).
 #
@@ -65,6 +66,10 @@ expect 1 "printf '\nSee \140examples/minimal-cli/README.md\140 for details.\n' >
 expect 1 "mv $SKILL/RUNBOOK.md RUNBOOK.hold" \
     "$SKILL/RUNBOOK.md" \
     'missing vendored RUNBOOK reports manifest drift, no traceback'
+
+expect 1 "mv $SKILL/SKILL.md SKILL.hold" \
+    "$SKILL/SKILL.md" \
+    'missing bootstrap SKILL.md is named as drift, no traceback'
 
 printf '\n%d cases: %d pass, %d fail\n' "$((pass + fail))" "$pass" "$fail"
 [ "$fail" -eq 0 ]

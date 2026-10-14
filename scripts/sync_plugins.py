@@ -114,20 +114,20 @@ _CANON_REF = re.compile(
 
 
 def _skill_strays():
-    """Yield files under the bootstrap skill dir no manifest unit explains."""
+    """Yield (path, kind) breaking the exact file set: 'extra' or 'missing'."""
     expected = {ROOT / BOOTSTRAP / "SKILL.md"} | {
         ROOT / d for _, d in VERBATIM_FILES if d.startswith(BOOTSTRAP)}
     expected |= {ROOT / dst / p.name for src, dst in VERBATIM_DIRS
                  for p in (ROOT / src).iterdir() if p.is_file()}
-    for p in sorted((ROOT / BOOTSTRAP).rglob("*")):
-        if p.is_file() and "__pycache__" not in p.parts and p not in expected:
-            yield p
+    actual = {p for p in (ROOT / BOOTSTRAP).rglob("*")
+              if p.is_file() and "__pycache__" not in p.parts}
+    yield from ((p, "missing") for p in sorted(expected - actual))
+    yield from ((p, "extra") for p in sorted(actual - expected))
 
 
 def _uncovered_refs():
     """Yield canon paths cited (code span or link) by the vendored RUNBOOK
-    that the skill neither vendors (doctrine/ -> reference/) nor discloses
-    in SKILL.md. Prose mentions and scripts/ paths are not citations."""
+    that the skill neither vendors nor discloses in SKILL.md."""
     skill = ROOT / BOOTSTRAP
     if not (skill / "RUNBOOK.md").is_file() or not (skill / "SKILL.md").is_file():
         return  # a missing unit is already reported as manifest drift
@@ -161,12 +161,12 @@ def run(check: bool) -> int:
                 dst.parent.mkdir(parents=True, exist_ok=True)
                 dst.write_bytes(expected)
                 print(f"synced  {rel}")
-        for extra in _skill_strays():
-            rel = extra.relative_to(ROOT)
+        for path, kind in _skill_strays():
+            rel = path.relative_to(ROOT)
             if check:
-                drift.append(f"  {rel}  (stray file — no manifest unit explains it)")
+                drift.append(f"  {rel}  ({kind} file — manifest expects an exact set)")
             else:
-                print(f"WARNING: stray file with no manifest unit: {rel}")
+                print(f"WARNING: {kind} file, manifest expects an exact set: {rel}")
         for ref in _uncovered_refs():
             if check:
                 drift.append(f"  {ref}  (RUNBOOK citation not vendored or disclosed)")
