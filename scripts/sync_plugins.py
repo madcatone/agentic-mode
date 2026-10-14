@@ -8,22 +8,17 @@ must carry a self-contained (vendored) copy of whatever canonical file it needs
 drift risk, so this script owns the one-way sync canon -> plugin and can verify
 it in CI.
 
-MANIFEST (the constant below) maps every canonical file to its vendored target:
+MANIFEST maps canon -> target three ways: SKILL body sync (the target SKILL.md
+keeps its YAML frontmatter, body verbatim from a ``playbooks/*.md`` canon
+file), verbatim file, verbatim dir (stray target files are drift).
 
-* SKILL body sync -- the plugin's ``SKILL.md`` keeps its own YAML frontmatter
-  (name + description, which drive skill triggering) and takes its BODY verbatim
-  from a ``playbooks/*.md`` canon file.
-* Verbatim file  -- the target is a byte-for-byte copy of a single canon file.
-* Verbatim dir   -- every file in a canon directory is copied byte-for-byte into
-  a target directory (and stray target files are reported as drift).
+``--check`` also asserts two invariants of the bootstrap skill dir: its file
+set is exactly what the manifest explains, and every canon path cited by the
+vendored RUNBOOK (code span or link; prose and scripts/ are not citations)
+is vendored there (doctrine/ -> reference/) or disclosed in SKILL.md.
 
-Two modes::
-
-    python scripts/sync_plugins.py            # default: write canon -> plugin
-    python scripts/sync_plugins.py --check     # verify only; exit 1 on any drift
-
-Exit status: 0 = in sync / synced, 1 = drift found (``--check`` only), 2 = error
-(missing source, malformed frontmatter, I/O). Pure standard library.
+Usage: ``python scripts/sync_plugins.py [--check]``; exit 0 = in sync / synced,
+1 = drift (``--check`` only), 2 = error. Pure standard library.
 """
 
 from __future__ import annotations
@@ -75,10 +70,6 @@ VERBATIM_DIRS = [
 _FRONTMATTER = re.compile(r"\A(---\n.*?\n---\n\n?)", re.DOTALL)
 
 
-def _read_bytes(p: Path) -> bytes:
-    return p.read_bytes()
-
-
 def _split_frontmatter(text: str):
     """Return (frontmatter_region, body) or (None, None) if no frontmatter."""
     m = _FRONTMATTER.match(text)
@@ -110,26 +101,46 @@ def _iter_units():
         yield ("skill", s, d, lambda s=s, d=d: _skill_expected(s, d))
     for src, dst in VERBATIM_FILES:
         s, d = ROOT / src, ROOT / dst
-        yield ("file", s, d, lambda s=s: _read_bytes(s))
+        yield ("file", s, d, lambda s=s: s.read_bytes())
     for src_dir, dst_dir in VERBATIM_DIRS:
         s_dir, d_dir = ROOT / src_dir, ROOT / dst_dir
         if not s_dir.is_dir():
             raise SyncError(f"missing source dir: {src_dir}")
         for s in sorted(p for p in s_dir.iterdir() if p.is_file()):
             d = d_dir / s.name
-            yield ("file", s, d, lambda s=s: _read_bytes(s))
+            yield ("file", s, d, lambda s=s: s.read_bytes())
 
 
-def _dir_extras():
-    """Yield vendored-dir files that have no canon counterpart (drift)."""
-    for src_dir, dst_dir in VERBATIM_DIRS:
-        s_dir, d_dir = ROOT / src_dir, ROOT / dst_dir
-        if not d_dir.is_dir():
-            continue
-        canon_names = {p.name for p in s_dir.iterdir() if p.is_file()}
-        for d in sorted(p for p in d_dir.iterdir() if p.is_file()):
-            if d.name not in canon_names:
-                yield d
+_CANON_REF = re.compile(
+    r"\b(?:doctrine|checker|templates|examples|playbooks|tests)/[\w./-]+")
+
+
+def _skill_strays():
+    """Yield files under the bootstrap skill dir no manifest unit explains."""
+    expected = {ROOT / BOOTSTRAP / "SKILL.md"} | {
+        ROOT / d for _, d in VERBATIM_FILES if d.startswith(BOOTSTRAP)}
+    expected |= {ROOT / dst / p.name for src, dst in VERBATIM_DIRS
+                 for p in (ROOT / src).iterdir() if p.is_file()}
+    for p in sorted((ROOT / BOOTSTRAP).rglob("*")):
+        if p.is_file() and "__pycache__" not in p.parts and p not in expected:
+            yield p
+
+
+def _uncovered_refs():
+    """Yield canon paths cited (code span or link) by the vendored RUNBOOK
+    that the skill neither vendors (doctrine/ -> reference/) nor discloses
+    in SKILL.md. Prose mentions and scripts/ paths are not citations."""
+    skill = ROOT / BOOTSTRAP
+    runbook = (skill / "RUNBOOK.md").read_text(encoding="utf-8")
+    wrapper = (skill / "SKILL.md").read_text(encoding="utf-8")
+    cited = set()
+    for line in runbook.splitlines():
+        for chunk in re.findall(r"`[^`\n]+`|\]\([^)\n]+\)", line):
+            cited.update(_CANON_REF.findall(chunk))
+    for ref in sorted(cited):
+        local = skill / ref.replace("doctrine/", "reference/", 1)
+        if not local.is_file() and ref not in wrapper:
+            yield ref
 
 
 def run(check: bool) -> int:
@@ -150,12 +161,17 @@ def run(check: bool) -> int:
                 dst.parent.mkdir(parents=True, exist_ok=True)
                 dst.write_bytes(expected)
                 print(f"synced  {rel}")
-        for extra in _dir_extras():
+        for extra in _skill_strays():
             rel = extra.relative_to(ROOT)
             if check:
-                drift.append(f"  {rel}  (no canonical source — stray vendored file)")
+                drift.append(f"  {rel}  (stray file — no manifest unit explains it)")
             else:
-                print(f"WARNING: stray vendored file with no canon source: {rel}")
+                print(f"WARNING: stray file with no manifest unit: {rel}")
+        for ref in _uncovered_refs():
+            if check:
+                drift.append(f"  {ref}  (RUNBOOK citation not vendored or disclosed)")
+            else:
+                print(f"WARNING: RUNBOOK citation not vendored or disclosed: {ref}")
     except SyncError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2

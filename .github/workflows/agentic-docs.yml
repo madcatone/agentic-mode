@@ -32,3 +32,5 @@ jobs:
           --root examples/minimal-cli
       - name: Check plugin vendoring is in sync with the canon
         run: python scripts/sync_plugins.py --check
+      - name: Run the sync fire-demos
+        run: sh tests/run_sync_demos.sh
