@@ -65,6 +65,12 @@ python3 checker/check_agentic_docs.py --config examples/minimal-cli/agentic-mode
 sh tests/run_fire_demos.sh
 ```
 
+- Run the sync fire-demo suite (must exit 0):
+
+```bash
+sh tests/run_sync_demos.sh
+```
+
 - Sweep for leftover template placeholders in the example:
 
 ```bash
