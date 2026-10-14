@@ -22,6 +22,12 @@ model, or dispatch to use. Read [`README.md`](README.md) first, then this.
   path: the open skills CLI installs these same directories into other agents'
   skill folders, where such a variable is undefined. See Development Commands for
   the check.
+- **Hard-metric exemptions.** The checker intentionally exceeds normal
+  per-file line limits because Phase C copies it whole as a zero-dependency
+  drop-in. `templates/` intentionally exceeds normal per-directory file-count
+  limits because the toolkit/RUNBOOK selects its files by document role,
+  project type, and CI platform, and the plugin vendors the directory
+  verbatim. Do not split either without changing that distribution contract.
 
 ## Key Files
 
