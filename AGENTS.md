@@ -22,6 +22,11 @@ model, or dispatch to use. Read [`README.md`](README.md) first, then this.
   path: the open skills CLI installs these same directories into other agents'
   skill folders, where such a variable is undefined. See Development Commands for
   the check.
+- **Single-file checker and flat `templates/` are deliberate.** The checker is
+  copied whole and verbatim into adopted repos (one file = zero-dependency
+  drop-in), and `templates/` mirrors the canon layout the checker config
+  enumerates by name. Do not split either without changing that drop-in
+  contract.
 
 ## Key Files
 
