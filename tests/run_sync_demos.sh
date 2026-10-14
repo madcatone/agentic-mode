@@ -26,7 +26,7 @@ expect() {
     _expected=$1; _plant=$2; _pattern=$3; _desc=$4
     rm -rf "$base/repo"
     mkdir -p "$base/repo"
-    (cd "$REPO_ROOT" && tar --exclude=.git --exclude=__pycache__ -cf - .) |
+    (cd "$REPO_ROOT" && git ls-files -z | tar --null -T - -cf -) |
         (cd "$base/repo" && tar -xf -)
     (cd "$base/repo" && sh -c "$_plant")
     python3 "$base/repo/scripts/sync_plugins.py" --check >"$base/out" 2>&1
@@ -61,6 +61,10 @@ expect 1 "touch $SKILL/reference/STRAY.md" \
 expect 1 "printf '\nSee \140examples/minimal-cli/README.md\140 for details.\n' >> RUNBOOK.md; printf '\nSee \140examples/minimal-cli/README.md\140 for details.\n' >> $SKILL/RUNBOOK.md" \
     'examples/minimal-cli/README.md' \
     'RUNBOOK citation with no vendored copy and no SKILL.md disclosure fires'
+
+expect 1 "mv $SKILL/RUNBOOK.md RUNBOOK.hold" \
+    "$SKILL/RUNBOOK.md" \
+    'missing vendored RUNBOOK reports manifest drift, no traceback'
 
 printf '\n%d cases: %d pass, %d fail\n' "$((pass + fail))" "$pass" "$fail"
 [ "$fail" -eq 0 ]

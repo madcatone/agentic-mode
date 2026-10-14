@@ -2,15 +2,13 @@
 # -*- coding: utf-8 -*-
 """Vendor the canonical agentic-mode assets into the Claude Code plugins.
 
-A Claude Code skill can only read files under its own directory, so each plugin
-must carry a self-contained (vendored) copy of whatever canonical file it needs
-— it may not reach back into the repo with ``../``. That duplication is a
-drift risk, so this script owns the one-way sync canon -> plugin and can verify
-it in CI.
+A Claude Code skill reads only files under its own directory, so each plugin
+carries a vendored copy of what it needs (no ``../`` reaches into the repo).
+That duplication is a drift risk, so this script owns the one-way sync
+canon -> plugin and can verify it in CI.
 
-MANIFEST maps canon -> target three ways: SKILL body sync (the target SKILL.md
-keeps its YAML frontmatter, body verbatim from a ``playbooks/*.md`` canon
-file), verbatim file, verbatim dir (stray target files are drift).
+MANIFEST maps canon -> target three ways: SKILL body sync (target SKILL.md
+keeps frontmatter, body verbatim from a playbooks/*.md file), file, dir.
 
 ``--check`` also asserts two invariants of the bootstrap skill dir: its file
 set is exactly what the manifest explains, and every canon path cited by the
@@ -131,6 +129,8 @@ def _uncovered_refs():
     that the skill neither vendors (doctrine/ -> reference/) nor discloses
     in SKILL.md. Prose mentions and scripts/ paths are not citations."""
     skill = ROOT / BOOTSTRAP
+    if not (skill / "RUNBOOK.md").is_file() or not (skill / "SKILL.md").is_file():
+        return  # a missing unit is already reported as manifest drift
     runbook = (skill / "RUNBOOK.md").read_text(encoding="utf-8")
     wrapper = (skill / "SKILL.md").read_text(encoding="utf-8")
     cited = set()
