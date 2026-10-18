@@ -1,0 +1,8 @@
+{
+  "name": "team-kit",
+  "description": "A four-role worker kit for dispatch-style teamwork: observer (pure dispatcher), coder (implementation gated by a SubagentStop verify hook), reviewer (dual-axis read-only review), and fortify (security pre-check), plus the team-rules canon, hook scripts, and the runtime state contract in STATE-CONTRACT.md. 四角色協作 kit：observer 純派工、coder 實作＋verify 停止閘門、reviewer 兩軸唯讀審查、fortify 安全預檢，附 team-rules 規範、hook 腳本與狀態面契約（STATE-CONTRACT.md）。Self-canonical (no harness-neutral playbook counterpart, not part of the vendoring sync).",
+  "version": "1.0.0",
+  "author": {
+    "name": "agentic-mode maintainers"
+  }
+}

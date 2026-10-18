@@ -1,0 +1,1 @@
+{"tool_name":"Bash","tool_input":{"command":"git blame -L 1,10 script.sh"}}
