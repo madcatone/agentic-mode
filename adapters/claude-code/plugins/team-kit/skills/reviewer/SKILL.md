@@ -82,7 +82,7 @@ target: <repo 路徑＠diff 錨點，或票號>
 - **可寫檔的 mounting**（如 pane／頂層 session，有檔案寫入能力）：把完整回報寫入
   `${AGENT_STATE_HOME:-$HOME/.agent-state}/team-kit/reports/reviewer/<任務識別碼>-<UTC ts>.md`
   （`<UTC ts>` 例：`date -u +%Y%m%dT%H%M%SZ`；目錄先建）。任務識別碼取自派工 prompt
-  （兩軸請由 dispatcher 給不同識別碼，如 `<票號>-standard`／`<票號>-spec`）。
+  （兩軸請由 dispatcher 給不同識別碼，統一 TK 文法：`TK-<issue>-STD`／`TK-<issue>-SPEC`）。
 - **subagent mounting（唯讀閘門）**：工具集無寫檔、Bash 被 git-only 閘門限制，
   report 寫檔**結構性不可行**——這是唯讀保證的代價，不是缺陷。此時不嘗試繞過閘門：
   完整回報以最終訊息交出（subagent 通道的最終訊息會由 dispatcher 原文代寫成 report 檔），
