@@ -22,6 +22,7 @@ this repo is on GitHub, a user adds it and installs any subset of plugins:
 /plugin install commander@agentic-mode
 /plugin install idea-to-spec@agentic-mode
 /plugin install pstack@agentic-mode
+/plugin install team-kit@agentic-mode
 ```
 
 Each plugin is independent and optional — install only what your team wants.
@@ -40,9 +41,10 @@ Each plugin is independent and optional — install only what your team wants.
 | [`commander`](plugins/commander) | The runnable per-repo dispatch-and-score loop: constitution, report protocol, task template, dispatch + scoring scripts, ledger scaffold. | The plugin directory itself (self-canonical — see below) |
 | [`idea-to-spec`](plugins/idea-to-spec) | The spec synthesizer: turn rough idea material into a development SPEC — batch interview, size triage, 12-section template. | The plugin directory itself (self-canonical — see below) |
 | [`pstack`](plugins/pstack) | Thirty-six third-party engineering skills under MIT: 24 design/execution principles plus architect, arena, benchmark-checklist, blast-radius, create-verification-skill, figure-it-out, interrogate, maintain-verification-skill, tdd, technical-writing, typescript-best-practices, and unslop. | The plugin directory itself (self-canonical — see below; third-party, see its `THIRD-PARTY-NOTICE.md`) |
+| [`team-kit`](plugins/team-kit) | The four-role worker kit: observer (pure dispatcher), coder (implementation under a SubagentStop verify gate), reviewer (dual-axis read-only review), fortify (security pre-check) — plus the team-rules canon, hook scripts, and the state contract. | The plugin directory itself (self-canonical — see below; see its `STATE-CONTRACT.md`) |
 
-`fable5`, `commander`, `idea-to-spec`, and `pstack` are deliberately different
-from the other six: none of the four has a **harness-neutral playbook counterpart** in
+`fable5`, `commander`, `idea-to-spec`, `pstack`, and `team-kit` are deliberately
+different from the other six: none of the five has a **harness-neutral playbook counterpart** in
 `playbooks/` — unlike the doc-contract core, there is no neutral source they
 could be lifted from. `fable5` and `commander` are harness-specific (they name
 model tiers, dispatch through a subagent tool or CLI, and write output into a
@@ -53,6 +55,9 @@ project's SPEC, so its canon is the procedure itself rather than a rules documen
 a reader could apply by hand. `pstack` is a third-party skill pack — 36 skills
 ported under MIT from an external collection (see its `THIRD-PARTY-NOTICE.md`) —
 so its canon is the imported collection itself, which this repo does not author.
+`team-kit` is a four-role worker kit (dispatcher plus gated workers) whose canon
+is the kit itself — rules, skills, state contract, and hook scripts live together
+in its plugin directory.
 Consequently each **plugin directory is its own
 canon**: nothing is vendored into them, and they are **not part of the
 `sync_plugins.py` MANIFEST** (there is no upstream canon that could drift from
@@ -63,7 +68,7 @@ them).
 A Claude Code skill can only read files **under its own directory** — it cannot
 reach back into the repo with `../`. So every synced plugin carries a **vendored
 copy** of whatever canonical file it needs (`fable5`, `commander`, `idea-to-spec`,
-and `pstack` are self-canonical and are excluded from this sync):
+`pstack`, and `team-kit` are self-canonical and are excluded from this sync):
 
 - The five playbook plugins keep their own `SKILL.md` frontmatter (the `name` +
   `description` that drive skill triggering) and take their **body verbatim**

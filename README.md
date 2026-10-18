@@ -126,7 +126,7 @@ Alongside the doc contract, [`playbooks/`](playbooks/) holds a small set of
 ## Install as Claude Code plugins
 
 This repo is also a **Claude Code plugin marketplace**. Once it is on GitHub,
-add the marketplace and install any subset of the ten plugins — each is
+add the marketplace and install any subset of the eleven plugins — each is
 independent and optional:
 
 ```
@@ -141,6 +141,7 @@ independent and optional:
 /plugin install commander@agentic-mode
 /plugin install idea-to-spec@agentic-mode
 /plugin install pstack@agentic-mode
+/plugin install team-kit@agentic-mode
 ```
 
 | Plugin | Installs | Canonical source |
@@ -155,6 +156,7 @@ independent and optional:
 | `commander` | The runnable per-repo dispatch-and-score loop: constitution, report protocol, task template, dispatch + scoring scripts, ledger scaffold. | The plugin directory itself (self-canonical) |
 | `idea-to-spec` | The spec-synthesizer skill: batch interview, size triage, 12-section SPEC template. | The plugin directory itself (self-canonical) |
 | `pstack` | Thirty-six third-party engineering skills under MIT: 24 design/execution principles plus architect, arena, benchmark-checklist, blast-radius, create-verification-skill, figure-it-out, interrogate, maintain-verification-skill, tdd, technical-writing, typescript-best-practices, and unslop. | The plugin directory itself (self-canonical; third-party under MIT) |
+| `team-kit` | The four-role worker kit: observer (pure dispatcher), coder (implementation under a SubagentStop verify gate), reviewer (dual-axis read-only review), fortify (security pre-check) — plus the team-rules canon, hook scripts, and the state contract. | The plugin directory itself (self-canonical; see its STATE-CONTRACT.md) |
 
 The commit/review conventions differ from team to team, which is why they are
 optional plugins and policy-overridable playbooks rather than part of the core.
@@ -162,8 +164,8 @@ Each of those plugins vendors a self-contained copy of its canonical source; see
 [`adapters/claude-code/README.md`](adapters/claude-code/README.md) for the
 vendoring + anti-drift sync.
 
-`fable5`, `commander`, `idea-to-spec`, and `pstack` are the exceptions: all four
-have **no harness-neutral playbook counterpart**. `fable5` governs how you operate a
+`fable5`, `commander`, `idea-to-spec`, `pstack`, and `team-kit` are the
+exceptions: all five have **no harness-neutral playbook counterpart**. `fable5` governs how you operate a
 *session* (the main model as advisor/dispatcher, subagent tiers, output written
 into a per-user config home); `commander` ships the runnable per-repo instance of
 that same doctrine (a constitution plus dispatch/scoring scripts a subagent CLI
@@ -172,7 +174,9 @@ project's SPEC, so its canon is the skill procedure itself rather than a rules
 document a reader could apply by hand. `pstack` is a third-party skill pack — 36
 engineering skills ported under MIT from an external collection, attribution in
 its `THIRD-PARTY-NOTICE.md` — so its canon is the imported collection itself.
-None of the four is a repo document
+`team-kit` is a four-role worker kit (dispatcher plus gated workers) whose canon
+is the kit itself — rules, skills, state contract, and hook scripts live together
+in its plugin directory. None of the five is a repo document
 contract, so none can live in the neutral core. Their **plugin directories are
 their own canon**: nothing is vendored into them and they are not part of the
 `sync_plugins.py` sync.
@@ -231,8 +235,9 @@ packaging lives only under [`adapters/`](adapters/):
 - [`adapters/claude-code/`](adapters/claude-code/) — a Claude Code plugin
   marketplace: the `agentic-bootstrap` toolkit, the five playbooks, and the
   self-canonical `fable5` commander-mode discipline, `commander`
-  dispatch-and-score loop, `idea-to-spec` spec synthesizer, and `pstack`
-  third-party engineering-skill pack (36 skills under MIT) packaged as
+  dispatch-and-score loop, `idea-to-spec` spec synthesizer, `pstack`
+  third-party engineering-skill pack (36 skills under MIT), and `team-kit`
+  four-role worker kit packaged as
   optional, independently installable plugins (see
   [its README](adapters/claude-code/README.md) and [Install as Claude Code
   plugins](#install-as-claude-code-plugins) above).

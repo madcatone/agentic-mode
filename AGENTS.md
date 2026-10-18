@@ -45,6 +45,9 @@ model, or dispatch to use. Read [`README.md`](README.md) first, then this.
 - `playbooks/scripts/okf_lint.py` (+ `okf_parse.py`): the OKF bundle linter's
   mechanical pass (pure stdlib).
 - `adapters/`: Claude Code plugins + marketplace, Devin IDE rule + review workflow.
+- `adapters/claude-code/plugins/team-kit/`: the four-role worker kit
+  (observer/coder/reviewer/fortify) with its rules, hook scripts, and state
+  contract — self-canonical, edited in place (see its STATE-CONTRACT.md).
 - `.claude-plugin/marketplace.json`: the Claude Code plugin marketplace manifest.
 - `scripts/sync_plugins.py`: one-way vendoring sync (canon → plugins) + `--check` gate.
 - `examples/minimal-cli/`: a complete contract that passes the checker.
@@ -127,8 +130,9 @@ grep -rn 'PLUGIN_ROOT' adapters/claude-code/plugins && echo "FOUND" || echo "cle
    `templates/`, `checker/`) changed, `python3 scripts/sync_plugins.py` was run
    so the plugin copies match, and `--check` exits 0. Never hand-edit a vendored
    copy under `adapters/claude-code/plugins/`. (Exception: the `fable5`,
-   `commander`, `idea-to-spec`, and `pstack` plugins are self-canonical — not
-   vendored and not in the sync MANIFEST — so their files are edited in place.)
+   `commander`, `idea-to-spec`, `pstack`, and `team-kit` plugins are
+   self-canonical — not vendored and not in the sync MANIFEST — so their files
+   are edited in place.)
 6. `README.md` and `README-ZH.md` stay information-equivalent when either changes.
 
 ## Sign-Off Points
