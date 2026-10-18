@@ -1,0 +1,83 @@
+# anchors.list — STATE-CONTRACT.md file:line citation pins (issue #36).
+# One anchor per line: <relpath>:<lineno>:<keyword>; relpath is relative to
+# the kit root (this plugin directory). An anchor holds only if the file
+# exists, the line number is inside the file, and the keyword sits on exactly
+# that line — so inserting lines above (or inside) a cited range shifts the
+# keyword off its pinned line and turns the suite red.
+# Keyword rules: stable, unique within its file, no leading/trailing spaces.
+# Colons inside the keyword are fine (the parser splits on the first two
+# colons only). Cited blank lines carry no keyword and are not listed
+# (observer SKILL.md:131 is the only such line).
+# Coverage: every observer SKILL.md line cited by STATE-CONTRACT.md (full
+# coverage — a superset of the issue's "8 處引用"); coder/reviewer/fortify
+# SKILL.md and the eng scripts are sampled (>=2 anchors each).
+# Comments (# ...) and blank lines are ignored by run-tests.sh.
+
+# --- skills/observer/SKILL.md — full coverage --------------------------------
+# §2.2 識別碼 — cited at STATE-CONTRACT.md:133 (observer SKILL.md:51)
+skills/observer/SKILL.md:51:統一文法
+# §2.2 收工契約 — cited at STATE-CONTRACT.md:42 and :130 (:55)
+skills/observer/SKILL.md:55:收工契約隨附
+# §3(a) 代寫 — cited at STATE-CONTRACT.md:144 (:110-113), :145 (:113), :42 (:112)
+skills/observer/SKILL.md:110:先代寫 report
+skills/observer/SKILL.md:111:無寫檔能力
+skills/observer/SKILL.md:112:**原文**寫入
+skills/observer/SKILL.md:113:不重複寫
+# §3(b) 第一優先讀 report — cited at STATE-CONTRACT.md:148 (:114-116), :42 (:114)
+skills/observer/SKILL.md:114:第一優先讀 report
+skills/observer/SKILL.md:115:取首行 status
+skills/observer/SKILL.md:116:不受終端視窗限制
+# §3(c) fallback — cited at STATE-CONTRACT.md:150 (:117-119)
+skills/observer/SKILL.md:117:降級 fallback
+skills/observer/SKILL.md:118:herdr agent read
+skills/observer/SKILL.md:119:report 檔缺席
+# §4 原文引用 — cited at STATE-CONTRACT.md:157 (:127)
+skills/observer/SKILL.md:127:鍵與值不改寫
+# §5 借用 — cited at STATE-CONTRACT.md:171 and :188 (:130-133; :131 is blank)
+skills/observer/SKILL.md:130:對外留言：人類閘
+skills/observer/SKILL.md:132:PR 回覆等
+skills/observer/SKILL.md:133:引用之，不在此重寫
+
+# --- skills/coder/SKILL.md — samples ------------------------------------------
+# root hint write — cited at STATE-CONTRACT.md:41/108/122 (:48-53, :51-52)
+skills/coder/SKILL.md:52:root-recent.txt
+# status first-line contract — cited at STATE-CONTRACT.md:153 (:72-76)
+skills/coder/SKILL.md:72:必須是以下之一
+skills/coder/SKILL.md:74:status: DONE
+# report path — cited at STATE-CONTRACT.md:129/138 (:86-90, :83-93)
+skills/coder/SKILL.md:87:reports/coder/
+# adhoc fallback id — cited at STATE-CONTRACT.md:135 (:91)
+skills/coder/SKILL.md:91:adhoc-
+
+# --- skills/reviewer/SKILL.md — samples ---------------------------------------
+# status block — cited at STATE-CONTRACT.md:155 (:58-61)
+skills/reviewer/SKILL.md:59:status: <PASS|FAIL|BLOCKED>
+# report path — cited at STATE-CONTRACT.md:41/129 (:82-85)
+skills/reviewer/SKILL.md:83:reports/reviewer/
+# ledger path — cited at STATE-CONTRACT.md:169 (:110)
+skills/reviewer/SKILL.md:110:ledger 防重貼
+# hash pipeline — cited at STATE-CONTRACT.md:179-182 (:112-114, :116)
+skills/reviewer/SKILL.md:116:shasum -a 256
+
+# --- skills/fortify/SKILL.md — samples ----------------------------------------
+# status block — cited at STATE-CONTRACT.md:156 (:57-65)
+skills/fortify/SKILL.md:57:回報**首行**
+skills/fortify/SKILL.md:60:status: PASS | FAIL | BLOCKED
+# report path — cited at STATE-CONTRACT.md:41/129 (:78-80)
+skills/fortify/SKILL.md:79:reports/fortify/
+
+# --- eng scripts — samples ----------------------------------------------------
+# state base expansion — cited at STATE-CONTRACT.md:40 (:31)
+eng/verify-on-stop.sh:31:state_base=${AGENT_STATE_HOME
+# hook-log line format — cited at STATE-CONTRACT.md:56 (:46)
+eng/verify-on-stop.sh:46:'%s|%s|%s\n'
+# key sanitization — cited at STATE-CONTRACT.md:96 (:81)
+eng/verify-on-stop.sh:81:tr -c 'A-Za-z0-9_-'
+# TK_VERIFY_CMD stub root — cited at STATE-CONTRACT.md:65 (:108)
+eng/verify-on-stop.sh:108:verify_root=stub
+# counter overwrite write — cited at STATE-CONTRACT.md:77 (:152)
+eng/verify-on-stop.sh:152:"$new" > "$count_file"
+# default project root — cited at STATE-CONTRACT.md:114 (verify.sh:16)
+eng/verify.sh:16:root=${TEAM_KIT_ROOT:-
+# results-dir cleanup — cited at STATE-CONTRACT.md:193 (verify.sh:35-43)
+eng/verify.sh:35:# Clear last run's results dir

@@ -366,6 +366,42 @@ else
   badc vs-valid-config-green "rc=$rc out=[$out]"
 fi
 
+# --- STATE-CONTRACT anchors (issue #36) ----------------------------------------
+# tests/anchors.list pins every file:line citation STATE-CONTRACT.md makes
+# about the kit: one <relpath>:<lineno>:<keyword> triple per line, relpath
+# relative to the kit root. Each triple is one case: the file must exist, the
+# line number must be inside the file, and the keyword must sit on exactly
+# that line — so any insertion that shifts a cited line (or edits away its
+# anchor text) turns the suite red with the drifted line named.
+KIT=$(CDPATH= cd -- "$ENG/.." && pwd)
+while IFS= read -r triple; do
+  case "$triple" in ''|'#'*) continue ;; esac
+  a_file=${triple%%:*}
+  a_rest=${triple#*:}
+  a_line=${a_rest%%:*}
+  a_kw=${a_rest#*:}
+  a_id="anchor $a_file:$a_line"
+  if [ ! -f "$KIT/$a_file" ]; then
+    badc "$a_id" "file missing (kit root=$KIT)"
+    continue
+  fi
+  case "$a_line" in ''|*[!0-9]*) badc "$a_id" "malformed line number '$a_line'"; continue ;; esac
+  if [ -z "$a_kw" ]; then badc "$a_id" "empty keyword"; continue; fi
+  a_total=$(wc -l < "$KIT/$a_file" | tr -d ' ')
+  if [ "$a_line" -gt "$a_total" ]; then
+    badc "$a_id" "line $a_line beyond EOF ($a_file has $a_total lines)"
+    continue
+  fi
+  a_content=$(sed -n "${a_line}p" "$KIT/$a_file")
+  case "$a_content" in
+    *"$a_kw"*) okc "$a_id" ;;
+    *)
+      a_hits=$(grep -nF -- "$a_kw" "$KIT/$a_file" | cut -d: -f1 | tr '\n' ' ')
+      badc "$a_id" "keyword [$a_kw] not on line $a_line (line reads: [$a_content]) — actually at: ${a_hits:-nowhere}"
+      ;;
+  esac
+done < "$ENG/tests/anchors.list"
+
 # --- summary -----------------------------------------------------------------
 total=$((pass + fail))
 printf -- '----\ntests: %d passed, %d failed (total %d)\n' "$pass" "$fail" "$total"
