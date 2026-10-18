@@ -1,6 +1,6 @@
 # herdr 契約（observer 執行時查）
 
-> 契約事實截至 herdr 0.9.1／2026-10-17 查證（本機 `/opt/homebrew/bin/herdr` 的
+> 契約事實截至 herdr 0.9.1／2026-10-17 查證（本機 herdr 執行檔（homebrew 安裝）的
 > `--help` 與實跑輸出）。控制／查詢類指令回 JSON，統一包 `{id, result}`——資料取
 > `.result.*`（例外：`agent read` 回終端原始文本，非 JSON）。版本或輸出不符時，以
 > `herdr <cmd> --help` 現場重查為準，不回填本檔以外的記憶。

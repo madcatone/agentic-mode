@@ -15,6 +15,12 @@
 #       block -> {"decision":"block","reason":"..."}   (reason assembled with jq, never hand-concatenated)
 #   - every decision appends one line to <state>/team-kit/hook-log.txt
 #     (ISO-8601 UTC | decision | detail); logging failures are silent and NEVER reach stdout.
+#   - jq is a hard prerequisite (payload parsing + block JSON assembly). When
+#     jq is not on PATH the gate fails LOUD but stays open: one stderr warning
+#     (SubagentStop shows stderr to the user), one hook-log line
+#     "jq missing—gate inert", allow {} exit 0. Never block on missing jq —
+#     the block JSON itself needs jq, and a blocked stop would deadlock the
+#     status: BLOCKED escape hatch. See INSTALL.md (prerequisites).
 #
 # Env knobs: AGENT_STATE_HOME (default ~/.agent-state), TK_MAX_ATTEMPTS
 # (default 0 = unlimited blocked stops), TK_TAIL_LINES (default 40),
@@ -43,6 +49,17 @@ log_line() { # <decision> <detail>
 
 allow() { log_line allow "$1"; printf '{}\n'; exit 0; }
 block() { log_line block "$1"; printf '%s\n' "$2"; exit 0; }
+
+# (0) jq is a hard prerequisite of this gate (payload parsing, block JSON
+#     assembly). Missing jq must never degrade into a SILENT fail-open: warn
+#     on stderr (shown to the user on SubagentStop), log the inert state,
+#     allow the stop. Blocking is not an option — the block JSON itself
+#     needs jq, and a blocked stop would deadlock the status: BLOCKED
+#     escape hatch.
+if ! command -v jq >/dev/null 2>&1; then
+  printf 'verify-on-stop.sh: jq missing—gate inert: cannot parse the hook payload or assemble a block decision; allowing this stop. Install jq (see team-kit INSTALL.md) to arm the gate.\n' >&2
+  allow "jq missing—gate inert"
+fi
 
 # (1) agent_type not in the coder family -> allow, hook is a no-op for others.
 agent_type=$(jstr '.agent_type')

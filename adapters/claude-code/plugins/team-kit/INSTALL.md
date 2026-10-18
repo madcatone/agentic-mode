@@ -35,6 +35,17 @@ skill 之間的引用一律是**相對於 skill 目錄**的路徑（如 `../../r
 | `<TEAM_KIT_DIR>` | kit 根目錄絕對路徑（其下有 `skills/`、`rules/`、`eng/`） |
 | `<TEAM_KIT_ENG>` | `eng/` 目錄絕對路徑（即 `<TEAM_KIT_DIR>/eng`） |
 
+## 前置依賴
+
+- **jq**：`eng/` 三個腳本都以 jq 解析 JSON——`verify.sh` 讀 `team-kit.json`、
+  `verify-on-stop.sh` 解析 hook payload 並組裝 block 決定 JSON、`reviewer-git-only.sh`
+  解析 tool 呼叫 payload。**macOS 預設不附 jq**；安裝前先 `command -v jq` 確認，
+  homebrew 使用者 `brew install jq` 即可（執行檔落在 homebrew 前綴的 `bin/`——
+  前綴隨機型而異，以 `brew --prefix` 查得，該目錄須在 PATH 上）。
+  jq 缺席時 stop 閘門**大聲失效**：對 stderr 發警告、hook-log 記
+  `jq missing—gate inert`、放行該次 stop（不 block——block 會卡死 `status: BLOCKED`
+  逃生口）；裝回 jq 後閘門即恢復，不需其他復原步驟。
+
 ## 安裝方式一：Claude Code plugin
 
 1. 經 marketplace 安裝本 plugin（`/plugin install team-kit@agentic-mode`）——四個 skill
@@ -66,4 +77,4 @@ skill 之間的引用一律是**相對於 skill 目錄**的路徑（如 `../../r
 ## 測試
 
 `sh eng/tests/run-tests.sh`——fixture 驅動，涵蓋兩個 hook 腳本的每個決定分支與
-verify.sh 端到端（68 案）；測試以環境變數注入狀態根，不碰個人目錄。
+verify.sh 端到端＋設定檔驗證（73 案）；測試以環境變數注入狀態根，不碰個人目錄。

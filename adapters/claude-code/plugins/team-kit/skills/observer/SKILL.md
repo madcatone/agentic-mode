@@ -111,6 +111,6 @@ observer 被 `/loop` 驅動（loop 本身是 harness 內建，不歸本 skill �
 
 ## 來源
 
-- 派工兩通道、素材契約、/loop 監管判定：GitHub issue #27（/tmp/tk-f.md，2026-10-17）。
+- 派工兩通道、素材契約、/loop 監管判定：GitHub issue #27 之任務規格檔（暫存路徑不入庫；2026-10-17）。
 - 人類閘＋ledger：借自 team-kit reviewer SKILL.md §5（引用不重寫）。
 - herdr 事實：本機 herdr 0.9.1 CLI `--help` 實測（2026-10-17），整理於 references/herdr-contract.md。

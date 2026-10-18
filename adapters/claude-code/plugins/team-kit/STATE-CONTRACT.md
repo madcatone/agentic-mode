@@ -37,7 +37,7 @@ ${AGENT_STATE_HOME:-~/.agent-state}/
 頂層 `reviewer/` 放**對外留言 ledger**。用途與格式互異，勿混。
 
 **AGENT_STATE_HOME 解析**：全部讀寫方統一展開 `${AGENT_STATE_HOME:-$HOME/.agent-state}`
-——env 有設用 env 值，未設用 `~/.agent-state`（eng/verify-on-stop.sh:25、
+——env 有設用 env 值，未設用 `~/.agent-state`（eng/verify-on-stop.sh:31、
 skills/coder/SKILL.md:51-52 與 87、skills/reviewer/SKILL.md:83 與 110、
 skills/fortify/SKILL.md:79、skills/observer/SKILL.md:55/75/77）。各元件**各自獨立**展開同一
 expression：若某環境地（例：hook 的 shell）與其他環境外設了不同值，狀態會分裂成兩個根，
@@ -47,56 +47,58 @@ expression：若某環境地（例：hook 的 shell）與其他環境外設了�
 ## 2. hook-log.txt — stop-hook 決定 log
 
 - **路徑模式**：`$AGENT_STATE_HOME/team-kit/hook-log.txt`（唯此一檔）。
-- **寫者**：`eng/verify-on-stop.sh` 的 `log_line()`（:38-42）——`allow()`／`block()`
-  兩個出口都先記一行（:44-45），即 **hook 的每一次決定各一行**；非 coder 家族的
-  subagent 停止也會觸發 hook 並記一行 allow（agent_type 判定在 :49-52，此 allow 亦經
-  `log_line`）。寫前 `mkdir -p` 狀態目錄（:39）。
+- **寫者**：`eng/verify-on-stop.sh` 的 `log_line()`（:44-48）——`allow()`／`block()`
+  兩個出口都先記一行（:50-51），即 **hook 的每一次決定各一行**；非 coder 家族的
+  subagent 停止也會觸發 hook 並記一行 allow（agent_type 判定在 :66-69，此 allow 亦經
+  `log_line`）。寫前 `mkdir -p` 狀態目錄（:45）。
 - **讀者**：無程式讀者——六個事實來源檔皆無讀取 hook-log 的程序；用途是人類事後稽核。
 - **格式**：一行一決定，`<ISO-8601 UTC>|<decision>|<detail>`：
-  - 時戳：`date -u +%Y-%m-%dT%H:%M:%SZ`（秒精度、`Z` 結尾，:40）。
-  - decision：`allow` 或 `block`（:44-45）。
-  - detail：純文字，無轉義。四種 allow 形態——`agent_type=<X|<null>> is not coder`
-    （:51）、`last_assistant_message declares status: BLOCKED`（:56）、
-    `verify passed (root=<R>) after <N> prior blocked stop(s); counter cleared`（:118）、
-    `max attempts (<M>) reached after <N> blocked stop(s); escalating`（:130）；
-    block 形態固定為 `attempt <N>, exit <RC>, key=<K>, root=<R>, summary=<S>`（:142）。
-    `root=` 帶解析出的專案根，或字面 `default`（:110）／`stub`（TK_VERIFY_CMD 測試樁，:91）。
-  - 欄位分隔：只有前兩個 `|` 是分隔符（printf 三參數，:40）；detail 內可再出現 `|`
+  - 時戳：`date -u +%Y-%m-%dT%H:%M:%SZ`（秒精度、`Z` 結尾，:46）。
+  - decision：`allow` 或 `block`（:50-51）。
+  - detail：純文字，無轉義。五種 allow 形態——`agent_type=<X|<null>> is not coder`
+    （:68）、`last_assistant_message declares status: BLOCKED`（:73）、
+    `jq missing—gate inert`（jq 不在 PATH 時的大聲失效：stderr 警告＋此 log 行，
+    決定仍為 allow，:61）、
+    `verify passed (root=<R>) after <N> prior blocked stop(s); counter cleared`（:135）、
+    `max attempts (<M>) reached after <N> blocked stop(s); escalating`（:147）；
+    block 形態固定為 `attempt <N>, exit <RC>, key=<K>, root=<R>, summary=<S>`（:159）。
+    `root=` 帶解析出的專案根，或字面 `default`（:127）／`stub`（TK_VERIFY_CMD 測試樁，:108）。
+  - 欄位分隔：只有前兩個 `|` 是分隔符（printf 三參數，:46）；detail 內可再出現 `|`
     （summary 取自 verify 輸出原文），機器解析時 split 前兩個 `|` 即可。
 - **生命週期**：append-only，程式碼無任何 truncate／rotate／刪除——**永久累積**。
-  寫入失敗靜默（`2>/dev/null`，:41）、絕不影響 stdout 決定輸出（:16-17）。
+  寫入失敗靜默（`2>/dev/null`，:47）、絕不影響 stdout 決定輸出（:16-17）。
 - **併發 caveat**：無鎖、無輪替；多 coder 並行停止時各行獨立 append，程式未做進一步保證。
-- **來源**：eng/verify-on-stop.sh:16-17, 38-45, 49-56, 91, 110, 118, 130, 142。
+- **來源**：eng/verify-on-stop.sh:16-17, 44-51, 53-62, 66-73, 108, 127, 135, 147, 159。
 
 ## 3. verify-attempts-<key>.txt — 被 block 的 stop 計數器
 
 - **路徑模式**：`$AGENT_STATE_HOME/team-kit/verify-attempts-<key>.txt`，`<key>` 見 §3.1。
 - **寫者**：僅 `eng/verify-on-stop.sh`。block 決定時以**覆寫**方式寫入遞增後的整數
-  （`printf '%s\n' "$new" > "$count_file"`，:135）；首次被擋即建立檔案（值 1）。
-- **讀者**：僅 `eng/verify-on-stop.sh` 自己——同一 key 下次 stop 時讀回（:70-73）。
-- **格式**：檔案全文＝一個十進位整數＋換行。讀回時空值或非數字一律視為 0（:72）。
+  （`printf '%s\n' "$new" > "$count_file"`，:152）；首次被擋即建立檔案（值 1）。
+- **讀者**：僅 `eng/verify-on-stop.sh` 自己——同一 key 下次 stop 時讀回（:87-90）。
+- **格式**：檔案全文＝一個十進位整數＋換行。讀回時空值或非數字一律視為 0（:89）。
 - **生命週期**：
-  - 刪除時機恰兩條：verify 通過（`rm -f`，allow「counter cleared」，:116-119）；
+  - 刪除時機恰兩條：verify 通過（`rm -f`，allow「counter cleared」，:133-136）；
     達 `TK_MAX_ATTEMPTS` 上限（環境旋鈕，預設 0＝不限制；上限>0 且遞增後超過時
-    `rm -f`，allow「escalating」，:127-131）。
+    `rm -f`，allow「escalating」，:144-148）。
   - **不刪除**的路徑：`status: BLOCKED` 逃生口與非 coder agent_type 的 allow 在計數器
-    邏輯之前返回（:49-57 先於 :61-66），計數器留存——session 經逃生口結束會留下殘檔。
+    邏輯之前返回（:66-74 先於 :78-83），計數器留存——session 經逃生口結束會留下殘檔。
     程式無自動清掃；殘檔由人類判讀後清理。（實例印證見 §8。）
 - **併發 caveat**：不同 agent 不同 key、各自獨立檔案；同 key 併發寫未由程式處理
   （前提是同一 subagent 不會同時觸發兩次 stop）。
-- **來源**：eng/verify-on-stop.sh:19-21, 27, 59-73, 115-131, 135。
+- **來源**：eng/verify-on-stop.sh:25-27, 33, 76-90, 132-148, 152。
 
 ### 3.1 key 推導規則
 
-hook 對每個 stop 事件推導計數器 key（eng/verify-on-stop.sh:59-65）：
+hook 對每個 stop 事件推導計數器 key（eng/verify-on-stop.sh:76-82）：
 
-1. `raw` ＝ hook payload 的 `.agent_id`；空則 `.session_id`；再空則字串 `default`（:61-63）。
-2. 清洗：`tr -c 'A-Za-z0-9_-' '_'`——不在 `[A-Za-z0-9_-]` 集合的字元逐一代換為 `_`（:64）。
-3. 清洗後為空（`raw` 全由外來字元構成時）→ `default`（:65）。
+1. `raw` ＝ hook payload 的 `.agent_id`；空則 `.session_id`；再空則字串 `default`（:78-80）。
+2. 清洗：`tr -c 'A-Za-z0-9_-' '_'`——不在 `[A-Za-z0-9_-]` 集合的字元逐一代換為 `_`（:81）。
+3. 清洗後為空（`raw` 全由外來字元構成時）→ `default`（:82）。
 
 hook 前置判定（與 key 無關但決定計數器是否生效）：`.agent_type` 需匹配
-`^coder(-[a-z0-9_-]+)?$`（:49）；`.last_assistant_message` 匹配
-`(?im)^\s*status:\s*BLOCKED` 時走逃生口 allow（:55-57）。
+`^coder(-[a-z0-9_-]+)?$`（:66）；`.last_assistant_message` 匹配
+`(?im)^\s*status:\s*BLOCKED` 時走逃生口 allow（:72-74）。
 
 ## 4. root-recent.txt — 最近專案根 hint
 
@@ -104,19 +106,19 @@ hook 前置判定（與 key 無關但決定計數器是否生效）：`.agent_ty
 - **寫者**：coder skill——**開工第一步**，拿到派工的 `TEAM_KIT_ROOT` 後立刻執行
   `mkdir -p` ＋ `printf '%s\n' "$TEAM_KIT_ROOT" > .../root-recent.txt`
   （skills/coder/SKILL.md:48-53）。
-- **讀者**：`eng/verify-on-stop.sh` 的根解析（:94-113），優先序（:8-11, 76-89）：
+- **讀者**：`eng/verify-on-stop.sh` 的根解析（:111-130），優先序（:8-11, 93-106）：
   1. env `TEAM_KIT_ROOT`（tests／CI 注入）——直接勝出；
   2. hook payload 的 `cwd`——**僅當** `<cwd>/team-kit.json` 存在**且** `jq -e .` 可解析
-     （:99-100；巢狀派工的 cwd 是上層 session 的 cwd，通常無 config，不得遮蔽 hint）；
-  3. 本 hint 檔——僅當檔案存在且非空（`-s`）時讀**第一行**（`sed -n '1p'`，:102-104）；
-  4. fallback：`eng/verify.sh` 自身預設（script 所在 eng/ 的上層＝kit 目錄，verify.sh:14）。
+     （:116-117；巢狀派工的 cwd 是上層 session 的 cwd，通常無 config，不得遮蔽 hint）；
+  3. 本 hint 檔——僅當檔案存在且非空（`-s`）時讀**第一行**（`sed -n '1p'`，:119-121）；
+  4. fallback：`eng/verify.sh` 自身預設（script 所在 eng/ 的上層＝kit 目錄，verify.sh:16）。
 - **格式**：一行＝一個絕對路徑（`%s\n`；覆寫式故恆為單行）。
 - **生命週期**：每次 coder 開工**覆寫**；程式無刪除時機。殘值語義＝「最近一次開工的
   專案根」，**不保證**是當前任務的根——上一任務留下的 hint 會被本次解析用到。
 - **併發 caveat**：last-writer wins——多 coder 並行於不同根時，後寫者覆蓋先寫者，
   stop 當下可能讀到別的任務的根。個人（單人多案）情境可接受，多工／多機常態化前
-  需重盤（eng/verify-on-stop.sh:85-88、skills/coder/SKILL.md:59-60）。
-- **來源**：eng/verify-on-stop.sh:8-11, 76-113；eng/verify.sh:14；
+  需重盤（eng/verify-on-stop.sh:102-105、skills/coder/SKILL.md:59-60）。
+- **來源**：eng/verify-on-stop.sh:8-11, 93-130；eng/verify.sh:16；
   skills/coder/SKILL.md:48-60。
 
 ## 5. reports/<role>/ — report 檔契約（machine-readable status 出口）
@@ -188,7 +190,7 @@ hook 前置判定（與 key 無關但決定計數器是否生效）：`.agent_ty
 ## 7. 界外聲明（不屬本契約管轄）
 
 - **專案端暫存**：`eng/verify.sh` 每輪清理 `<TEAM_KIT_ROOT>/<results_dir>`（預設
-  `TestResults`，`rm -rf`；verify.sh:30-38）——作用在**專案根**，屬專案端工作目錄，
+  `TestResults`，`rm -rf`；verify.sh:35-43）——作用在**專案根**，屬專案端工作目錄，
   不在 `$AGENT_STATE_HOME` 契約內。
 - **其他 skill 的 ledger**：`two-axis-review`、`review-response` 等各自 skill 在
   `~/.agent-state/` 下的目錄（本機實存 `two-axis-review/`、`review-response/`），
@@ -198,10 +200,10 @@ hook 前置判定（與 key 無關但決定計數器是否生效）：`.agent_ty
 ## 8. 實例抽樣核對（2026-10-18，`~/.agent-state/team-kit/`）
 
 - `hook-log.txt`：抽樣 8 行全符合 `<ISO>|<decision>|<detail>`；block 行如
-  `2026-10-17T16:19:13Z|block|attempt 1, exit 1, key=adaf5f1241e572511, root=~/code/agentic-mode, summary=verify exited 1 with no diagnostic line`（原實例的 home 前綴以 `~` 縮寫）
-  與 :142 的欄位順序一致；allow 行含 `verify passed (root=...) after 0 prior blocked stop(s); counter cleared`
-  與 `last_assistant_message declares status: BLOCKED` 兩型，與 :118／:56 一致。
-- `root-recent.txt`：恰一行 `/tmp/tk-f4-coder.gQGQg4`（單行絕對路徑，覆寫式殘值）。
+  `2026-10-17T16:19:13Z|block|attempt 1, exit 1, key=adaf5f1241e572511, root=<repo>, summary=verify exited 1 with no diagnostic line`（原實例的 root 已以 `<repo>` 匿名化）
+  與 :159 的欄位順序一致；allow 行含 `verify passed (root=...) after 0 prior blocked stop(s); counter cleared`
+  與 `last_assistant_message declares status: BLOCKED` 兩型，與 :135／:73 一致。
+- `root-recent.txt`：恰一行 `<demo-root>`（單行絕對路徑，覆寫式殘值；原實例的暫存路徑已匿名化）。
 - `verify-attempts-*.txt` 三檔：內容各為 `1`／`1`／`4`（單整數）。其中
   `verify-attempts-adaf5f1241e572511.txt`＝4 與 hook-log 同 key 的 4 次 block 後接
   `status: BLOCKED` 逃生口 allow 相符——印證 §3「逃生口不刪計數器」。

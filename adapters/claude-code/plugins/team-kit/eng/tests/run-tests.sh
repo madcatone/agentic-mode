@@ -2,7 +2,8 @@
 # run-tests.sh — fixture-driven tests for the team-kit/eng gate scripts.
 # Every decision branch of verify-on-stop.sh and reviewer-git-only.sh gets at
 # least one positive and one negative case; verify.sh is exercised end-to-end
-# through verify-on-stop.sh against real mini projects.
+# through verify-on-stop.sh against real mini projects, and directly for its
+# config validation (empty step name/cmd must be a loud error).
 set -u
 
 ENG=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
@@ -124,6 +125,22 @@ vos_block() {
 
 STUB_FAIL='echo "make: error E1234 in parser.c" >&2; echo "  12 tests failed"; exit 1'
 STUB_FAIL_SILENT='exit 1'
+
+# (0-F1) jq unavailable (PATH carries no jq): the gate must fail LOUD, not
+#        silently — stderr warning + hook-log "jq missing—gate inert" line,
+#        decision stays allow {} (blocking would deadlock the status: BLOCKED
+#        escape hatch, and the block JSON itself needs jq).
+newst
+fakebin=$(mktemp -d); tmpdirs="$tmpdirs
+$fakebin"
+for t in sh dirname cat mkdir date; do ln -s "$(command -v "$t")" "$fakebin/$t"; done
+out=$(env AGENT_STATE_HOME="$st" PATH="$fakebin" sh "$VOS" < "$FIX/vos-coder-fail.json" 2>"$st/err"); rc=$?
+if [ "$rc" -eq 0 ] && [ "$out" = "{}" ] && grep -q 'jq missing' "$st/err" \
+   && grep -qF 'jq missing—gate inert' "$st/team-kit/hook-log.txt"; then
+  okc vos-jq-missing-allow
+else
+  badc vos-jq-missing-allow "rc=$rc out=[$out] err=[$(cat "$st/err" 2>/dev/null)] log=[$(cat "$st/team-kit/hook-log.txt" 2>/dev/null)]"
+fi
 
 # (1) non-coder agent_type / null / unparseable input -> allow {}
 vos_allow vos-noncoder-allow   vos-noncoder.json
@@ -317,6 +334,36 @@ if [ "$rc" -eq 0 ] && [ "$dec" = block ] && [ "$fb" = ok ] \
   okc vos-cwd-noconfig-nohint-fallback
 else
   badc vos-cwd-noconfig-nohint-fallback "rc=$rc dec=$dec $fb log=[$(cat "$st/team-kit/hook-log.txt" 2>/dev/null)]"
+fi
+
+# --- verify.sh (F4) -----------------------------------------------------------
+# Empty name or empty cmd in steps[] is a config error: verify.sh must say
+# which step is broken and exit 1 — never skip silently, never run nothing
+# and print VERIFY PASSED.
+# vs_err <name> <steps-json> <stderr-substring> — expect exit 1 + message
+vs_err() {
+  d=$(mktemp -d); tmpdirs="$tmpdirs
+$d"
+  printf '{"steps":[%s]}' "$2" > "$d/team-kit.json"
+  out=$(env TEAM_KIT_ROOT="$d" sh "$ENG/verify.sh" 2>"$d/err"); rc=$?
+  if [ "$rc" -ne 0 ] && grep -qF "$3" "$d/err"; then
+    okc "$1"
+  else
+    badc "$1" "expected exit 1 with '$3', got rc=$rc err=[$(cat "$d/err" 2>/dev/null)] out=[$out]"
+  fi
+}
+vs_err vs-empty-name-deny '{"name":"build","cmd":"true"},{"name":"","cmd":"true"}' 'step 2 has an empty name'
+vs_err vs-empty-cmd-deny  '{"name":"build","cmd":""}'                             "step 1 ('build') has an empty cmd"
+vs_err vs-empty-both-deny '{"name":"","cmd":""}'                                  'step 1 has an empty name'
+# control: named, non-empty steps still pass end-to-end
+d=$(mktemp -d); tmpdirs="$tmpdirs
+$d"
+printf '%s' '{"steps":[{"name":"build","cmd":"true"},{"name":"test","cmd":"true"}]}' > "$d/team-kit.json"
+out=$(env TEAM_KIT_ROOT="$d" sh "$ENG/verify.sh" 2>&1); rc=$?
+if [ "$rc" -eq 0 ] && printf '%s' "$out" | grep -q '^VERIFY PASSED$'; then
+  okc vs-valid-config-green
+else
+  badc vs-valid-config-green "rc=$rc out=[$out]"
 fi
 
 # --- summary -----------------------------------------------------------------
