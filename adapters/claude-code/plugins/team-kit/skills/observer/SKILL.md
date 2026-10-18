@@ -61,6 +61,41 @@ disable-model-invocation: true
 - 帶 `--wait` 收首個匹配狀態（5 秒 activity gate 抓 stalled）；長任務不要傻等——派完即回，交給 /loop 監管。
 - 需要新終端跑 agent：`herdr pane split` 建**自己的** pane → `herdr agent start <name> --kind <kind> --pane <id>`（pane 須在 shell prompt）。完整指令語義見 `references/herdr-contract.md`。
 
+### 2.4 交付管線（issue → coder → PR → review → merge）
+
+一張票一輪管線；站間等待與狀態監管依 §3（/loop），對外寫入依 §5。管線中 observer 的
+git／PR 操作與驗收複跑屬指揮職責，不屬 §0 禁止的代做任務本體。
+
+1. **進場**：票上留 started comment；從 develop 開分支 `<type>/<issue>-<slug>`；
+   依 §2.2 備齊素材契約——管線任務識別碼＝`TK-<issue>`（修復輪 `-FIX`、審查軸
+   `-SPEC`／`-STD`，例 `TK-31-FIX`）。
+2. **實作輪**：派 coder。回報 `status: DONE` 且 verify 綠後，observer 驗收＝複跑
+   coder 引述的同一驗證指令比對輸出；`BLOCKED` → 回報使用者，不代猜。
+3. **PR**：驗收後 observer push 分支＋建 PR——base develop、body 引票（`resolves #N`）
+   並註明 base 非 default branch，**resolves 不自動關票、須手動關**（見 8）。PR 建立
+   屬派工授權範圍、免逐次閘；**merge 永遠人類專屬**。
+4. **verdict → 動作**（兩軸齊後對照）：
+
+   | verdict | 動作 |
+   |---|---|
+   | 任一軸 FAIL（必要級 CONFIRMED） | 重派 coder 帶 findings 原文：同分支新 commit、識別碼 `-FIX` |
+   | 雙軸 PASS | 收斂：呈報使用者等 merge |
+   | BLOCKED | 回報使用者，不代答 |
+   | 建議級 finding（不構成 FAIL） | 呈報使用者裁示，不自行採納或駁回 |
+
+5. **輪數保險**：修復輪上限 3——到頂仍有必要級 FAIL 即停止重派，整理軌跡回報使用者問方向。
+6. **CI 等待**：merge 前輪詢該 SHA 的 check-runs（`/commits/<sha>/check-runs`，或
+   `gh run watch`）至脫離 pending——全綠才呈報可 merge，failure 如實呈報。
+   **--watch 空輸出 ≠ 綠燈**：`gh pr checks --watch` 在 push 後會賽跑——check-run
+   尚未註冊時以「no checks reported」退出，合併可能搶在 CI 回報前（#34 實例）。
+7. **PR 留言尺度**：開工指令預授權例行 verdict 摘要留言（各軸 status 首行＋findings
+   計數，原文引用；ledger 照記）。非例行內容（裁示、回應第三方、承諾時程）逐則人類閘
+   ——機制即 §5，此處只定尺度。
+8. **收帳**（人類 merge 後）：手動關票、本地同步（`git checkout develop && git pull`）、
+   票上留流程記錄留言（輪數、findings 收斂、遺留項——屬例行尺度）。
+
+> 來源：協議蒸餾自 TK-31／TK-34 實跑（reports/ 可稽）。
+
 ## 3. /loop 監管：每輪醒來做什麼
 
 observer 被 `/loop` 驅動（loop 本身是 harness 內建，不歸本 skill 實作）。每輪依序：
