@@ -80,6 +80,12 @@ sh tests/run_fire_demos.sh
 sh tests/run_sync_demos.sh
 ```
 
+- Run the team-kit plugin eng tests (73 cases, must exit 0; requires `jq` on PATH):
+
+```bash
+sh adapters/claude-code/plugins/team-kit/eng/tests/run-tests.sh
+```
+
 - Sweep for leftover template placeholders in the example:
 
 ```bash

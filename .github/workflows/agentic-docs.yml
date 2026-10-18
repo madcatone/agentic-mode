@@ -34,3 +34,5 @@ jobs:
         run: python scripts/sync_plugins.py --check
       - name: Run the sync fire-demos
         run: sh tests/run_sync_demos.sh
+      - name: Run the team-kit plugin eng tests
+        run: sh adapters/claude-code/plugins/team-kit/eng/tests/run-tests.sh
