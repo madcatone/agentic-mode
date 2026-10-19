@@ -1,0 +1,8 @@
+# anchor-drift.list — fixture for the negative anchor case (issue #36, F2).
+# One good triple (keyword really sits on line 16 -> must report ok) plus one
+# drifted triple: eng/verify.sh exists and line 8 is inside the file, but the
+# keyword sits on line 35 — the exact shift an insertion above a cited line
+# causes. Consumed only by run-tests.sh's isolated-subshell negative case,
+# never by the main anchors.list pass.
+eng/verify.sh:16:root=${TEAM_KIT_ROOT:-
+eng/verify.sh:8:# Clear last run's results dir

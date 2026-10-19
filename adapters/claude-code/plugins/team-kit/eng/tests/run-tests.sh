@@ -366,6 +366,83 @@ else
   badc vs-valid-config-green "rc=$rc out=[$out]"
 fi
 
+# --- STATE-CONTRACT anchors (issue #36) ----------------------------------------
+# tests/anchors.list pins file:line citations STATE-CONTRACT.md makes about
+# the kit: one <relpath>:<lineno>:<keyword> triple per line, relpath relative
+# to the kit root. Coverage matches the list's own header: every observer
+# SKILL.md line cited by STATE-CONTRACT.md is pinned (full coverage), while
+# the coder/reviewer/fortify SKILL.md and eng-script citations are sampled
+# (>=2 anchors each). The pin is one-way protection: it catches drift in
+# lines already listed, but a newly added STATE-CONTRACT.md citation is not
+# covered until an anchor is added for it. Each triple is one case: the file
+# must exist, the line number must be inside the file, and the keyword must
+# sit on exactly that line — so any insertion that shifts a cited line (or
+# edits away its anchor text) turns the suite red with the drifted line named.
+# Silent-drop guards (review F1): a missing or unreadable list, a list whose
+# triples were all lost, and a final line without a trailing newline must
+# never collapse this section into a green suite — the first two are FAIL
+# cases in their own right, the third keeps the last triple inside the loop.
+KIT=$(CDPATH= cd -- "$ENG/.." && pwd)
+# anchor_check <list> — run the triples in <list> against the kit root.
+# Output and pass/fail counting are identical to the pre-function inline
+# loop (F2 extracted it so negative cases can reuse it); okc/badc mutate the
+# caller's counters, so callers that must stay isolated run it in a subshell.
+anchor_check() {
+  a_list=$1
+  a_checked=0
+  if [ ! -f "$a_list" ] || [ ! -r "$a_list" ]; then
+    badc "anchors.list" "list missing or unreadable ($a_list) — every anchor case dropped"
+  else
+    while IFS= read -r triple || [ -n "$triple" ]; do
+      case "$triple" in ''|'#'*) continue ;; esac
+      a_checked=$((a_checked + 1))
+      a_file=${triple%%:*}
+      a_rest=${triple#*:}
+      a_line=${a_rest%%:*}
+      a_kw=${a_rest#*:}
+      a_id="anchor $a_file:$a_line"
+      if [ ! -f "$KIT/$a_file" ]; then
+        badc "$a_id" "file missing (kit root=$KIT)"
+        continue
+      fi
+      case "$a_line" in ''|*[!0-9]*) badc "$a_id" "malformed line number '$a_line'"; continue ;; esac
+      if [ -z "$a_kw" ]; then badc "$a_id" "empty keyword"; continue; fi
+      a_total=$(wc -l < "$KIT/$a_file" | tr -d ' ')
+      if [ "$a_line" -gt "$a_total" ]; then
+        badc "$a_id" "line $a_line beyond EOF ($a_file has $a_total lines)"
+        continue
+      fi
+      a_content=$(sed -n "${a_line}p" "$KIT/$a_file")
+      case "$a_content" in
+        *"$a_kw"*) okc "$a_id" ;;
+        *)
+          a_hits=$(grep -nF -- "$a_kw" "$KIT/$a_file" | cut -d: -f1 | tr '\n' ' ')
+          badc "$a_id" "keyword [$a_kw] not on line $a_line (line reads: [$a_content]) — actually at: ${a_hits:-nowhere}"
+          ;;
+      esac
+    done < "$a_list"
+    if [ "$a_checked" -lt 1 ]; then
+      badc "anchors.list" "no parseable triples in $a_list — every anchor case dropped"
+    fi
+  fi
+}
+anchor_check "$ENG/tests/anchors.list"
+
+# (F2) negative anchor case: a drifted triple must FAIL by name while a good
+#      triple in the same fixture list still reports ok. Command substitution
+#      is the isolated subshell: the fixture's FAILs land in $dr_out only and
+#      cannot leak into this suite's pass/fail counters.
+dr_out=$(anchor_check "$FIX/anchor-drift.list" 2>&1)
+dr_fails=$(printf '%s\n' "$dr_out" | grep -c '^FAIL')
+if printf '%s\n' "$dr_out" | grep -q 'not on line' \
+   && printf '%s\n' "$dr_out" | grep -q '^ok   anchor eng/verify.sh:16$' \
+   && printf '%s\n' "$dr_out" | grep -q '^FAIL anchor eng/verify.sh:8:' \
+   && [ "$dr_fails" -eq 1 ]; then
+  okc anchor-drift-fixture
+else
+  badc anchor-drift-fixture "expected exactly the drifted FAIL plus one ok, fails=$dr_fails out=[$dr_out]"
+fi
+
 # --- summary -----------------------------------------------------------------
 total=$((pass + fail))
 printf -- '----\ntests: %d passed, %d failed (total %d)\n' "$pass" "$fail" "$total"
