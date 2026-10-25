@@ -366,7 +366,7 @@ else
   badc vs-valid-config-green "rc=$rc out=[$out]"
 fi
 
-# --- STATE-CONTRACT anchors (issue #36) ----------------------------------------
+# --- STATE-CONTRACT anchors -----------------------------------------------------
 # tests/anchors.list pins file:line citations STATE-CONTRACT.md makes about
 # the kit: one <relpath>:<lineno>:<keyword> triple per line, relpath relative
 # to the kit root. Coverage matches the list's own header: every observer

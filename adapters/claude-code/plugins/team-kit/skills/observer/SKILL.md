@@ -51,6 +51,7 @@ disable-model-invocation: true
 - **任務識別碼**（每件派工一個不重複識別碼——統一文法 `TK-<issue>`＋後綴：修復輪 `-FIX`、審查軸 `-STD`／`-SPEC`，例 `TK-29`／`TK-29-FIX`／`TK-29-STD`。它是 report 檔檔名與聚合時對回各任務的鍵）。
 - **diff 錨點**（branch／commit／PR 識別——審查與預檢的標的）。
 - **票全文**（spec 軸驗收的依據；無票的 test／chore 類在 prompt 註明「無票，僅 Standard 軸」）。
+- **引用真實性**：prompt 引用規格來源文件（調研報告、先例 report 等）的內容時，逐字自檔案抄錄並核對被引事實確在檔內；檔案精簡遺漏被引事實 → 先補檔（標注補註）再派，不得憑記憶引用——引用斷鏈會被 Spec 軸以「出處承載不了被引內容」抓出（兩起實證）。
 - 派 **coder** 的任務另須指明 `TEAM_KIT_ROOT`（專案根，verify 入口 `TEAM_KIT_ROOT=<專案根> sh <kit>/eng/verify.sh` 讀它底下的 team-kit.json——`<kit>` 為 kit 安裝根，skill 內以 `../../eng/verify.sh` 相對本 skill 目錄表示；coder 開工會把它登記進 root hint 檔供 stop hook 解析）。
 - 收工契約隨附：coder 回報首行 `status: DONE|BLOCKED`；code-reviewer（每軸）與 fortify 回報首行 `status: PASS|FAIL|BLOCKED`。report 檔（`${AGENT_STATE_HOME:-$HOME/.agent-state}/team-kit/reports/<role>/<任務識別碼>-<UTC ts>.md`）是 §3 讀取的第一優先來源：可寫檔的 mounting（coder；pane 上的唯讀角色）由 worker 自寫，subagent mounting 的唯讀角色由 observer 在 §3(a) 代寫——告訴 worker 「你的最終訊息就是全部回報，沒有人會追問」。
 
@@ -69,11 +70,15 @@ git／PR 操作與驗收複跑屬指揮職責，不屬 §0 禁止的代做任務
 1. **進場**：票上留 started comment（屬 item 7 預授權清單①）；從 develop 開分支
    `<type>/<issue>-<slug>`；依 §2.2 備齊素材契約——管線任務識別碼＝`TK-<issue>`
    （修復輪 `-FIX`、審查軸 `-SPEC`／`-STD`，例 `TK-31-FIX`）。
-2. **實作輪**：派 coder。回報 `status: DONE` 且 verify 綠後，observer 驗收＝複跑
-   coder 引述的同一驗證指令比對輸出；`BLOCKED` → 回報使用者，不代猜。
+2. **實作輪**：派 coder。回報 `status: DONE` 且 verify 綠後，observer 驗收＝①複跑
+   coder 引述的同一驗證指令比對輸出；②抽查專案宣告的結構硬限（行數／檔案數上限等，
+   **含既有檔增補後狀態**——coder 自檢常只看新檔，實證過既有檔爆限而全綠照過）；
+   ③commit 訊息衛生（依專案規範：attribution 行、emoji 等）。`BLOCKED` → 回報使用者，不代猜。
 3. **PR**：驗收後 observer push 分支＋建 PR——base develop、body 引票（`resolves #N`）
    並註明 base 非 default branch，**resolves 不自動關票、須手動關**（見 8）。PR 建立
-   屬派工授權範圍、免逐次閘；**merge 永遠人類專屬**。
+   屬派工授權範圍、免逐次閘；**merge 永遠人類專屬**。body 含反引號或 shell 特殊字元時
+   一律 `--body-file`＋quoted heredoc（`<<'EOF'`）——inline `--body` 會被 shell 展開吃字
+   （實證：反引號內字樣被當 command substitution 吞掉）。
 4. **verdict → 動作**（兩軸齊後對照）：
 
    | verdict | 動作 |
@@ -87,7 +92,7 @@ git／PR 操作與驗收複跑屬指揮職責，不屬 §0 禁止的代做任務
 6. **CI 等待**：merge 前輪詢該 SHA 的 check-runs（`/commits/<sha>/check-runs`，或
    `gh run watch`）至脫離 pending——全綠才呈報可 merge，failure 如實呈報。
    **--watch 空輸出 ≠ 綠燈**：`gh pr checks --watch` 在 push 後會賽跑——check-run
-   尚未註冊時以「no checks reported」退出，合併可能搶在 CI 回報前（#34 實例）。
+   尚未註冊時以「no checks reported」退出，合併可能搶在 CI 回報前（實例）。
 7. **對外留言預授權清單（唯一定義點）**：§5 的人類閘＋ledger 是機制預設；管線情境下
    僅下列三類預授權免逐則閘（ledger 照記）：①票上 started comment；②例行 verdict
    摘要留言（各軸 status 首行＋findings 計數，原文引用）；③收帳流程記錄留言。
@@ -95,8 +100,11 @@ git／PR 操作與驗收複跑屬指揮職責，不屬 §0 禁止的代做任務
    此處只列 pipeline 例外。
 8. **收帳**（人類 merge 後）：手動關票、本地同步（`git checkout develop && git pull`）、
    票上留流程記錄留言（輪數、findings 收斂、遺留項；屬 item 7 預授權清單③）。
+   **多切片票**（單票多輪管線，如路線圖 S1…SN）：每輪 merge 後**不關票**，收帳 comment
+   記該輪收斂與遺留即可；路線圖完結的最後一輪才關票（多輪實證——「一張票一輪管線」
+   的關票步驟不適用於切片票）。
 
-> 來源：協議蒸餾自 TK-31／TK-34 實跑（reports/ 可稽）。
+> 來源：協議蒸餾自實跑管線（reports/ 可稽）。
 
 ## 3. /loop 監管：每輪醒來做什麼
 
@@ -115,7 +123,7 @@ observer 被 `/loop` 驅動（loop 本身是 harness 內建，不歸本 skill �
      找該任務識別碼最新一檔（同名取 ts 最大），`sed -n '1p'` 取首行 status
      （機器可解析、不受終端視窗限制）。
      (c) report 檔不存在或識別碼對不上 → 降級 fallback：subagent 通道用最終訊息首行；
-     herdr 通道用 `herdr agent read <target>` 近端讀取回報首行（#28 實證其視窗有限——
+     herdr 通道用 `herdr agent read <target>` 近端讀取回報首行（實證其視窗有限——
      僅當 report 檔缺席時使用，且讀不到就如實回報「讀不到」，不代填）。
    - `blocked`：**警報，不得自答**——立即回報使用者（pane_id＋終端標題＋讀到的 pending 訊息），等使用者決策。需要即時等 blocked 時可用 `herdr agent wait <target> --until blocked --timeout <ms>`，但輪詢 snapshot 已足夠，不要常駐 wait。
    - `unknown`：如實回報，不猜原因。
@@ -148,6 +156,5 @@ observer 被 `/loop` 驅動（loop 本身是 harness 內建，不歸本 skill �
 
 ## 來源
 
-- 派工兩通道、素材契約、/loop 監管判定：GitHub issue #27 之任務規格檔（暫存路徑不入庫；2026-10-17）。
 - 人類閘＋ledger：借自 team-kit reviewer SKILL.md §5（引用不重寫）。
 - herdr 事實：本機 herdr 0.9.1 CLI `--help` 實測（2026-10-17），整理於 references/herdr-contract.md。

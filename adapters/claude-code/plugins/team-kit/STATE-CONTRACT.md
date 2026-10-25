@@ -38,11 +38,11 @@ ${AGENT_STATE_HOME:-~/.agent-state}/
 
 **AGENT_STATE_HOME 解析**：全部讀寫方統一展開 `${AGENT_STATE_HOME:-$HOME/.agent-state}`
 ——env 有設用 env 值，未設用 `~/.agent-state`（eng/verify-on-stop.sh:31、
-skills/coder/SKILL.md:51-52 與 87、skills/reviewer/SKILL.md:83 與 110、
-skills/fortify/SKILL.md:79、skills/observer/SKILL.md:55/112/114）。各元件**各自獨立**展開同一
+skills/coder/SKILL.md:53-54 與 91、skills/reviewer/SKILL.md:83 與 110、
+skills/fortify/SKILL.md:79、skills/observer/SKILL.md:56/120/122）。各元件**各自獨立**展開同一
 expression：若某環境地（例：hook 的 shell）與其他環境外設了不同值，狀態會分裂成兩個根，
-契約不涵蓋此情境——部署時須全環境一致。本機現況（2026-10-18 實測）：`AGENT_STATE_HOME`
-未設，狀態根＝`~/.agent-state`；`~/.agent-state/reviewer/` 尚未存在（無對外留言紀錄）。
+契約不涵蓋此情境——部署時須全環境一致。預設情境（env 未設）：狀態根＝`~/.agent-state`；
+`~/.agent-state/reviewer/` 在首次對外留言前不存在屬正常。
 
 ## 2. hook-log.txt — stop-hook 決定 log
 
@@ -105,7 +105,7 @@ hook 前置判定（與 key 無關但決定計數器是否生效）：`.agent_ty
 - **路徑模式**：`$AGENT_STATE_HOME/team-kit/root-recent.txt`（唯此一檔）。
 - **寫者**：coder skill——**開工第一步**，拿到派工的 `TEAM_KIT_ROOT` 後立刻執行
   `mkdir -p` ＋ `printf '%s\n' "$TEAM_KIT_ROOT" > .../root-recent.txt`
-  （skills/coder/SKILL.md:48-53）。
+  （skills/coder/SKILL.md:50-55）。
 - **讀者**：`eng/verify-on-stop.sh` 的根解析（:111-130），優先序（:8-11, 93-106）：
   1. env `TEAM_KIT_ROOT`（tests／CI 注入）——直接勝出；
   2. hook payload 的 `cwd`——**僅當** `<cwd>/team-kit.json` 存在**且** `jq -e .` 可解析
@@ -117,44 +117,44 @@ hook 前置判定（與 key 無關但決定計數器是否生效）：`.agent_ty
   專案根」，**不保證**是當前任務的根——上一任務留下的 hint 會被本次解析用到。
 - **併發 caveat**：last-writer wins——多 coder 並行於不同根時，後寫者覆蓋先寫者，
   stop 當下可能讀到別的任務的根。個人（單人多案）情境可接受，多工／多機常態化前
-  需重盤（eng/verify-on-stop.sh:102-105、skills/coder/SKILL.md:59-60）。
+  需重盤（eng/verify-on-stop.sh:102-105、skills/coder/SKILL.md:61-62）。
 - **來源**：eng/verify-on-stop.sh:8-11, 93-130；eng/verify.sh:16；
-  skills/coder/SKILL.md:48-60。
+  skills/coder/SKILL.md:50-62。
 
 ## 5. reports/<role>/ — report 檔契約（machine-readable status 出口）
 
 - **路徑模式**：`$AGENT_STATE_HOME/team-kit/reports/<role>/<任務識別碼>-<UTC ts>.md`；
   `<role>` 目前為 `coder`／`reviewer`／`fortify`（observer 以 `<role>` 泛稱）。
   `<UTC ts>`＝`date -u +%Y%m%dT%H%M%SZ`（秒精度）。目錄由寫者先 `mkdir -p`。
-  （skills/coder/SKILL.md:86-90、skills/reviewer/SKILL.md:82-85、
-  skills/fortify/SKILL.md:78-80、skills/observer/SKILL.md:55。）
+  （skills/coder/SKILL.md:90-94、skills/reviewer/SKILL.md:82-85、
+  skills/fortify/SKILL.md:78-80、skills/observer/SKILL.md:56。）
 - **任務識別碼**：由 **observer 的素材契約**在派工 prompt 給定——每件派工唯一，
   統一文法 `TK-<issue>`＋後綴（修復輪 `-FIX`、審查軸 `-STD`／`-SPEC`；例
   `TK-29`／`TK-29-FIX`／`TK-29-STD`；observer SKILL.md:51）；兩軸審查由 dispatcher
   給**不同**識別碼（`TK-<issue>-STD`／`TK-<issue>-SPEC`；skills/reviewer/SKILL.md:84-85）。
-  coder 的 prompt 未給時自訂 `adhoc-<UTC ts>` 並在回報註明（skills/coder/SKILL.md:91）。
+  coder 的 prompt 未給時自訂 `adhoc-<UTC ts>` 並在回報註明（skills/coder/SKILL.md:95）。
   識別碼同時是聚合時對回各任務的鍵。
 - **寫者**（mounting-aware）：
-  - coder：收工必做**自寫**（有寫檔能力；skills/coder/SKILL.md:83-93）。
+  - coder：收工必做**自寫**（有寫檔能力；skills/coder/SKILL.md:87-97）。
   - reviewer／fortify：**可寫檔的 mounting**（pane／頂層 session）自寫；
     **subagent mounting（唯讀閘門）**寫檔結構性不可行——不繞閘門，以最終訊息交出，
     由 dispatcher（observer）**原文代寫**成 report 檔（不改字、不潤飾、不代填結論），
     並在該回報 Limitations 註明「report 檔未自寫（唯讀閘門 mounting）」
     （skills/reviewer/SKILL.md:86-89、skills/fortify/SKILL.md:81-84、
-    skills/observer/SKILL.md:110-113）。
-  - 代寫去重：同識別碼已有檔且首行同 status → 不重複寫（skills/observer/SKILL.md:113）。
+    skills/observer/SKILL.md:118-121）。
+  - 代寫去重：同識別碼已有檔且首行同 status → 不重複寫（skills/observer/SKILL.md:121）。
 - **讀者**：observer／herdr 通道——status 的**第一優先**來源（終端視窗內容有限且未必
   逐字）。讀取程序：`ls reports/<role>/` 找該識別碼最新一檔（同名取 ts 最大）→
-  `sed -n '1p'` 取首行 status（skills/observer/SKILL.md:114-116）。fallback（report 缺席或
+  `sed -n '1p'` 取首行 status（skills/observer/SKILL.md:122-124）。fallback（report 缺席或
   識別碼對不上）：subagent 通道用最終訊息首行；herdr 通道用 `herdr agent read
-  <target>`（視窗有限，讀不到就如實回報，不代填；skills/observer/SKILL.md:117-119）。
+  <target>`（視窗有限，讀不到就如實回報，不代填；skills/observer/SKILL.md:125-127）。
 - **格式**：檔案內容＝該角色**完整回報＝其最終訊息全文**；**首行必為 status 行**
   （機器解析契約；鍵 `status:` 為英文原字，不得翻譯或改寫）：
   - coder：`status: DONE` 或 `status: BLOCKED`（skills/coder/SKILL.md:72-76）。
   - reviewer（每軸各自一檔）：`status: PASS|FAIL|BLOCKED`，次行起另有
     `reviewer:`／`target:` 等行（skills/reviewer/SKILL.md:58-61）。
   - fortify：`status: PASS`／`FAIL`／`BLOCKED` 擇一（skills/fortify/SKILL.md:57-65）。
-  - 聚合時 status 首行**原文引用**、鍵與值不改寫（skills/observer/SKILL.md:127）。
+  - 聚合時 status 首行**原文引用**、鍵與值不改寫（skills/observer/SKILL.md:135）。
 - **生命週期**：累積、無自動清理（各 skill 皆無清理程序）；每次寫入是新檔（新 ts），
   不覆寫既有 report。寫檔（或代寫）失敗**不阻止收工**，但 coder 必須列為風險
   （skills/coder/SKILL.md:93）、reviewer／fortify 必須列入 Limitations
@@ -168,7 +168,7 @@ hook 前置判定（與 key 無關但決定計數器是否生效）：`.agent_ty
 - **路徑模式**：`$AGENT_STATE_HOME/reviewer/<target>.jsonl`（頂層 `reviewer/`，**不在**
   `team-kit/` 下）；`<target>`＝票號或審查目標識別（skills/reviewer/SKILL.md:110）。
 - **寫者**：reviewer 的對外留言流程（§5 人類閘＋ledger）；observer 對外留言沿用
-  同一模式與路徑（借契約不重寫；skills/observer/SKILL.md:130-133）。
+  同一模式與路徑（借契約不重寫；skills/observer/SKILL.md:138-141）。
 - **讀者**：貼留言前的同一角色——防重貼查詢（查 target、比 hash）。
 - **格式**：JSON Lines，append-only、一行一則、**不改寫既有行**：
 
@@ -185,7 +185,7 @@ hook 前置判定（與 key 無關但決定計數器是否生效）：`.agent_ty
   (b) 人類核准後貼；(c) 貼完立刻 append。
 - **併發 caveat**：防重貼是**程序層**保證（三步順序＋貼前查），無鎖——兩個程序並發
   對同一 target 貼留言不受此契約保護。
-- **來源**：skills/reviewer/SKILL.md:105-116；skills/observer/SKILL.md:130-133。
+- **來源**：skills/reviewer/SKILL.md:105-116；skills/observer/SKILL.md:138-141。
 
 ## 7. 界外聲明（不屬本契約管轄）
 

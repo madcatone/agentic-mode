@@ -115,6 +115,12 @@ target: <repo 路徑＠diff 錨點，或票號>
 
    三步順序不可換：(a) 貼前查 ledger 的 target——已記錄即跳過，並在報告寫「已於 `<ts>` 留言過」；target 命中但 hash 不同（結論後來改了）→ 停下來問使用者，不自行再貼。(b) 人類核准後貼。(c) 貼完立刻 append（hash：`printf '%s' "<全文>" | shasum -a 256 | cut -c1-12`）。
 
+   留言 id 取法（PR／issue comment，gh CLI）：`gh pr comment` **無 `--json` 旗標**——取最後
+   留言 id 用 `gh api repos/<owner>/<repo>/issues/<號>/comments --jq 'last | .id'`（PR 的
+   comments 走 issues endpoint）；對 shell quoting 中的全文取 hash 易翻車時，hash 亦可以
+   該 id 為源（同一 target 內一致即可）。直取不存在的輸出會得到空字串雜湊、ledger 斷鏈
+   （實證）。
+
 ## 6. 跨 harness mounting
 
 本檔與 `references/` 全部以**能力描述**表達工具（唯讀 shell、檔案讀取、搜尋、委派子代理），不寫死任何 harness 專屬工具名——其他 harness 可直接把本目錄當規則檔載入。各 harness 的唯讀保證與掛載差異（Claude Code／VS Code Local／Codex）見 [`references/mounting.md`](references/mounting.md)。
