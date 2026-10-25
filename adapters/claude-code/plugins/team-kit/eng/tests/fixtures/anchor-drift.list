@@ -1,4 +1,4 @@
-# anchor-drift.list — fixture for the negative anchor case (issue #36, F2).
+# anchor-drift.list — fixture for the negative anchor case.
 # One good triple (keyword really sits on line 16 -> must report ok) plus one
 # drifted triple: eng/verify.sh exists and line 8 is inside the file, but the
 # keyword sits on line 35 — the exact shift an insertion above a cited line

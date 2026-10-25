@@ -1,4 +1,4 @@
-# anchors.list — STATE-CONTRACT.md file:line citation pins (issue #36).
+# anchors.list — STATE-CONTRACT.md file:line citation pins.
 # One anchor per line: <relpath>:<lineno>:<keyword>; relpath is relative to
 # the kit root (this plugin directory). An anchor holds only if the file
 # exists, the line number is inside the file, and the keyword sits on exactly
@@ -7,47 +7,47 @@
 # Keyword rules: stable, unique within its file, no leading/trailing spaces.
 # Colons inside the keyword are fine (the parser splits on the first two
 # colons only). Cited blank lines carry no keyword and are not listed
-# (observer SKILL.md:131 is the only such line).
-# Coverage: every observer SKILL.md line cited by STATE-CONTRACT.md (full
-# coverage — a superset of the issue's "8 處引用"); coder/reviewer/fortify
+# (observer SKILL.md:139 is the only such line).
+# Coverage: every observer SKILL.md line cited by STATE-CONTRACT.md
+# (full coverage); coder/reviewer/fortify
 # SKILL.md and the eng scripts are sampled (>=2 anchors each).
 # Comments (# ...) and blank lines are ignored by run-tests.sh.
 
 # --- skills/observer/SKILL.md — full coverage --------------------------------
 # §2.2 識別碼 — cited at STATE-CONTRACT.md:133 (observer SKILL.md:51)
 skills/observer/SKILL.md:51:統一文法
-# §2.2 收工契約 — cited at STATE-CONTRACT.md:42 and :130 (:55)
-skills/observer/SKILL.md:55:收工契約隨附
-# §3(a) 代寫 — cited at STATE-CONTRACT.md:144 (:110-113), :145 (:113), :42 (:112)
-skills/observer/SKILL.md:110:先代寫 report
-skills/observer/SKILL.md:111:無寫檔能力
-skills/observer/SKILL.md:112:**原文**寫入
-skills/observer/SKILL.md:113:不重複寫
-# §3(b) 第一優先讀 report — cited at STATE-CONTRACT.md:148 (:114-116), :42 (:114)
-skills/observer/SKILL.md:114:第一優先讀 report
-skills/observer/SKILL.md:115:取首行 status
-skills/observer/SKILL.md:116:不受終端視窗限制
-# §3(c) fallback — cited at STATE-CONTRACT.md:150 (:117-119)
-skills/observer/SKILL.md:117:降級 fallback
-skills/observer/SKILL.md:118:herdr agent read
-skills/observer/SKILL.md:119:report 檔缺席
-# §4 原文引用 — cited at STATE-CONTRACT.md:157 (:127)
-skills/observer/SKILL.md:127:鍵與值不改寫
-# §5 借用 — cited at STATE-CONTRACT.md:171 and :188 (:130-133; :131 is blank)
-skills/observer/SKILL.md:130:對外留言：人類閘
-skills/observer/SKILL.md:132:PR 回覆等
-skills/observer/SKILL.md:133:引用之，不在此重寫
+# §2.2 收工契約 — cited at STATE-CONTRACT.md:42 and :130 (:56)
+skills/observer/SKILL.md:56:收工契約隨附
+# §3(a) 代寫 — cited at STATE-CONTRACT.md:144 (:118-121), :145 (:121), :42 (:120)
+skills/observer/SKILL.md:118:先代寫 report
+skills/observer/SKILL.md:119:無寫檔能力
+skills/observer/SKILL.md:120:**原文**寫入
+skills/observer/SKILL.md:121:不重複寫
+# §3(b) 第一優先讀 report — cited at STATE-CONTRACT.md:148 (:122-124), :42 (:122)
+skills/observer/SKILL.md:122:第一優先讀 report
+skills/observer/SKILL.md:123:取首行 status
+skills/observer/SKILL.md:124:不受終端視窗限制
+# §3(c) fallback — cited at STATE-CONTRACT.md:150 (:125-127)
+skills/observer/SKILL.md:125:降級 fallback
+skills/observer/SKILL.md:126:herdr agent read
+skills/observer/SKILL.md:127:report 檔缺席
+# §4 原文引用 — cited at STATE-CONTRACT.md:157 (:135)
+skills/observer/SKILL.md:135:鍵與值不改寫
+# §5 借用 — cited at STATE-CONTRACT.md:171 and :188 (:138-141; :139 is blank)
+skills/observer/SKILL.md:138:對外留言：人類閘
+skills/observer/SKILL.md:140:PR 回覆等
+skills/observer/SKILL.md:141:引用之，不在此重寫
 
 # --- skills/coder/SKILL.md — samples ------------------------------------------
-# root hint write — cited at STATE-CONTRACT.md:41/108/122 (:48-53, :51-52)
-skills/coder/SKILL.md:52:root-recent.txt
-# status first-line contract — cited at STATE-CONTRACT.md:153 (:72-76)
-skills/coder/SKILL.md:72:必須是以下之一
-skills/coder/SKILL.md:74:status: DONE
-# report path — cited at STATE-CONTRACT.md:129/138 (:86-90, :83-93)
-skills/coder/SKILL.md:87:reports/coder/
-# adhoc fallback id — cited at STATE-CONTRACT.md:135 (:91)
-skills/coder/SKILL.md:91:adhoc-
+# root hint write — cited at STATE-CONTRACT.md:41/108/122 (:50-55, :53-54)
+skills/coder/SKILL.md:54:root-recent.txt
+# status first-line contract — cited at STATE-CONTRACT.md:153 (:76-80)
+skills/coder/SKILL.md:76:必須是以下之一
+skills/coder/SKILL.md:78:status: DONE
+# report path — cited at STATE-CONTRACT.md:129/138 (:91-95, :87-97)
+skills/coder/SKILL.md:91:reports/coder/
+# adhoc fallback id — cited at STATE-CONTRACT.md:135 (:95)
+skills/coder/SKILL.md:95:adhoc-
 
 # --- skills/reviewer/SKILL.md — samples ---------------------------------------
 # status block — cited at STATE-CONTRACT.md:155 (:58-61)
