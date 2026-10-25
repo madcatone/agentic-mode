@@ -44,6 +44,8 @@ model, or dispatch to use. Read [`README.md`](README.md) first, then this.
 - `playbooks/scripts/doc_lint.py`: the doc-linter's mechanical pass (pure stdlib).
 - `playbooks/scripts/okf_lint.py` (+ `okf_parse.py`): the OKF bundle linter's
   mechanical pass (pure stdlib).
+- `NORMALIZATION.md`: the audience-split retrofit guide — reshape any repo's
+  README/AGENTS.md into human-facing vs machine-facing contracts.
 - `adapters/`: Claude Code plugins + marketplace, Devin IDE rule + review workflow.
 - `adapters/claude-code/plugins/team-kit/`: the four-role worker kit
   (observer/coder/reviewer/fortify) with its rules, hook scripts, and state

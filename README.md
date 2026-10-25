@@ -220,6 +220,7 @@ their subdirectories come along.
 | [`checker/`](checker/) | The config-driven checker and an annotated example config. |
 | [`templates/`](templates/) | The fill-in skeletons for every generated doc + CI files. |
 | [`playbooks/`](playbooks/) | Harness-neutral collaboration canon (commit messages, two-axis review, review response, doc linting, OKF doc style) — optional, local rules override. |
+| [`NORMALIZATION.md`](NORMALIZATION.md) | The audience-split retrofit guide: reshape any repo's README.md and AGENTS.md/CLAUDE.md into human-facing vs machine-facing contracts — criteria table, 7-step workflow with a backup gate, verification checklist. |
 | [`adapters/`](adapters/) | Harness-specific packaging (Claude Code plugins + marketplace, Devin IDE rule + review workflow). |
 | [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json) | The Claude Code plugin marketplace manifest. |
 | [`scripts/sync_plugins.py`](scripts/sync_plugins.py) | One-way vendoring sync (canon → plugins) with a `--check` drift gate. |
