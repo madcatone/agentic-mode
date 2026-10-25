@@ -191,6 +191,7 @@ templates 與 RUNBOOK）會整包安裝——子目錄一併帶過去。
 | [`checker/`](checker/) | config 驅動的檢查器與一份註解過的範例 config。 |
 | [`templates/`](templates/) | 每份產出文件的填空骨架 + CI 檔。 |
 | [`playbooks/`](playbooks/) | harness-neutral 的協作正典（commit message、雙軸 review、review response、文件 lint、OKF 文件風格）——可選，本地規則優先。 |
+| [`NORMALIZATION.md`](NORMALIZATION.md) | 文件正規化指南——把任意 repo 的 README.md 與 AGENTS.md（含 CLAUDE.md）改造成人類／機器分眾契約：判準表、七步工作流（含備份回退門檻）、驗證清單。 |
 | [`adapters/`](adapters/) | harness 專屬的包裝（Claude Code plugins + marketplace、Devin IDE rule + review workflow）。 |
 | [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json) | Claude Code plugin marketplace 清單。 |
 | [`scripts/sync_plugins.py`](scripts/sync_plugins.py) | 單向 vendoring 同步（正典 → plugins）與 `--check` 防漂移 gate。 |
