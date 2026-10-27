@@ -203,6 +203,10 @@ inline gate. **Do not advance on a failed gate.** Production order:
 Also write **`AGENTIC-MODE.md`** (root index) and **`agentic-mode/SELF-TEST.md`**
 (from their templates). These are resident meta files, not part of the chain.
 
+If TARGET also seeds a local review canon (an optional `CODE-REVIEW.md`),
+seed it with an **empty** "what failure looks like" section — one line per
+sensitive area — for the code owner to fill in.
+
 ---
 
 ## Phase C — Wire enforcement and run the checker clean
