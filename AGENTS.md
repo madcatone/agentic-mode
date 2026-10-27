@@ -57,6 +57,9 @@ model, or dispatch to use. Read [`README.md`](README.md) first, then this.
 - `examples/minimal-cli/`: a complete contract that passes the checker.
 - `tests/fire-demos/`: regression fixtures proving each check fires when
   violated and passes when satisfied (run via `tests/run_fire_demos.sh`).
+- `tests/review-evals/`: planted-bug fixture + expected findings + a stdlib
+  scorer for two-axis-review reports — the review step itself runs outside
+  CI; CI runs the scorer's selftest (see `tests/run_review_eval_demos.sh`).
 
 ## Development Commands
 
@@ -76,6 +79,12 @@ python3 checker/check_agentic_docs.py --config examples/minimal-cli/agentic-mode
 
 ```bash
 sh tests/run_fire_demos.sh
+```
+
+- Run the review-eval demo suite (must exit 0):
+
+```bash
+sh tests/run_review_eval_demos.sh
 ```
 
 - Run the sync fire-demo suite (must exit 0):

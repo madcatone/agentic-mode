@@ -1,0 +1,112 @@
+{
+  "fixture": "todo-review",
+  "ticket_type": "bug-fix",
+  "line_tolerance": 5,
+  "note": "Line numbers refer to the fixture tree AFTER change.patch is applied. match_any keywords are deliberately code identifiers/paths, not prose: reports are written in Traditional Chinese, so matching must be language-robust. A report finding matches an expected item when the cited file (basename) agrees, the cited line falls inside one of line_ranges (widened by line_tolerance), and the finding text contains any keyword.",
+  "expected": [
+    {
+      "id": "EF-1",
+      "class": "correctness",
+      "file": "commands.py",
+      "line": 40,
+      "line_ranges": [[38, 42]],
+      "axis": "Spec",
+      "verdict": "CONFIRMED-able by code reading; single-reviewer reports cap at PLAUSIBLE",
+      "origin": "introduced",
+      "origin_strict": false,
+      "description": "append_done_id() opens done.log with mode \"w\", so each todo done erases the previously recorded ids; two dones then todo list --all shows the first task as [ ]",
+      "match_any": ["append_done_id", "done.log"]
+    },
+    {
+      "id": "EF-2",
+      "class": "spec-missing",
+      "file": "store.py",
+      "line": 36,
+      "line_ranges": [[30, 37]],
+      "axis": "Spec",
+      "verdict": "PLAUSIBLE or above",
+      "origin": "pre-existing code, but the AC3 gap belongs to this change; either origin acceptable",
+      "origin_strict": false,
+      "description": "AC3 unmet: load() renumbers ids with enumerate(rows, start=1), so ids are not stable across save/load",
+      "match_any": ["enumerate", "AC3", "stable"]
+    },
+    {
+      "id": "EF-3",
+      "class": "spec-extra",
+      "file": "commands.py",
+      "line": 20,
+      "line_ranges": [[18, 23]],
+      "axis": "Spec",
+      "verdict": "PLAUSIBLE or above",
+      "origin": "introduced",
+      "origin_strict": false,
+      "description": "cmd_add now rejects duplicate titles with 'error: task already exists' - behavior the bug-fix ticket never asked for",
+      "match_any": ["already exists", "cmd_add", "duplicate"]
+    },
+    {
+      "id": "EF-4",
+      "class": "pre-existing",
+      "file": "commands.py",
+      "line": 85,
+      "line_ranges": [[83, 88]],
+      "axis": "Standards",
+      "verdict": "PLAUSIBLE or above",
+      "origin": "pre-existing",
+      "origin_strict": true,
+      "description": "pre-existing, non-blocking: run() returns 2 silently when no subcommand is given (no usage line); base already behaved this way and the patch does not touch run()",
+      "match_any": ["handlers", "usage", "args.command"]
+    },
+    {
+      "id": "EF-5",
+      "class": "standards",
+      "file": "commands.py",
+      "line": 12,
+      "line_ranges": [[11, 14], [47, 51], [58, 60]],
+      "axis": "Standards",
+      "verdict": "PLAUSIBLE or above",
+      "origin": "introduced",
+      "origin_strict": false,
+      "description": "R1 violation (.dev-notes/CODE-REVIEW.md): done.log is a second persistent store for task state beside tasks.json - acceptable citation sites are the _DONE_LOG definition or either call site",
+      "match_any": ["done.log", "_DONE_LOG", "R1"]
+    },
+    {
+      "id": "EF-6",
+      "class": "root-cause",
+      "file": "store.py",
+      "line": 41,
+      "line_ranges": [[30, 37], [39, 44]],
+      "axis": "Spec",
+      "verdict": "PLAUSIBLE or above",
+      "origin": "pre-existing",
+      "origin_strict": false,
+      "description": "root cause untouched: save()/load() never round-trip the done field (rows carry only id and title); the patch works around the symptom with a side file instead of fixing the round-trip",
+      "match_any": ["save", "tasks.json", "done"]
+    }
+  ],
+  "noise_zones": [
+    {
+      "id": "NZ-1",
+      "file": "parse.py",
+      "lines": [16, 18],
+      "why_clean": "adds the --all flag required by AC2"
+    },
+    {
+      "id": "NZ-2",
+      "file": "todo.py",
+      "lines": [1, 4],
+      "why_clean": "docstring correction naming the real store file"
+    },
+    {
+      "id": "NZ-3",
+      "file": "commands.py",
+      "lines": [61, 66],
+      "why_clean": "cmd_list filter/marker logic implementing AC2"
+    },
+    {
+      "id": "NZ-4",
+      "file": "commands.py",
+      "lines": [52, 54],
+      "why_clean": "cmd_done unknown-id error implementing AC4"
+    }
+  ]
+}
