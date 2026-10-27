@@ -61,13 +61,19 @@ rules (a review canon, a defect taxonomy) take precedence over this playbook.**
 - **多（scope creep）**：diff 裡有票沒要求的行為。**release/merge 載體 MR 是重災區**——逐 hunk 讀 diff，不看標題。
 - **錯**：看起來實作了但語意不對——對照票的重現步驟與期望行為逐條核。
 
+**bug-fix 類變更加一條查核——root cause**：變更是否**指認 root cause**（修法對準成因，而非只壓症狀）。未指認 → 開 finding 要求補指認（要求說清成因，不是要求重寫修法）——成因未動，同型缺陷會再發，票等於沒修完。
+
 ## 4. Finding 格式（DoD）
 
-每條 finding：**`檔案:行號` ＋ 一句缺陷描述 ＋ 具體失效情境（什麼輸入 → 什麼錯誤結果）＋ severity ＋ `CONFIRMED`／`PLAUSIBLE` 標記**。報告結尾一行：**「共 N 個 finding，其中 M 個 CONFIRMED」**。找不到問題就回報「無 finding」＋檢查過哪些面向。
+每條 finding：**`檔案:行號` ＋ 一句缺陷描述 ＋ 具體失效情境（什麼輸入 → 什麼錯誤結果）＋ severity ＋ `CONFIRMED`／`PLAUSIBLE` 標記 ＋ `introduced`／`pre-existing` 標記**。報告**第一行＝計數行**：**「共 N 個 finding：X 個 CONFIRMED／Y 個 PLAUSIBLE／Z 個 pre-existing」**——信心與起源是兩個正交維度，Z 計的是前兩項裡屬既有碼者。找不到問題就回報「無 finding」＋檢查過哪些面向。
 
 **severity 判準**：severity 評級前必答一題——**這條路徑存在的目的，在 finding 成立時還達成嗎？** 靜默擊敗改動自身目的的缺陷（例：修復的核心路徑實際 no-op）＝ **Major**，即使不崩潰、不損毀資料——「不崩潰」不是「low」的理由。
 
 **CONFIRMED／PLAUSIBLE 釘死**：hinge 在「可能／或許」上的 finding **不得直接交卷**——先在 repo 裡找具體證據做一次值的 trace（UT fixtures／mocks，grep 症狀關鍵字如錯誤碼；票附件 log；raw payload），把它釘成 CONFIRMED 或排除。一次具體 trace 的成本遠低於漏報一個 Major；真的找不到證據才保留 PLAUSIBLE，且必須註明**缺哪個證據**。（實例：「id 可能為空」用 repo 內建的錯誤碼 fixture 走一遍即變「恆為空」。）
+
+**introduced／pre-existing 標記**：以對 base 的 diff 與 `git blame` 對照認定——`introduced`＝本變更引入；`pre-existing`＝既有碼、此 diff 之前就存在。pre-existing **照報**（決策者該知道問題在），但**不擋 merge、不算作者失誤**；建議處置是**另開票**，不是在本 PR 逼修。
+
+**root cause（bug-fix 類變更）**：Spec 軸的 root-cause 查核（§3）結果要列在報告裡——變更指認的成因是什麼、修法對準成因還是只壓症狀；未指認即開 finding 要求補指認。
 
 - ✅ 正例：`lookup.ts:42 [CONFIRMED] 查表 key 大小寫不符——來源 enum 成員為大寫、查表用小寫 key，當輸入含大寫字面值時查落空、fallback 直接把原字串輸出到使用者可見層。`
 - ❌ 反例：「整體程式碼品質不錯，建議加強錯誤處理。」——不可定位、不可重現，視同沒審。
@@ -76,6 +82,7 @@ rules (a review canon, a defect taxonomy) take precedence over this playbook.**
 
 - 兩軸**各派一個獨立 agent 平行審**（**同一則訊息**一次派出、互不見對方 context）。
 - 主對話**聚合**兩份報告——**不合併、不重排、不跨軸挑贏家**，兩份並列呈報。
+- **每軸報告以計數行開頭**（§4）——聚合呈報時兩行計數留在最前：決策者先看到規模（confirmed／plausible／pre-existing 各多少），再讀細節。
 - **兩軸獨立命中同一位置＝高訊號事件**：聚合者不得只並列呈報，必須對該位置做**第三次合軸檢查**——把 Spec 軸的目標套到 Standards 軸的機制上，重問 §4 那題（goal-defeat），必要時派一個 mini verify。這不是跨軸重排名（不合併、不重排的原則不變），是對交會點的加驗。
 - 任一軸的輸入壞掉（票抓不到、diff 空、ref 解不出）在**派工前**就擋下，不要讓 agent 各自撞牆。
 
@@ -124,3 +131,15 @@ mkdir -p "$(dirname "$LEDGER")"; touch "$LEDGER"; echo "$LEDGER"
    hash 算法：`printf '%s' "<留言全文>" | shasum -a 256 | cut -c1-12`（Linux 用 `sha256sum`）。
 
 **恢復情境（重進時怎麼走）**：第一步是定錨後立刻讀 ledger（§1 最後一條），**先於派工**——包含使用者說「某一軸重跑一次」的情況：ledger 有記錄就只重跑審查、不重貼。「貼了但還沒 append」是唯一會漏記的窗口——ledger 存在但該票沒記錄時，貼之前先讀票的既有 comments 確認沒有自己貼的同內容，有就補寫 ledger 並跳過。
+
+## 8. 多輪收斂與 class 升華
+
+前幾節假設單輪審查；同一 MR 常要走多輪，這一節是**多輪的紀律**——目標是每輪訊號遞增、噪音遞減，不是每輪重掃整個 diff。
+
+**收斂三律（審者側）**：
+
+1. **第三輪仍未收斂 → 停止逐行續審**——此時逐行續審只剩噪音。回報「**建議作者退後重議做法**」：把問題升到做法層，不在同一行上繼續磨。
+2. **第二輪起只審前輪之後新 commit 的 diff**——已審段落不重掃；唯一例外是前輪 finding 指向的位置又被改動，該位置才重回範圍。
+3. **已解決的 finding 不重複報**——前輪已 fix、或作者已帶理由 resolve 的，新一輪不再出現；重複報等於懲罰作者回應。
+
+**class 升華**：同類 finding 在 **≥3 次審查**出現（跨 MR 累計，依審者可得的重複證據認定）→ reviewer 不再逐條開 finding，改為**標記整個 class**：指認違反的規則、列全部實例、要求**一次修整類**；並在報告中提案把該規則**回寫本地正典**（查找鏈的檔頭，如 `.dev-notes/CODE-REVIEW.md`），附建議條目文字。回寫本身走 repo 正常變更流程——reviewer 只提案，不代改正典檔。（與 §6 回流的分工：§6 是審後把**新模式**蒸餾進知識庫；這裡是審中把**重複違規**升成 class 要求一次修。）

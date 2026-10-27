@@ -193,6 +193,8 @@ Report the MR URL and key metadata (source→target, assignee, pipeline status) 
 ## 6.a Code review — requesting
 - Review the MR the user names.
 - Report every non-nitpick issue you find. If you find none after reading the full diff, say so explicitly.
+- Mark each finding `introduced` (created by this MR's diff) or `pre-existing` (already on the target branch — verify against the diff to base / `git blame`). Report pre-existing issues too, but marked as such: not introduced by this MR, so they do not block merge and are not the author's miss; file a separate issue instead of forcing the fix into this MR.
+- Open the review summary with a count line — `N findings: X confirmed / Y plausible / Z pre-existing` — before any detail.
 - Raise findings in MR replies; a blocking finding may stay a default resolvable discussion.
 - If quality is fine, reply `LGTM`; informational/status notes add `--resolvable=false`.
 
@@ -217,9 +219,11 @@ glab mr view --comments <N>
 5. Commit, then post a summary note to the MR.
 
 ### Notes
-- **A bug fix must include a before/after repro** — reproduce the reviewer's condition once (wrong result), fix, reproduce again (right result). That is the only credible proof.
+- **A bug fix must include a before/after repro plus a one-line root cause** — reproduce the reviewer's condition once (wrong result), fix, reproduce again (right result), and state in one line which cause the fix targets (not just the symptom). That is the only credible proof.
 - **Non-blocking trade-off:** if fixing a non-blocking item touches files outside the current issue's scope, or adds a new behavior, split it into a follow-up issue and say so in the note.
 - **Do not silently drop a reviewer's point:** if you disagree with a blocking item, argue the case in reply rather than ignoring it.
+- **Pre-existing findings** (marked by the reviewer as not introduced by this MR): respond with one of — open a follow-up issue, record it on the backlog, or state why it will not be fixed here. Never leave one unanswered; never force the fix into this MR.
+- **Third round without convergence:** if the reviewer suggests stepping back and rethinking the approach, re-examine the approach against the issue — do not patch the same line yet again.
 
 ```bash
 glab mr note create <N> --resolvable=false -m "$(cat <<'EOF'
