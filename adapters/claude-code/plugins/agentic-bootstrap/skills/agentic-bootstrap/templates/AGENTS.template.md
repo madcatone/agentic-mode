@@ -9,7 +9,8 @@ DO NOT put here: generic agent discipline (how to dispatch, which model/tool to 
 parallelize) — that is the executor's environment (How/Who), not this contract.
 DO NOT put here: platform-CLI rules or comment styles — those defer to docs/WORKFLOW.md.
 
-HARD LIMIT: the generated file MUST stay <= checks.line_limits.agents (default 200).
+HARD LIMIT: the generated file MUST stay <= checks.line_limits.agents (set the limit explicitly
+in agentic-mode/config.json — an absent key means the checker enforces no line limit).
 The checker enforces this mechanically. Keep it terse; push depth to REQUIREMENTS/WORKFLOW.
 Harness-neutral: never name a specific agent product, model, or proprietary tool.
 -->

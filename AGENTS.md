@@ -12,7 +12,9 @@ model, or dispatch to use. Read [`README.md`](README.md) first, then this.
   adapters, and a worked example.
 - **Harness-neutral core (iron rule).** Nothing in `doctrine/`, `RUNBOOK.md`,
   `templates/`, or `checker/` may name a specific agent product, model, or
-  proprietary tool. Harness-specific content lives **only** under `adapters/`.
+  proprietary tool. (The checker's built-in `HARNESS_DENY_WORDS` list is itself a
+  list of harness names — detection data, not prose; this rule governs document
+  text.) Harness-specific content lives **only** under `adapters/`.
 - **Project-neutral.** No hardcoded brands, hosts, IP literals, or absolute
   machine paths anywhere. The worked example uses a fictional project.
 - **Portable skills (iron rule).** Every `SKILL.md` under
@@ -134,9 +136,10 @@ grep -rn 'PLUGIN_ROOT' adapters/claude-code/plugins && echo "FOUND" || echo "cle
 3. If the doc-set changed, the templates and `RUNBOOK.md`'s layout/schema stay
    in sync (the config schema is stated in exactly one place — `RUNBOOK.md`).
 4. The worked example still passes the gate (see Development Commands).
-5. If a `playbooks/` file or a vendored core file (`RUNBOOK.md`, `doctrine/`,
-   `templates/`, `checker/`) changed, `python3 scripts/sync_plugins.py` was run
-   so the plugin copies match, and `--check` exits 0. Never hand-edit a vendored
+5. If a `playbooks/` file or a vendored core file (`RUNBOOK.md`,
+   `doctrine/BOOTSTRAP-CORE.md`, `templates/`, `checker/`) changed,
+   `python3 scripts/sync_plugins.py` was run so the plugin copies match, and
+   `--check` exits 0. Never hand-edit a vendored
    copy under `adapters/claude-code/plugins/`. (Exception: the `fable5`,
    `commander`, `idea-to-spec`, `pstack`, and `team-kit` plugins are
    self-canonical — not vendored and not in the sync MANIFEST — so their files

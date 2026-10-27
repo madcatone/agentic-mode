@@ -72,7 +72,7 @@ One issue → one branch → one PR. Do not smuggle unrelated changes into a bra
 ## 3. Commit
 
 ### Format
-Conventional commit (team convention — the canonical rules live in the team-skills plugin's `gcm` skill):
+Conventional commit (team convention — the canonical rules live in your team's commit-message playbook):
 ```
 <type>[ <TICKET>]: <Subject>
 

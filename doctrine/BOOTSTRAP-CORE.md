@@ -11,7 +11,7 @@ This document is **harness-neutral**. It never names a specific agent product, m
 Three principles make a repo legible to a cold reader — human or agent — with no chat history:
 
 1. **Layered, non-overlapping docs.** Each doc has exactly one job. Don't duplicate the same fact in two files — pick the canonical home and cross-link.
-2. **Stable IDs for every behavior.** Requirements carry IDs (`{{PREFIX}}-001`). User-guide sections, validation checklists, commit messages, and merge/pull-request notes cite those IDs. Any reader can jump across docs by ID. The ID is also the **bootstrap join key**: it is what lets README ↔ REQUIREMENTS ↔ USER_GUIDE/API_REFERENCE ↔ VALIDATION ↔ commit/MR stay in sync during both initial production and ongoing self-operation. Treat ID-integrity (SELF-TEST §1) as a release gate, not a nicety.
+2. **Stable IDs for every behavior.** Requirements carry IDs (`{{PREFIX}}-001`). User-guide sections, validation checklists, commit messages, and merge/pull-request notes cite those IDs. Any reader can jump across docs by ID. The ID is also the **bootstrap join key**: it is what lets README ↔ REQUIREMENTS ↔ USER_GUIDE/API_REFERENCE ↔ VALIDATION ↔ commit/MR stay in sync during both initial production and ongoing self-operation. Treat ID-integrity (SELF-TEST §A) as a release gate, not a nicety.
 3. **Append-only provenance + per-feature done evidence.** Iteration history records *why* a change landed (never rewritten). Validation checklists record *that it was actually done* and how to re-verify.
 
 When all three hold, a new collaborator can bootstrap understanding top-down, and a reviewer can audit any claim by following the ID trail.
@@ -73,7 +73,7 @@ This is the single highest-leverage convention.
 - **IDs are cited everywhere.** User-guide / API-reference sections cite `{{PREFIX}}-029` next to the behavior they describe. Validation checklists list `Requirements Met: {{PREFIX}}-058 ✓`. Commit messages and MR/PR notes reference IDs instead of prose ("implements {{PREFIX}}-061" beats "adds the export").
 - **Iteration history is descriptive, not numeric-cited.** When two language tracks exist, their numbering may be off by one. Cite by description ("the export-format entry") when referencing across languages.
 - **ID format.** `{{PREFIX}}-NNN` where PREFIX is uppercase letters, one prefix per component. IDs match `^[A-Z]{2,6}-[0-9]{3,}$`. This removes the ambiguity a reader would otherwise hit between `FOO-001` / `FOO_001` / `FEAT-1`. <!-- agentic-gate: allow -->
-- **The ID is the bootstrap join key.** See `RUNBOOK.md` for the production procedure and SELF-TEST §1 for the integrity self-test.
+- **The ID is the bootstrap join key.** See `RUNBOOK.md` for the production procedure and SELF-TEST §A for the integrity self-test.
 
 The ID is the join key between contract, surface, evidence, and history. Without it, the four layers drift.
 
@@ -196,7 +196,7 @@ The rule is not "never repeat words." The rule is "never let duplicated facts be
 | Fact type | Canonical owner | Allowed mirrors | Update rule |
 |---|---|---|---|
 | Development / verification commands | `AGENTS.md` Development Commands | README Verification, REQUIREMENTS Verification Commands, per-feature VALIDATION blocks | Mirrors copy the current command or explicitly say they are a focused subset. |
-| User-visible commands, flags, keys, endpoints, API signatures | `docs/USER_GUIDE.md` or `docs/API_REFERENCE.md` | README Quick Start, REQUIREMENTS requirement rows | Mirrors must be checked by the command-surface parity tests (SELF-TEST §3). |
+| User-visible commands, flags, keys, endpoints, API signatures | `docs/USER_GUIDE.md` or `docs/API_REFERENCE.md` | README Quick Start, REQUIREMENTS requirement rows | Mirrors must be checked by the command-surface parity tests (SELF-TEST §A). |
 | Behavior contract and stable IDs | `docs/REQUIREMENTS.md` | USER_GUIDE/API_REFERENCE citations, VALIDATION `Requirements Met`, commits/MRs | Mirrors cite IDs; they do not redefine the requirement. |
 | Per-feature completion evidence | `docs/VALIDATION.md` | MR/PR description, issue closure comment | Mirrors may summarize, but the validation block is the re-verification home. |
 | Workflow / review commands | `docs/WORKFLOW.md` | AGENTS one-line deferral | Do not duplicate platform-specific steps in AGENTS. |

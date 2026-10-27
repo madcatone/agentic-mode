@@ -23,11 +23,11 @@ python scripts/check_agentic_docs.py --config agentic-mode/config.json
 
 It enforces, from `agentic-mode/config.json`:
 
-- **ID continuity** — every `{{PREFIX}}-NNN` cited in README, AGENTS, the observable-surface doc, VALIDATION, and the latest commit/MR/PR resolves to a row in `{{REQUIREMENTS_PATH}}`; every observable behavior maps to ≥1 ID; uniform format `^[A-Z]{2,6}-[0-9]{3,}$`.
-- **Command-surface consistency** — README quick-start ↔ observable-surface doc; every `checks.commands` entry appears in the files its `must_appear_in` lists; no surviving `<command>` / `{{PLACEHOLDER}}` / empty smoke command in any verification block.
+- **ID continuity** — every `{{PREFIX}}-NNN` cited in README, AGENTS, the observable-surface doc, and VALIDATION resolves to a row in `{{REQUIREMENTS_PATH}}` (rows are duplicate-free and gap-free; bilingual regions carry identical ID sets). Not machine-checked: references in commit/MR/PR messages (a review discipline — the checker reads docs, not git history), the uniform format `^[A-Z]{2,6}-[0-9]{3,}$` itself, and "every observable behavior maps to ≥1 ID" (a Phase-B gate in the RUNBOOK).
+- **Command-surface consistency** — every `checks.commands` entry appears in the files its `must_appear_in` lists. README quick-start ↔ observable-surface parity beyond the configured commands is a review matter; surviving `<command>` / `{{PLACEHOLDER}}` markers are swept by hand in Phase C (`grep -rn '{{'`).
 - **Line limit** — the generated `{{AGENTS_PATH}}` stays within `checks.line_limits`.
 - **Neutrality / harness-neutrality** — the configurable forbidden-token sweep (`checks.deny_words`, `checks.harness_neutrality`) over docs/examples, honoring `agentic-gate: allow` markers.
-- **Layer presence + cross-links** — required layer files exist and README links to them.
+- **Layer presence** — every doc path declared under `docs` in the config exists. (That README cross-links the layers is not machine-checked.)
 
 Run it until it exits clean before touching the manual rows. **CI:** platform is `{{CI_PLATFORM}}`; when not `none`, this command runs on every change.
 
