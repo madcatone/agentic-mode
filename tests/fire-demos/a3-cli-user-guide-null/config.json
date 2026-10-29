@@ -32,7 +32,12 @@
       "enabled": false,
       "heading": "Iteration History"
     },
-    "commands": [],
+    "commands": [
+      {
+        "run": "make demo",
+        "must_appear_in": ["agents", "user_guide"]
+      }
+    ],
     "entrypoints": []
   },
   "project": {
