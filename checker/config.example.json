@@ -21,7 +21,6 @@
   },
   "bilingual": {
     "enabled": false,
-    "secondary_language": "zh-TW",
     "primary_heading": "## English",
     "secondary_heading": "## 繁體中文"
   },
