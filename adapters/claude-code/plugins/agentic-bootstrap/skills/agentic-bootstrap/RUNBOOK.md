@@ -53,7 +53,7 @@ scripts/check_agentic_docs.py  # the checker, copied verbatim from TOOLKIT/check
            "api_reference": "docs/API_REFERENCE.md or null",
            "validation": "docs/VALIDATION.md", "workflow": "docs/WORKFLOW.md",
            "architecture": "docs/architecture.json or null"},
-  "bilingual": {"enabled": false, "secondary_language": "zh-TW",
+  "bilingual": {"enabled": false,
                 "primary_heading": "## English", "secondary_heading": "## 繁體中文"},
   "checks": {
     "line_limits": {"agents": 200},
