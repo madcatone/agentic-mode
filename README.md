@@ -264,8 +264,8 @@ paths to it. Do not fork the doctrine.
 ## Canonical source
 
 This repository is the canonical source of the agentic-mode methodology. When you
-vendor it downstream (a plugin, an IDE rule, a subtree), sync **from here** and do
-not hand-edit the vendored `doctrine/`, `templates/`, or `checker/` — a downstream
+vendor it downstream (a plugin, a subtree), sync **from here** and do not
+hand-edit the vendored `doctrine/`, `templates/`, or `checker/` — a downstream
 edit that never flows back becomes silent drift. If a downstream repo needs a new
 capability, add it here first, then re-sync.
 

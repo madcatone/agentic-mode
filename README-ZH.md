@@ -228,7 +228,7 @@ fork 教義。
 
 ## 正典來源
 
-本 repo 是 agentic-mode 方法論的正典來源。當你把它 vendor 到下游（plugin、IDE rule、
+本 repo 是 agentic-mode 方法論的正典來源。當你把它 vendor 到下游（plugin、
 subtree），請**從這裡同步**，不要手改 vendor 進來的 `doctrine/`、`templates/`、
 `checker/`——一個永不回流的下游修改會變成無聲的漂移。若下游需要新能力，先在這裡加，
 再重新同步。
