@@ -29,7 +29,10 @@ model, or dispatch to use. Read [`README.md`](README.md) first, then this.
   drop-in. `templates/` intentionally exceeds normal per-directory file-count
   limits because the toolkit/RUNBOOK selects its files by document role,
   project type, and CI platform, and the plugin vendors the directory
-  verbatim. Do not split either without changing that distribution contract.
+  verbatim. `tests/review-evals/score_review.py` intentionally exceeds normal
+  per-file line limits for the same reason as the checker: a zero-dependency
+  drop-in (pure stdlib, `--selftest`) consumed whole by the eval demo runner.
+  Do not split any of these without changing that distribution contract.
 
 ## Key Files
 
