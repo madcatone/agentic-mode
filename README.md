@@ -7,8 +7,8 @@ config-driven checker and a CI gate that keep those docs from drifting out of
 sync with the code.
 
 This repo is the **canonical source** of the methodology. Downstream copies (a
-Claude Code plugin, a Devin IDE rule, a vendored subtree in your own repo) should
-sync *from here* — see [Adapters](#adapters) and [Canonical source](#canonical-source).
+Claude Code plugin, a vendored subtree in your own repo) should sync *from
+here* — see [Adapters](#adapters) and [Canonical source](#canonical-source).
 
 > 繁體中文版：[README-ZH.md](README-ZH.md)。本檔與繁中版資訊等價。
 
@@ -223,7 +223,7 @@ their subdirectories come along.
 | [`templates/`](templates/) | The fill-in skeletons for every generated doc + CI files. |
 | [`playbooks/`](playbooks/) | Harness-neutral collaboration canon (commit messages, two-axis review, review response, doc linting, OKF doc style) — optional, local rules override. |
 | [`NORMALIZATION.md`](NORMALIZATION.md) | The audience-split retrofit guide: reshape any repo's README.md and AGENTS.md/CLAUDE.md into human-facing vs machine-facing contracts — criteria table, 7-step workflow with a backup gate, verification checklist. |
-| [`adapters/`](adapters/) | Harness-specific packaging (Claude Code plugins + marketplace, Devin IDE rule + review workflow). |
+| [`adapters/`](adapters/) | Harness-specific packaging (Claude Code plugins + marketplace). |
 | [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json) | The Claude Code plugin marketplace manifest. |
 | [`scripts/sync_plugins.py`](scripts/sync_plugins.py) | One-way vendoring sync (canon → plugins) with a `--check` drift gate. |
 | [`examples/minimal-cli/`](examples/minimal-cli/) | A complete worked example that passes the checker. |
@@ -251,17 +251,21 @@ packaging lives only under [`adapters/`](adapters/):
     dispatch system (rule files + subagent definitions) as a directly installable
     kit — the evolved counterpart to the `fable5` founding prompt (see [its
     README](adapters/claude-code/dispatch/README.md)).
-- [`adapters/devin-ide/`](adapters/devin-ide/) — a Devin IDE rule and a review
-  workflow.
+
+Harnesses that consume the open [`AGENTS.md`](AGENTS.md) standard directly —
+Codex, Cursor, and the like — **need no dedicated adapter**: the repo-root
+`AGENTS.md` that Phase B generates *is* the adapter. Add a new adapter only for
+a harness that needs a dedicated mechanism (like the Claude Code plugins/skills
+above).
 
 Each adapter is thin: it points at (or vendors) the canonical core and resolves
-paths to it. Add a new adapter for a new harness; do not fork the doctrine.
+paths to it. Do not fork the doctrine.
 
 ## Canonical source
 
 This repository is the canonical source of the agentic-mode methodology. When you
-vendor it downstream (a plugin, an IDE rule, a subtree), sync **from here** and do
-not hand-edit the vendored `doctrine/`, `templates/`, or `checker/` — a downstream
+vendor it downstream (a plugin, a subtree), sync **from here** and do not
+hand-edit the vendored `doctrine/`, `templates/`, or `checker/` — a downstream
 edit that never flows back becomes silent drift. If a downstream repo needs a new
 capability, add it here first, then re-sync.
 

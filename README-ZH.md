@@ -5,7 +5,7 @@
 以 config 驅動的檢查器與 CI gate，用來防止這些文件與程式碼失去同步。
 
 本 repo 是這套方法論的**正典（canonical source）**。下游拷貝（Claude Code plugin、
-Devin IDE rule、vendor 進你自己 repo 的 subtree）都應該**從這裡同步**——見
+vendor 進你自己 repo 的 subtree）都應該**從這裡同步**——見
 [轉接層](#轉接層adapters)與[正典來源](#正典來源)。
 
 > English version: [README.md](README.md)。本檔與英文版資訊等價。
@@ -192,7 +192,7 @@ templates 與 RUNBOOK）會整包安裝——子目錄一併帶過去。
 | [`templates/`](templates/) | 每份產出文件的填空骨架 + CI 檔。 |
 | [`playbooks/`](playbooks/) | harness-neutral 的協作正典（commit message、雙軸 review、review response、文件 lint、OKF 文件風格）——可選，本地規則優先。 |
 | [`NORMALIZATION.md`](NORMALIZATION.md) | 文件正規化指南——把任意 repo 的 README.md 與 AGENTS.md（含 CLAUDE.md）改造成人類／機器分眾契約：判準表、七步工作流（含備份回退門檻）、驗證清單。 |
-| [`adapters/`](adapters/) | harness 專屬的包裝（Claude Code plugins + marketplace、Devin IDE rule + review workflow）。 |
+| [`adapters/`](adapters/) | harness 專屬的包裝（Claude Code plugins + marketplace）。 |
 | [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json) | Claude Code plugin marketplace 清單。 |
 | [`scripts/sync_plugins.py`](scripts/sync_plugins.py) | 單向 vendoring 同步（正典 → plugins）與 `--check` 防漂移 gate。 |
 | [`examples/minimal-cli/`](examples/minimal-cli/) | 一個可通過檢查器的完整範例。 |
@@ -217,15 +217,18 @@ templates 與 RUNBOOK）會整包安裝——子目錄一併帶過去。
     另附一份原始機器 `~/.claude/` 指揮官派工系統的定時快照（規則檔 + subagent 定義檔），
     可直接安裝——即 `fable5` founding prompt 的演化版成品（見[它的
     README](adapters/claude-code/dispatch/README.md)）。
-- [`adapters/devin-ide/`](adapters/devin-ide/)——一份 Devin IDE rule 與一個 review
-  workflow。
 
-每個 adapter 都很薄：它指向（或 vendor）正典核心，並把路徑解析到它。要支援新 harness
-就新增一個 adapter，不要 fork 教義。
+直接消費 [`AGENTS.md`](AGENTS.md) 開放標準的 harness（Codex、Cursor 等）
+**不需要專屬 adapter**：Phase B 產出的 repo 根 `AGENTS.md` 本身就是 adapter。
+新增 adapter 僅留給需要專屬機制的 harness（如上面的 Claude Code
+plugins/skills）。
+
+每個 adapter 都很薄：它指向（或 vendor）正典核心，並把路徑解析到它。不要
+fork 教義。
 
 ## 正典來源
 
-本 repo 是 agentic-mode 方法論的正典來源。當你把它 vendor 到下游（plugin、IDE rule、
+本 repo 是 agentic-mode 方法論的正典來源。當你把它 vendor 到下游（plugin、
 subtree），請**從這裡同步**，不要手改 vendor 進來的 `doctrine/`、`templates/`、
 `checker/`——一個永不回流的下游修改會變成無聲的漂移。若下游需要新能力，先在這裡加，
 再重新同步。
