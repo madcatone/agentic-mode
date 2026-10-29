@@ -34,7 +34,18 @@ jobs:
         run: python scripts/sync_plugins.py --check
       - name: Run the sync fire-demos
         run: sh tests/run_sync_demos.sh
+      - name: Run the checker fire-demos
+        run: sh tests/run_fire_demos.sh
       - name: Run the review-eval demos
         run: sh tests/run_review_eval_demos.sh
       - name: Run the team-kit plugin eng tests
         run: sh adapters/claude-code/plugins/team-kit/eng/tests/run-tests.sh
+      - name: Self-check the doc linter
+        run: |
+          python -m py_compile scripts/doc_lint.py
+          python scripts/doc_lint.py DOC-LINTER.md
+        working-directory: playbooks
+      - name: Self-check the OKF bundle linter
+        run: |
+          python -m py_compile playbooks/scripts/okf_parse.py playbooks/scripts/okf_lint.py playbooks/scripts/okf_selftest.py
+          python playbooks/scripts/okf_lint.py --selftest
