@@ -53,7 +53,7 @@ The mechanical parts of the self-test are executable. Run the repo-local gate:
 python scripts/check_agentic_docs.py --config agentic-mode/config.json
 ```
 
-It automates the mechanizable check classes — ID continuity (`{{PREFIX}}-NNN` resolves and is cited; format `^[A-Z]{2,6}-[0-9]{3,}$`), command-surface consistency (README ↔ surface doc; no unfilled `<command>` / `{{PLACEHOLDER}}` in any verification block), the `{{AGENTS_PATH}}` line limit, and the configurable neutrality / harness-neutrality sweep. Lines that must show a bad example are exempted with a trailing `agentic-gate: allow` marker. Everything the script cannot mechanize stays a manual review in `agentic-mode/SELF-TEST.md`.
+It automates the mechanizable check classes — ID continuity (`{{PREFIX}}-NNN` rows are duplicate-free and gap-free; IDs cited in the other governed docs resolve), command-surface consistency (every `checks.commands` entry appears in the docs its `must_appear_in` lists), the `{{AGENTS_PATH}}` line limit, and the configurable neutrality / harness-neutrality sweep. Lines that must show a bad example are exempted with a trailing `agentic-gate: allow` marker. What it does not mechanize — the `^[A-Z]{2,6}-[0-9]{3,}$` ID format itself, README ↔ surface-doc parity beyond the configured commands, commit/MR/PR reference hygiene, and the placeholder sweep (`grep -rn '{{'`, RUNBOOK Phase C) — stays with manual review per `agentic-mode/SELF-TEST.md`.
 
 CI platform: **{{CI_PLATFORM}}**. When not `none`, the gate above runs on every change.
 

@@ -52,7 +52,8 @@ scripts/check_agentic_docs.py  # the checker, copied verbatim from TOOLKIT/check
            "api_reference": "docs/API_REFERENCE.md or null",
            "validation": "docs/VALIDATION.md", "workflow": "docs/WORKFLOW.md",
            "architecture": "docs/architecture.json or null"},
-  "bilingual": {"enabled": false, "secondary_language": "zh-TW"},
+  "bilingual": {"enabled": false, "secondary_language": "zh-TW",
+                "primary_heading": "## English", "secondary_heading": "## 繁體中文"},
   "checks": {
     "line_limits": {"agents": 200},
     "deny_words": [],
@@ -93,8 +94,8 @@ offending key and a remedy. Two families are rejected:
   any-address allowlist), and the string fields with a built-in default
   (`iteration_history.heading`, `bilingual.primary_heading` /
   `secondary_heading`) take that default. A `null` on a structural section
-  (`docs`, `id`, `bilingual`, `checks`, `line_limits`, `commands`) is itself
-  a type error.
+  (`docs`, `id`, `bilingual`, `checks`, `project`, `line_limits`, `commands`)
+  is itself a type error.
 - **Undeclared dependencies.** An active check's dependent docs must be
   declared under `docs` — a missing key or `null` silently disabling a check
   is how a gate degrades to nothing. `id-continuity` requires
@@ -201,6 +202,10 @@ inline gate. **Do not advance on a failed gate.** Production order:
 
 Also write **`AGENTIC-MODE.md`** (root index) and **`agentic-mode/SELF-TEST.md`**
 (from their templates). These are resident meta files, not part of the chain.
+
+If TARGET also seeds a local review canon (an optional `CODE-REVIEW.md`),
+seed it with an **empty** "what failure looks like" section — one line per
+sensitive area — for the code owner to fill in.
 
 ---
 

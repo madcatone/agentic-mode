@@ -15,10 +15,11 @@ Per-feature done evidence. One block per landed non-trivial change. A reviewer (
 
 <!--
 ==== PER-FEATURE BLOCK TEMPLATE — copy below the line when a new feature lands ====
+The heading cites the issue/MR/PR number — use exactly one of (issue #N), (MR !N), or (PR #N).
 
 ---
 
-## {{FEATURE_NAME}} (issue #{{ISSUE_NUMBER}})   <!-- or (MR !N) / (PR #N) -->
+## {{FEATURE_NAME}} (issue #{{ISSUE_NUMBER}})
 
 ### Code Implementation
 - [ ] {{concrete bullet: function/class/module added or changed, with `path` references}}

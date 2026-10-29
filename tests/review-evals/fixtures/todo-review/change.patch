@@ -1,0 +1,101 @@
+diff --git a/commands.py b/commands.py
+index 24d7d38..97fb900 100644
+--- a/commands.py
++++ b/commands.py
+@@ -4,14 +4,22 @@ Each handler loads the store, mutates it, and saves it back; every command
+ run is a fresh process.
+ """
+ 
++import os
+ import sys
+ 
+ import store
+ 
++_DONE_LOG = os.path.join(os.path.dirname(os.path.abspath(__file__)),
++                         "done.log")
++
+ 
+ def cmd_add(args):
+     """Add a task with the next free id."""
+     tasks = store.load()
++    for task in tasks:
++        if task.title == args.title:
++            print("error: task already exists", file=sys.stderr)
++            return 1
+     task = store.Task(store.next_id(tasks), args.title)
+     tasks.append(task)
+     store.save(tasks)
+@@ -19,21 +27,41 @@ def cmd_add(args):
+     return 0
+ 
+ 
++def load_done_ids():
++    """Read the ids recorded as done in the side log."""
++    if not os.path.exists(_DONE_LOG):
++        return set()
++    with open(_DONE_LOG, "r", encoding="utf-8") as fh:
++        return {int(line) for line in fh.read().split() if line}
++
++
++def append_done_id(task_id):
++    """Record one more id as done in the side log."""
++    with open(_DONE_LOG, "w", encoding="utf-8") as fh:
++        fh.write("%d\n" % task_id)
++
++
+ def cmd_done(args):
+     """Mark the task with the given id as done."""
+     tasks = store.load()
+-    task = tasks[args.task_id - 1]
+-    task.done = True
+-    store.save(tasks)
+-    print("done:", task.title)
+-    return 0
++    for task in tasks:
++        if task.id == args.task_id:
++            append_done_id(task.id)
++            print("done:", task.title)
++            return 0
++    print("error: unknown task id %d" % args.task_id, file=sys.stderr)
++    return 1
+ 
+ 
+ def cmd_list(args):
+-    """Print every task, done ones marked with [x]."""
++    """Print tasks; done ones are hidden unless --all is given."""
+     tasks = store.load()
++    done_ids = load_done_ids()
+     for task in tasks:
+-        marker = "[x]" if task.done else "[ ]"
++        is_done = task.id in done_ids
++        if is_done and not args.all:
++            continue
++        marker = "[x]" if is_done else "[ ]"
+         print(marker, task.id, task.title)
+     return 0
+ 
+diff --git a/parse.py b/parse.py
+index 7511744..17c665b 100644
+--- a/parse.py
++++ b/parse.py
+@@ -14,6 +14,8 @@ def build_parser():
+     p_done.add_argument("task_id", type=int)
+ 
+     p_list = sub.add_parser("list", help="list tasks")
++    p_list.add_argument("--all", action="store_true",
++                        help="also show tasks that are done")
+ 
+     p_rm = sub.add_parser("rm", help="remove a task")
+     p_rm.add_argument("task_id", type=int)
+diff --git a/todo.py b/todo.py
+index dc05c1f..073ab69 100644
+--- a/todo.py
++++ b/todo.py
+@@ -1,6 +1,6 @@
+ """todo - a tiny task list for the terminal.
+ 
+-Every command is a fresh process: state lives in the database between runs.
++Every command is a fresh process: state lives in tasks.json between runs.
+ """
+ import sys
+ 

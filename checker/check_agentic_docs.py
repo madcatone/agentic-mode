@@ -94,8 +94,8 @@ with a message naming the offending key and an honest remedy:
   any-address allowlist), and the string fields with a built-in default
   (``iteration_history.heading``, ``bilingual.primary_heading`` /
   ``secondary_heading``) take that default. A ``null`` on a structural section
-  (``docs``, ``id``, ``bilingual``, ``checks``, ``line_limits``, ``commands``)
-  is itself a type error.
+  (``docs``, ``id``, ``bilingual``, ``checks``, ``project``, ``line_limits``,
+  ``commands``) is itself a type error.
 - An active check's dependent doc must be declared under ``docs`` (a missing
   key or ``null`` never silently disables a check): ``id-continuity`` requires
   ``requirements``, ``validation``, and the observable-surface doc selected by
@@ -290,8 +290,8 @@ def validate_config(config: Dict) -> None:
     ``secondary_heading``) are normalized to that default here, so no later
     read ever sees ``None`` where a string is expected. A ``null`` on a
     structural section (``docs``, ``id``, ``bilingual``, ``checks``,
-    ``line_limits``, ``commands``) is rejected as a type error, like any
-    other wrong type.
+    ``project``, ``line_limits``, ``commands``) is rejected as a type error,
+    like any other wrong type.
     """
     version = config.get("schema_version")
     if not isinstance(version, int) or isinstance(version, bool):
@@ -1145,7 +1145,10 @@ def run(config_path: str, root_override: Optional[str]) -> int:
     config = load_config(config_path)
     validate_config(config)
     root = root_override or os.path.dirname(os.path.abspath(config_path)) or "."
-    # If the config lives in agentic-mode/, the repo root is its parent.
+    # Without an explicit --root the root is unconditionally the config
+    # directory's parent -- the repo root when the config lives in
+    # <repo>/agentic-mode/, and the directory above the config's folder
+    # wherever else the config is placed.
     if root_override is None:
         parent = os.path.dirname(os.path.dirname(os.path.abspath(config_path)))
         if parent:
@@ -1211,7 +1214,9 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
         "--root",
         default=None,
         help="repo root for resolving doc paths "
-             "(default: the parent directory of the config file)",
+             "(default: the parent directory of the config file's directory, "
+             "e.g. the repo root when the config lives in "
+             "<repo>/agentic-mode/)",
     )
     return parser.parse_args(list(argv))
 

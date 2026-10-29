@@ -129,7 +129,7 @@ marketplace 即可安裝十一個 plugin 中的任意子集——每個都獨立
 
 | Plugin | 安裝什麼 | 正典來源 |
 | --- | --- | --- |
-| `agentic-bootstrap` | 文件契約 bootstrapper skill（跑 RUNBOOK）。 | `RUNBOOK.md` + `doctrine/` + `templates/` + `checker/`（vendored） |
+| `agentic-bootstrap` | 文件契約 bootstrapper skill（跑 RUNBOOK）。 | `RUNBOOK.md` + `doctrine/BOOTSTRAP-CORE.md` + `templates/` + `checker/`（vendored） |
 | `gcm` | commit message 慣例 skill。 | [`playbooks/COMMIT-MESSAGES.md`](playbooks/COMMIT-MESSAGES.md) |
 | `two-axis-review` | 雙軸 review skill。 | [`playbooks/TWO-AXIS-REVIEW.md`](playbooks/TWO-AXIS-REVIEW.md) |
 | `review-response` | review-response 紀律 skill。 | [`playbooks/REVIEW-RESPONSE.md`](playbooks/REVIEW-RESPONSE.md) |
@@ -201,7 +201,9 @@ templates 與 RUNBOOK）會整包安裝——子目錄一併帶過去。
 ## 轉接層（adapters）
 
 核心（doctrine、RUNBOOK、templates、checker）是 **harness-neutral** 的——絕不指名任何
-特定 agent 產品、model 或專有工具。harness 專屬的包裝只放在 [`adapters/`](adapters/)：
+特定 agent 產品、model 或專有工具。（檢查器內建的 harness deny 清單本身即是一份 harness
+名單——那是偵測資料而非行文；鐵則規範的是文件正文。）harness 專屬的包裝只放在
+[`adapters/`](adapters/)：
 
 - [`adapters/claude-code/`](adapters/claude-code/)——一個 Claude Code plugin
   marketplace：`agentic-bootstrap` 工具包、五份 playbook，加上 self-canonical 的

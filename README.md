@@ -10,6 +10,8 @@ This repo is the **canonical source** of the methodology. Downstream copies (a
 Claude Code plugin, a Devin IDE rule, a vendored subtree in your own repo) should
 sync *from here* — see [Adapters](#adapters) and [Canonical source](#canonical-source).
 
+> 繁體中文版：[README-ZH.md](README-ZH.md)。本檔與繁中版資訊等價。
+
 ## Why
 
 Chat history is not a durable substrate. The moment a new collaborator arrives —
@@ -146,7 +148,7 @@ independent and optional:
 
 | Plugin | Installs | Canonical source |
 | --- | --- | --- |
-| `agentic-bootstrap` | The doc-contract bootstrapper skill (runs the RUNBOOK). | `RUNBOOK.md` + `doctrine/` + `templates/` + `checker/` (vendored) |
+| `agentic-bootstrap` | The doc-contract bootstrapper skill (runs the RUNBOOK). | `RUNBOOK.md` + `doctrine/BOOTSTRAP-CORE.md` + `templates/` + `checker/` (vendored) |
 | `gcm` | Commit-message convention skill. | [`playbooks/COMMIT-MESSAGES.md`](playbooks/COMMIT-MESSAGES.md) |
 | `two-axis-review` | Dual-axis review skill. | [`playbooks/TWO-AXIS-REVIEW.md`](playbooks/TWO-AXIS-REVIEW.md) |
 | `review-response` | Review-response discipline skill. | [`playbooks/REVIEW-RESPONSE.md`](playbooks/REVIEW-RESPONSE.md) |
@@ -230,7 +232,9 @@ their subdirectories come along.
 ## Adapters
 
 The core (doctrine, RUNBOOK, templates, checker) is **harness-neutral** — it never
-names a specific agent product, model, or proprietary tool. Harness-specific
+names a specific agent product, model, or proprietary tool. (The checker's built-in
+harness deny-list is itself a list of harness names — that is detection data, not
+prose; the iron rule governs document text.) Harness-specific
 packaging lives only under [`adapters/`](adapters/):
 
 - [`adapters/claude-code/`](adapters/claude-code/) — a Claude Code plugin

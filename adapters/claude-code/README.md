@@ -8,14 +8,16 @@ this repo that names a specific agent product — the core (`doctrine/`,
 ## The marketplace
 
 The marketplace manifest lives at the repo root:
-[`.claude-plugin/marketplace.json`](../../.claude-plugin/marketplace.json). Once
-this repo is on GitHub, a user adds it and installs any subset of plugins:
+[`.claude-plugin/marketplace.json`](../../.claude-plugin/marketplace.json). The
+repo is on GitHub (`madcatone/agentic-mode`); a user adds the marketplace and
+installs any subset of plugins:
 
 ```
 /plugin marketplace add madcatone/agentic-mode
 /plugin install agentic-bootstrap@agentic-mode
 /plugin install gcm@agentic-mode
 /plugin install doc-linter@agentic-mode
+/plugin install okf-doc-style@agentic-mode
 /plugin install two-axis-review@agentic-mode
 /plugin install review-response@agentic-mode
 /plugin install fable5@agentic-mode
@@ -31,7 +33,7 @@ Each plugin is independent and optional — install only what your team wants.
 
 | Plugin | What it installs | Canonical source |
 | --- | --- | --- |
-| [`agentic-bootstrap`](plugins/agentic-bootstrap) | The doc-contract bootstrapper: a skill that runs the RUNBOOK to bootstrap/adopt agentic-mode in any repo. | `RUNBOOK.md`, `doctrine/`, `templates/`, `checker/` (all vendored into the skill) |
+| [`agentic-bootstrap`](plugins/agentic-bootstrap) | The doc-contract bootstrapper: a skill that runs the RUNBOOK to bootstrap/adopt agentic-mode in any repo. | `RUNBOOK.md`, `doctrine/BOOTSTRAP-CORE.md`, `templates/`, `checker/` (all vendored into the skill) |
 | [`gcm`](plugins/gcm) | Commit-message convention skill. | [`playbooks/COMMIT-MESSAGES.md`](../../playbooks/COMMIT-MESSAGES.md) |
 | [`doc-linter`](plugins/doc-linter) | Agent-doc linter skill: mechanical pass (`doc_lint.py`) + judgment rules. | [`playbooks/DOC-LINTER.md`](../../playbooks/DOC-LINTER.md) |
 | [`okf-doc-style`](plugins/okf-doc-style) | OKF v0.2 knowledge-bundle skill: 9-step runbook + mechanical pass (`okf_lint.py`). | [`playbooks/OKF-DOC-STYLE.md`](../../playbooks/OKF-DOC-STYLE.md) |

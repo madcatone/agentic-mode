@@ -3,7 +3,7 @@ TEMPLATE: docs/USER_GUIDE.md for project.type == "cli". Observable surface: comm
 views, output, troubleshooting. Filled from config.json (id.prefix, bilingual.*) and Phase-A answers
 (the CLI surface mined from --help / argument parsing).
 Every behavior subsection CITES its owning {{PREFIX}}-XXX from REQUIREMENTS. Keyboard/flag tables
-must match the source 1:1 (the checker parity-checks these where the source exposes grep-able constants).
+must match the source 1:1 (a RUNBOOK Phase-B gate, checked by hand — the checker never parses project source).
 BILINGUAL: keep the second track ONLY IF config bilingual.enabled == true; else delete it.
 Harness-neutral: never name a specific agent product, model, or proprietary tool.
 -->

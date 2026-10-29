@@ -125,6 +125,16 @@ target: <repo 路徑＠diff 錨點，或票號>
 
 本檔與 `references/` 全部以**能力描述**表達工具（唯讀 shell、檔案讀取、搜尋、委派子代理），不寫死任何 harness 專屬工具名——其他 harness 可直接把本目錄當規則檔載入。各 harness 的唯讀保證與掛載差異（Claude Code／VS Code Local／Codex）見 [`references/mounting.md`](references/mounting.md)。
 
+## 7. 審查深度分級
+
+深度**由 dispatcher 指定**；未指定時依變更的 blast radius 自選。鐵則：深度由 blast radius 決定，不由作者偏好決定；不確定時取更深一級。
+
+- **Quick**：小、可逆、低 blast radius 的變更——Spec 軸照跑，Standard 軸只走查高訊號類別（如 SEC）。省的是**覆蓋範圍**，不是證據標準——§3 的 verdict 紀律不降級。
+- **Standard**：預設全流程——兩軸全開（§1）。
+- **Deep**：漏一個 bug 代價高的區域（付費、認證、資料遷移、CI／release 設定）——兩軸全開，且 **root-cause 查核必做**（變更是否指認成因、修法對準成因而非只壓症狀；不因變更非 bug-fix 類而略過）；**全部 CONFIRMED 候選強制獨立複核**——reviewer 唯讀、不自行加派：在報告中列出每個 CONFIRMED 候選（`檔案:行號`＋失效情境），請 dispatcher 加派一個**未產出該 finding 的 fresh-context verifier** 對照證據與失效情境重驗（只回「同意／不同意＋一句理由」）；不同意者降為 PLAUSIBLE 並保留理由。
+
+任何深度下唯讀邊界（§0）不變。
+
 ## 來源
 
 - 兩軸拆分、聚合不合併、高訊號合軸、ledger 三步：契約借自 two-axis-review playbook（本 repo 的 two-axis-review plugin），借契約不抄全文。

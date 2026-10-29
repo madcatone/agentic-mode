@@ -72,7 +72,7 @@ One issue → one branch → one PR. Do not smuggle unrelated changes into a bra
 ## 3. Commit
 
 ### Format
-Conventional commit (team convention — the canonical rules live in the team-skills plugin's `gcm` skill):
+Conventional commit (team convention — the canonical rules live in your team's commit-message playbook):
 ```
 <type>[ <TICKET>]: <Subject>
 
@@ -176,6 +176,8 @@ Report the PR URL and key metadata (head→base, assignee, checks status) to the
 ## 6.a Code review — requesting
 - Review the PR the user names: `gh pr view <N> --comments` and `gh pr diff <N>`.
 - Report every non-nitpick issue you find. If you find none after reading the full diff, say so explicitly.
+- Mark each finding `introduced` (created by this PR's diff) or `pre-existing` (already on the base branch — verify against the diff to base / `git blame`). Report pre-existing issues too, but marked as such: not introduced by this PR, so they do not block merge and are not the author's miss; file a separate issue instead of forcing the fix into this PR.
+- Open the review summary with a count line — `N findings: X confirmed / Y plausible / Z pre-existing` — before any detail.
 - Raise findings as PR review comments. If quality is fine, approve with `LGTM`.
 
 ```bash
@@ -201,9 +203,11 @@ gh pr view <N> --comments
 5. Commit. Push only if the user has consented (a PR review commit must be pushed to appear — ask first). Then post a summary comment.
 
 ### Notes
-- **A bug fix must include a before/after repro** — reproduce the reviewer's condition (wrong result), fix, reproduce again (right result).
+- **A bug fix must include a before/after repro plus a one-line root cause** — reproduce the reviewer's condition (wrong result), fix, reproduce again (right result), and state in one line which cause the fix targets (not just the symptom).
 - **Non-blocking trade-off:** if fixing a non-blocking item touches files outside the current issue's scope, or adds a new behavior, split it into a follow-up issue and say so in the comment.
 - **Do not silently drop a reviewer's point:** argue the case in reply rather than ignoring it.
+- **Pre-existing findings** (marked by the reviewer as not introduced by this PR): respond with one of — open a follow-up issue, record it on the backlog, or state why it will not be fixed here. Never leave one unanswered; never force the fix into this PR.
+- **Third round without convergence:** if the reviewer suggests stepping back and rethinking the approach, re-examine the approach against the issue — do not patch the same line yet again.
 
 ```bash
 gh pr comment <N> --body "$(cat <<'EOF'
