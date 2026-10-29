@@ -48,7 +48,8 @@ scripts/check_agentic_docs.py  # the checker, copied verbatim from TOOLKIT/check
   "project": {"name": "str", "type": "cli|library|web-service|docs-only", "description": "str"},
   "id": {"prefix": "[A-Z]{2,6}"},
   "docs": {"index": "AGENTIC-MODE.md", "readme": "README.md", "agents": "AGENTS.md",
-           "requirements": "docs/REQUIREMENTS.md", "user_guide": "docs/USER_GUIDE.md",
+           "requirements": "docs/REQUIREMENTS.md",
+           "user_guide": "docs/USER_GUIDE.md or null",
            "api_reference": "docs/API_REFERENCE.md or null",
            "validation": "docs/VALIDATION.md", "workflow": "docs/WORKFLOW.md",
            "architecture": "docs/architecture.json or null"},
@@ -103,7 +104,14 @@ offending key and a remedy. Two families are rejected:
   selected by `project.type`: `cli` / `web-service` require
   `docs.user_guide`, `library` requires `docs.api_reference`, and
   `docs-only` requires neither (no surface doc — REQUIREMENTS carries the
-  surface). `iteration_history` (when enabled) requires `docs.requirements`.
+  surface). The type-selected surface doc admits exactly one explicit
+  exemption: declaring it as `null` (the key present, value `null`) is the
+  **Lite-profile opt-out** — the doc is deliberately absent, so
+  `doc-presence` skips it, cross-doc references do not scan it, and a
+  `command-consistency` rule's `must_appear_in` target naming it withdraws.
+  A merely *missing* surface key — and a `null` on any other dependency
+  (`docs.requirements`, `docs.validation`) — is still an error.
+  `iteration_history` (when enabled) requires `docs.requirements`.
   When `project.type` is absent the checker takes the strict reading (a
   surface project, so `docs.user_guide`) and the dependency stays. Checks
   without a disable switch tell you to declare the path; `iteration_history`

@@ -77,7 +77,8 @@ python3 scripts/check_agentic_docs.py --config agentic-mode/config.json
 `2`（config 壞掉／I/O 錯誤）。config 本身會先被驗證：欄位型別錯誤、未知的
 `project.type`、未宣告的檢查依賴都 exit `2`（surface doc 依型別而定：`cli`／
 `web-service` 需要 `docs.user_guide`、`library` 需要 `docs.api_reference`、
-`docs-only` 兩者皆免）。檢查類別：
+`docs-only` 兩者皆免；把 surface doc 明示宣告為 `null` 是 Lite profile 的豁免——
+該文件刻意缺席，依賴它的檢查一律退場，但鍵未宣告仍視為錯誤）。檢查類別：
 
 | 類別 | 檢查什麼 |
 | --- | --- |

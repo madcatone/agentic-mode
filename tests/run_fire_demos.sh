@@ -26,7 +26,8 @@
 #       -- t1 supersedes it with the flipped contract)
 #   s*  follow-up fence findings (S1/S2, code spans)
 #   b*  docs-only adoption findings
-#   a*  api_reference surface dependency (type-mapped surface doc)
+#   a*  surface-doc dependency by project type (type-mapped surface doc):
+#       the explicit-null Lite exemption and the absent-key error (#49)
 #   g*  coverage gaps found in read-back (one firing case per check family)
 #   t*  tilde fences + fence-engine edge cases (indent leniency, fake
 #       closers) (#5)
@@ -174,16 +175,23 @@ expect 0 b-docs-only-user-guide-null-clean \
 expect 2 b-project-type-misspelled \
     "project.type \"docsonly\" (misspelled) -> enum config error"
 
-# ---- api_reference surface dependency (type-mapped) --------------------------
+# ---- surface doc by project type (type-mapped; #49 explicit-null Lite) ------
 expect 0 a1-library-api-reference-clean \
     "library project with api_reference declared (user_guide null) runs clean"
-expect 2 a2-library-api-reference-null \
-    "library project with api_reference null -> config error naming docs.api_reference"
-expect 2 a3-cli-user-guide-null \
-    "cli project with user_guide null still -> config error naming docs.user_guide"
+expect 0 a2-library-api-reference-null \
+    "library Lite: api_reference explicit null = surface exemption, runs clean"
+expect 0 a3-cli-user-guide-null \
+    "cli Lite: user_guide explicit null = exemption; command rule's user_guide target withdraws"
 expect 1 a4-api-reference-declared-missing \
     "declared api_reference file missing while config is valid -> flagged" \
     doc-presence
+expect 2 a5-cli-user-guide-absent \
+    "cli with the user_guide key absent (not null) -> still a config error"
+expect 2 a6-library-api-reference-absent \
+    "library with the api_reference key absent (not null) -> still a config error"
+expect 1 a7-lite-dangling-ref-still-fires \
+    "Lite exemption narrows to the surface doc: dangling ref in AGENTS still fires" \
+    id-continuity:DEM-099
 
 # ---- coverage gaps: one firing case per check family -------------------------
 expect 1 g1-line-limit-exceeded \

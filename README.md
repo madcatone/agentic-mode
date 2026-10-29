@@ -91,7 +91,10 @@ It reports `<file>:<line>: [<category>] <message>` and exits `0` (clean), `1`
 wrong field types, an unknown `project.type`, and undeclared check
 dependencies exit `2` (the surface doc is required by type: `cli` /
 `web-service` need `docs.user_guide`, `library` needs `docs.api_reference`,
-`docs-only` needs neither). Check categories:
+`docs-only` needs neither; declaring the surface doc as an explicit `null` is
+the Lite-profile exemption — the doc is deliberately absent and every check
+that depends on it withdraws, while an undeclared key stays an error). Check
+categories:
 
 | Category | What it enforces |
 | --- | --- |
