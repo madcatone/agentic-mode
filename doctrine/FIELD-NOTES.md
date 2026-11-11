@@ -188,8 +188,8 @@ command *exists* in a doc; it cannot verify the procedure the doc describes
 still matches reality.
 
 What held was not better prose but less of it: the wait/verify procedure became
-two small scripts (`ci_wait.sh`, `verify_deploy.sh`) and the docs now point at
-the scripts instead of restating steps.
+two small scripts (a pipeline-wait wrapper and a deploy verifier) and the docs
+now point at the scripts instead of restating steps.
 
 **Generalization:** prose that names verification steps drifts; an executable
 either runs or fails. A doc's job is to record *where the procedure lives*
