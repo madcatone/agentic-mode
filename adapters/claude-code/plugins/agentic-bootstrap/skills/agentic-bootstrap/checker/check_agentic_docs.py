@@ -73,6 +73,12 @@ Check categories
    ``N.`` numbered entries must start at 1 (in document order) and be
    duplicate-free and gap-free; when bilingual, each language region's history
    is checked independently.
+8. ``ci-runners`` -- opt-in via config ``ci.runners``. A governed doc's
+   ``<!-- ci-runners: ... -->`` marker (comma-separated runner names; prose
+   lines only -- fenced code is exempt) must list exactly the runners the
+   config declares. When ``ci.runners`` is declared non-empty, at least one
+   marker must exist (the finding anchors to the workflow doc, or the readme);
+   a marker when config declares no runners is flagged as well.
 
 Config validation
 -----------------
@@ -388,6 +394,11 @@ def validate_config(config: Dict) -> None:
     optional_str_list(checks.get("entrypoints"), "checks.entrypoints")
     optional_str_list(checks.get("url_allowlist"), "checks.url_allowlist")
     optional_str_list(checks.get("ipv4_allowlist"), "checks.ipv4_allowlist")
+
+    ci = config.get("ci") or {}
+    if not isinstance(ci, dict):
+        raise ConfigError("config field ci must be an object")
+    optional_str_list(ci.get("runners"), "ci.runners")
     require_bool(checks, "forbid_ipv4", "checks.forbid_ipv4")
     require_bool(checks, "forbid_local_paths", "checks.forbid_local_paths")
 
@@ -916,6 +927,80 @@ def check_command_consistency(root: str, config: Dict, rel,
 
 
 # ---------------------------------------------------------------------------
+# 2b. ci-runners (opt-in, config ci.runners)
+# ---------------------------------------------------------------------------
+_CI_RUNNERS_RE = re.compile(r"<!--\s*ci-runners:\s*(.*?)\s*-->")
+
+
+def check_ci_runners(root: str, config: Dict, rel,
+                     contents: Dict[str, List[str]]) -> List[Finding]:
+    """``ci-runners`` markers in governed docs must equal ``ci.runners``.
+
+    The workflow doc declares the repo's pipeline runners on one line as
+    ``CI runners: <names> <!-- ci-runners: <names> -->`` (names comma-
+    separated). The gate reads the marker; the visible prose travels with it
+    on the same line, so editing one without the other becomes a finding
+    instead of silent drift. Markers inside fenced code blocks are exempt
+    (quoted, not declared).
+
+    - a marker whose names differ from ``ci.runners`` is flagged;
+    - a marker when config declares no runners is flagged;
+    - runners declared but no marker anywhere is flagged (anchored to the
+      workflow doc, or the readme when no workflow doc is declared).
+    """
+    findings: List[Finding] = []
+    declared = (config.get("ci") or {}).get("runners") or []
+    declared_set = set(declared)
+
+    found_any = False
+    for path, lines in contents.items():
+        fenced = in_code_block_flags(lines)
+        for lineno, line in enumerate(lines, start=1):
+            if fenced[lineno - 1]:
+                continue
+            for match in _CI_RUNNERS_RE.finditer(line):
+                found_any = True
+                names = {p.strip() for p in match.group(1).split(",") if p.strip()}
+                if names == declared_set:
+                    continue
+                listed = ", ".join(sorted(names)) or "(empty)"
+                if declared_set:
+                    expected = ", ".join(sorted(declared_set))
+                    findings.append(Finding(
+                        rel(path), lineno, "ci-runners",
+                        f"ci-runners marker lists {listed!r} but config "
+                        f"ci.runners declares {expected!r}",
+                    ))
+                else:
+                    findings.append(Finding(
+                        rel(path), lineno, "ci-runners",
+                        f"ci-runners marker lists {listed!r} but config "
+                        "declares no ci.runners (remove the marker or "
+                        "declare ci.runners)",
+                    ))
+
+    if declared_set and not found_any:
+        docs = doc_paths(config)
+        anchor = (resolve(root, docs.get("workflow"))
+                  or resolve(root, docs.get("readme")))
+        if anchor:
+            findings.append(Finding(
+                rel(anchor), 0, "ci-runners",
+                f"config ci.runners declares {len(declared_set)} runner(s) "
+                "but no ci-runners marker exists in any governed doc "
+                "(declare it on the CI-runners line of the workflow doc)",
+            ))
+        else:
+            findings.append(Finding(
+                "docs", 0, "ci-runners",
+                f"config ci.runners declares {len(declared_set)} runner(s) "
+                "but no ci-runners marker exists in any governed doc "
+                "(declare it on the CI-runners line of the workflow doc)",
+            ))
+    return findings
+
+
+# ---------------------------------------------------------------------------
 # 3. neutrality
 # ---------------------------------------------------------------------------
 def _build_deny_words(config: Dict) -> List[Tuple[str, re.Pattern]]:
@@ -1167,6 +1252,7 @@ def run(config_path: str, root_override: Optional[str]) -> int:
     findings.extend(check_id_continuity(root, config, rel, contents))
     findings.extend(check_iteration_history(root, config, rel, contents))
     findings.extend(check_command_consistency(root, config, rel, contents))
+    findings.extend(check_ci_runners(root, config, rel, contents))
 
     # Per-line neutrality scan across every governed prose doc.
     deny = _build_deny_words(config)
@@ -1183,6 +1269,7 @@ def run(config_path: str, root_override: Optional[str]) -> int:
         "id-continuity",
         "iteration-continuity",
         "command-consistency",
+        "ci-runners",
         "neutrality",
         "line-limit",
         "entrypoint",

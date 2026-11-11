@@ -76,6 +76,6 @@ The ultimate test of the contract is whether a **zero-context reviewer** (a huma
 1. Hand a zero-context reviewer *only* the repo's committed docs — no chat history, no walkthrough.
 2. Ask them the canonical questions. They answer *solely* from the docs, citing the file:section (and `{{PREFIX}}-XXX` where relevant) that supplied each answer.
 3. Any question they cannot answer, or answer wrongly, marks a **doc gap** — the docs, not the reader, are at fault. Fix the offending layer.
-4. **Record the outcome in `{{VALIDATION_PATH}}`**: the date, who/what read back, each question's pass/fail, and the citation or the gap found. A clean read-back is part of the done evidence for a bootstrap or a major doc change.
+4. **Record the outcome in `{{VALIDATION_PATH}}`**: the date, who/what read back, each question's pass/fail, and the citation or the gap found. A clean read-back is part of the done evidence for a bootstrap, a major doc change, or a release tag (WORKFLOW release checklist).
 
 A repo passes the read-back probe when every canonical question is answerable, cold, from the docs alone.

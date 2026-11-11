@@ -30,6 +30,9 @@
 #   g*  coverage gaps found in read-back (one firing case per check family)
 #   t*  tilde fences + fence-engine edge cases (indent leniency, fake
 #       closers) (#5)
+#   m*  ci-runners marker consistency (opt-in via config ci.runners):
+#       marker vs config mismatch, marker without declared runners,
+#       declared runners without any marker, and the satisfied control
 #
 # Neutrality rule: deny words in these fixtures are fictional
 # (vexide/zorpal/novera/fictool) and reach the deny list only via
@@ -213,6 +216,19 @@ expect 0 t5-list-nested-fence-exempt \
 expect 1 t6-fake-close-ideographic-space \
     "a closer followed only by U+3000 is not a closer -> unclosed flagged" \
     neutrality:unclosed
+
+# ---- ci-runners marker consistency ----------------------------------------
+expect 1 m1-ci-runners-marker-mismatch \
+    "ci-runners marker lists one runner; config declares two" \
+    ci-runners
+expect 1 m2-marker-without-config-runners \
+    "a ci-runners marker when config declares no ci.runners" \
+    ci-runners
+expect 1 m3-runners-without-any-marker \
+    "config declares runners but no governed doc carries the marker" \
+    ci-runners:no ci-runners marker
+expect 0 m4-ci-runners-marker-clean \
+    "control: marker matches config ci.runners exactly -> clean"
 
 printf '\n%d cases: %d pass, %d fail\n' "$((pass + fail))" "$pass" "$fail"
 [ "$fail" -eq 0 ]
