@@ -2,12 +2,15 @@
 TEMPLATE: docs/WORKFLOW.md for ci.platform == "github". PR-based equivalent of the GitLab workflow,
 using the `gh` CLI. Ported as-is: substitute only the H1, the Template-Source marker, and the
 {{PLACEHOLDER}} build/test commands (from AGENTS Development Commands). Do NOT re-author the review-loop body.
+CI-RUNNERS line: resolve `{{CI_RUNNERS}}` from config `ci.runners` (comma-separated runner names,
+e.g. when pipelines run on an external runner). When config declares no `ci.runners`, DELETE the
+whole line. The doc gate checks the `ci-runners:` marker against config.
 NOTE: NEW — not yet battle-tested. The GitLab variant is the field-proven one; this GitHub variant mirrors
 its structure onto issues → branch → commit → PR → review. Treat deviations as bugs to report upstream.
 BILINGUAL dual-language external replies apply ONLY when config bilingual.enabled == true.
 `gh` appears here because this is the GitHub platform doc — it is the ONLY doc allowed to name it.
 Harness-neutral otherwise: never name a specific agent product or model.
-Template-Source: agentic-bootstrap/WORKFLOW-github@v1
+Template-Source: agentic-bootstrap/WORKFLOW-github@v2
 -->
 
 # GitHub Workflow — Collaborator Rule
@@ -15,6 +18,9 @@ Template-Source: agentic-bootstrap/WORKFLOW-github@v1
 > **Status: NEW — not yet battle-tested.** This mirrors the field-proven GitLab workflow onto GitHub's PR model. If a step does not fit `gh`'s actual behavior, fix it and note the deviation.
 
 This document is the authoritative GitHub workflow rule for anyone (human or agent) working in this repo. Read it before touching issues, branches, commits, or PRs. It complements `README.md` and `AGENTS.md` (code/scope/test discipline) — this file focuses on the issue → branch → commit → pull request (PR) → review loop. Assume the reader is new and has no chat history. All commands run from the repo root.
+
+CI runners executing this repo's pipelines: {{CI_RUNNERS}} <!-- ci-runners: {{CI_RUNNERS}} -->
+Single source of truth: `agentic-mode/config.json` (`ci.runners`). To change runners, change the config **and** this line in the same PR — the doc gate verifies the marker against config.
 
 ## 0. Iron Rules (apply in every context)
 
@@ -265,3 +271,16 @@ gh pr list
 - Reply to an issue without reading `gh issue view <N> --comments` in full.
 - Put chat context into a commit message or PR description.
 - Assume the reader remembers a prior conversation; PR/issue comments must be self-contained.
+
+## 11. Release checklist (tagged releases)
+
+One release = one squash-merged PR onto the default branch + one annotated tag. Run top to bottom; do not skip the verification steps — a green pipeline proves the build, not the artifact.
+
+1. Inventory changes since the last tag: `git log --oneline <last-tag>..<default-branch>`.
+2. Branch `release/vX.Y.Z` from the default branch. The prepare commit touches exactly the changelog (new section) and the version file — nothing else.
+3. Open the release PR against the default branch; merge **squash** (one commit per release on the default branch), after §4 verification and CI is green.
+4. Tag the squash commit: `git tag -a vX.Y.Z -m vX.Y.Z <sha> && git push origin vX.Y.Z`.
+5. If merging triggers a deployment, verify the deployed artifact itself (a fresh version timestamp, a live smoke test) — not just a green job; a job can skip by design and stay green. Encode the verification as a script in this repo; do not re-derive it from prose each release.
+6. Back-merge the default branch into the development branch via PR (`chore: merge vX.Y.Z back`).
+7. Optionally run the zero-context read-back probe (`agentic-mode/SELF-TEST.md` §D) before tagging — it catches semantic doc drift the structural gate cannot.
+8. Backfill post-merge deploy evidence into the release PR's VALIDATION block (post-merge clause, `docs/VALIDATION.md` header).

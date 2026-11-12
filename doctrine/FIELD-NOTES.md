@@ -4,8 +4,8 @@ The agentic-mode contract was distilled from an agent-maintained real project �
 a log-inspection TUI with a console tool, a web service, and a browser UI, kept
 alive across many sessions by different agents with no shared chat history.
 These are the field lessons that shaped the doctrine. Each is written
-harness-neutral and generalized away from the origin project; where the origin
-project is referenced it is called "the origin project."
+harness-neutral and generalized away from its source project; the founding
+project is called "the origin project," later adoptions are named as such.
 
 Read [`BOOTSTRAP-CORE.md`](BOOTSTRAP-CORE.md) for the doctrine itself; this file
 is the *why-it-earned-its-place* record behind several of its rules.
@@ -170,3 +170,45 @@ Two lessons rode along:
 *policy* (which checks, with which parameters). Policy belongs in a config the
 downstream repo owns; mechanism stays frozen so every repo shares one auditable
 implementation.
+
+---
+
+## 7. Encode verification procedures as scripts, not prose
+
+A second adoption (a web-service demo, 2026-11) migrated its CI to a different
+runner mid-flight and cut two tagged releases in three days. The structural
+gate stayed at zero findings throughout — and every "is it done?" detour came
+from *prose describing a verification that was no longer true*: a phase-1
+exception sentence that outlived the migration it excepted; a "watch the
+check-runs" recipe that hangs forever on branch pushes because the platform
+posts commit statuses there instead; a "green means deployed" assumption while
+the deploy job skips green by design; a deployment list read newest-first when
+the tool prints oldest-first. Four incidents, one shape: the gate can verify a
+command *exists* in a doc; it cannot verify the procedure the doc describes
+still matches reality.
+
+What held was not better prose but less of it: the wait/verify procedure became
+two small scripts (a pipeline-wait wrapper and a deploy verifier) and the docs
+now point at the scripts instead of restating steps.
+
+**Generalization:** prose that names verification steps drifts; an executable
+either runs or fails. A doc's job is to record *where the procedure lives*
+(the script, kept in-repo) — not the procedure itself. The release checklist
+in the WORKFLOW templates encodes this: step 5 says "encode the verification
+as a script; do not re-derive it from prose each release."
+
+## 8. Docs record how to verify, not what a status is called
+
+Same adoption, same week: "the deploy job is green" carried no information.
+The job skipped — by design, staying green — when deploy credentials were
+missing, so *status success* proved nothing about anything being deployed. The
+durable doc content was not the status noun but the verification action: check
+a fresh version timestamp on the deployed artifact, then smoke-test the live
+site. Statuses are names a platform can silently redefine (skip-but-green,
+oldest-first lists); a verification action is something the reader can
+re-execute, so its truth re-generates on every run.
+
+**Generalization:** when a doc must choose between naming a status and naming
+an action, write the action. The one-line runner declaration in the WORKFLOW
+templates follows the same split: the *name* lives in config (`ci.runners`,
+machine-checked), the *doc* carries only the marker that keeps the two honest.

@@ -13,6 +13,8 @@ Harness-neutral: never name a specific agent product, model, or proprietary tool
 
 Per-feature done evidence. One block per landed non-trivial change. A reviewer (human or agent) re-verifies any feature by running its Verification Commands. Each block cites the stable requirement IDs and the issue/MR/PR number so the ID trail stays followable.
 
+**Post-merge evidence clause.** Evidence that exists only after merge — deployments, live previews — may be backfilled into the same block's Status subsection via a small chore PR: limited to adding a post-merge entry or replacing that block's explicit "unverified / pending" wording, and it must cite the original PR/MR. Every other subsection stays append-only. This is the only declared exception to "never rewrite a past block."
+
 <!--
 ==== PER-FEATURE BLOCK TEMPLATE — copy below the line when a new feature lands ====
 The heading cites the issue/MR/PR number — use exactly one of (issue #N), (MR !N), or (PR #N).
@@ -49,7 +51,7 @@ The heading cites the issue/MR/PR number — use exactly one of (issue #N), (MR 
 ```
 
 ### Status
-{{One paragraph: what is covered and any intentional exclusions. If a requirement is only partially met, say so here instead of checking the box.}}
+{{One paragraph: what is covered and any intentional exclusions. If a requirement is only partially met, say so here instead of checking the box. Post-merge evidence entries land here, per the post-merge clause in the header.}}
 
 ==== END BLOCK TEMPLATE ====
 -->

@@ -50,6 +50,7 @@
     "entrypoints": []
   },
   "ci": {
-    "platform": "github"
+    "platform": "github",
+    "runners": []
   }
 }
