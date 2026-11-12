@@ -5,8 +5,9 @@ using the `gh` CLI. Ported as-is: substitute only the H1, the Template-Source ma
 CI-RUNNERS line: resolve `{{CI_RUNNERS}}` from config `ci.runners` (comma-separated runner names,
 e.g. when pipelines run on an external runner). When config declares no `ci.runners`, DELETE the
 whole line. The doc gate checks the `ci-runners:` marker against config.
-NOTE: NEW — not yet battle-tested. The GitLab variant is the field-proven one; this GitHub variant mirrors
-its structure onto issues → branch → commit → PR → review. Treat deviations as bugs to report upstream.
+NOTE: initially a structural mirror of the GitLab variant; since validated end-to-end in a real
+adoption (bootstrap through multiple tagged releases, including a CI-runner migration). Treat
+deviations found in your own use as bugs to report upstream.
 BILINGUAL dual-language external replies apply ONLY when config bilingual.enabled == true.
 `gh` appears here because this is the GitHub platform doc — it is the ONLY doc allowed to name it.
 Harness-neutral otherwise: never name a specific agent product or model.
@@ -15,7 +16,7 @@ Template-Source: agentic-bootstrap/WORKFLOW-github@v2
 
 # GitHub Workflow — Collaborator Rule
 
-> **Status: NEW — not yet battle-tested.** This mirrors the field-proven GitLab workflow onto GitHub's PR model. If a step does not fit `gh`'s actual behavior, fix it and note the deviation.
+> **Status: field-proven.** Initially mirrored from the GitLab workflow; since validated end-to-end in a real adoption (bootstrap → tagged releases). If a step does not fit `gh`'s actual behavior, fix it and note the deviation.
 
 This document is the authoritative GitHub workflow rule for anyone (human or agent) working in this repo. Read it before touching issues, branches, commits, or PRs. It complements `README.md` and `AGENTS.md` (code/scope/test discipline) — this file focuses on the issue → branch → commit → pull request (PR) → review loop. Assume the reader is new and has no chat history. All commands run from the repo root.
 

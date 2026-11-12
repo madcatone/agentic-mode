@@ -106,6 +106,8 @@ Three rules the block enforces:
 2. **Each feature block header MUST cite its issue or MR/PR number**, matching a `Closes #N` / `MR !N` / `PR #N` marker in Iteration History.
 3. **Verification Commands MUST include** (a) a build/compile of touched entry points, (b) a test step, (c) ≥1 smoke run against a fixture or example — sourced from AGENTS.md Development Commands, not reinvented.
 
+**Verification procedures live in scripts, not prose.** A checker can verify that a command *exists* in a doc; it cannot verify that the procedure the doc describes still matches reality — prose steps drift as platforms change, while an in-repo script either runs or fails. Record *where the procedure lives* (the script), not the procedure itself. And record the **verification action** (a fresh version timestamp, a live smoke test), not a status name ("green," "deployed") — platforms silently redefine status semantics (a job can skip by design and stay green), while an action's truth re-generates on every run.
+
 The file-level seed lives in `templates/VALIDATION.template.md`.
 
 ---
@@ -238,6 +240,8 @@ README is the onboarding map, not the final authority for behavior or workflow. 
 | Hardcoded package/serial/host in code or docs | Locks repo to one env; leak risk | Runtime placeholders (Project-Neutrality Contract). |
 | Chat-context references in commit messages or MR descriptions | Unreadable to anyone cold | Self-contained prose; cite IDs and SHA, not conversation. |
 | Encoding *How/Who* (tool choice, dispatch, model) into these docs | Binds repo to one harness; rots | Keep it in the executor's environment (Two-Layer Division of Labor). |
+| Prose restating a verification procedure (wait/verify steps in docs) | Drifts as platforms change; re-derived every time | Encode as an in-repo script; the doc points at it. |
+| Docs asserting status names ("green," "deployed") instead of verification actions | Platforms silently redefine statuses (skip-but-green) | Write the re-executable action (timestamp check, live smoke test). |
 <!-- agentic-gate: allow -->
 
 ---
