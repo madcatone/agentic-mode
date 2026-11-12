@@ -284,6 +284,31 @@ a rewrite.
 
 ---
 
+## Upgrading an adopted repo to a newer toolkit version
+
+Adopted repos carry two artifacts that age: the checker (copied verbatim in
+Phase C) and the ported WORKFLOW (versioned by its `Template-Source:` marker).
+A toolkit release changes neither silently — upgrade on purpose, and record it
+like any change.
+
+1. **Read the delta before swapping.** Diff your checker against the new tag
+   before replacing it (`git -C <toolkit-repo> show <tag>:checker/check_agentic_docs.py`
+   against your `scripts/check_agentic_docs.py`) — know the behavioral change,
+   not just the version number. Opt-in checks (e.g. `ci.runners`) stay inert
+   until your config declares them.
+2. **Swap the checker verbatim from the tag**, byte-compile it, run the gate.
+   A new check firing on your current docs is the upgrade working as designed —
+   fix the docs (add the missing declaration), not the checker.
+3. **Re-port the template only at its declared substitution points** when
+   `Template-Source` bumps (@v1 → @v2): the template header lists what moved
+   (new lines, new sections). Port those into your WORKFLOW; local sections you
+   authored yourself (recipes, checklists) are yours to keep — `Template-Source`
+   records the base you ported from, not a lockstep contract.
+4. **Record it like any change**: REQUIREMENTS iteration-history entry +
+   VALIDATION block citing the PR, with the diff-against-tag as evidence.
+
+---
+
 ## Hard rules
 
 - **Harness neutrality (iron rule).** Nothing generated — no template output, no
