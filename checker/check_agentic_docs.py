@@ -77,7 +77,8 @@ Check categories
    is checked independently.
 8. ``ci-runners`` -- opt-in via config ``ci.runners``. A governed doc's
    ``<!-- ci-runners: ... -->`` marker (comma-separated runner names; prose
-   lines only -- fenced code is exempt) must list exactly the runners the
+   lines only -- fenced code and inline code spans are exempt) must list
+   exactly the runners the
    config declares. When ``ci.runners`` is declared non-empty, at least one
    marker must exist (the finding anchors to the workflow doc, or the readme);
    a marker when config declares no runners is flagged as well.
@@ -970,6 +971,9 @@ def check_command_consistency(root: str, config: Dict, rel,
 # 2b. ci-runners (opt-in, config ci.runners)
 # ---------------------------------------------------------------------------
 _CI_RUNNERS_RE = re.compile(r"<!--\s*ci-runners:\s*(.*?)\s*-->")
+# An inline code span quotes text (docs explaining the marker syntax), it
+# does not declare runners -- blank spans before scanning, as neutrality does.
+_INLINE_SPAN_RE = re.compile(r"`[^`]*`")
 
 
 def check_ci_runners(root: str, config: Dict, rel,
@@ -980,8 +984,8 @@ def check_ci_runners(root: str, config: Dict, rel,
     ``CI runners: <names> <!-- ci-runners: <names> -->`` (names comma-
     separated). The gate reads the marker; the visible prose travels with it
     on the same line, so editing one without the other becomes a finding
-    instead of silent drift. Markers inside fenced code blocks are exempt
-    (quoted, not declared).
+    instead of silent drift. Markers inside fenced code blocks or inline
+    code spans are exempt (quoted, not declared).
 
     - a marker whose names differ from ``ci.runners`` is flagged;
     - a marker when config declares no runners is flagged;
@@ -998,7 +1002,8 @@ def check_ci_runners(root: str, config: Dict, rel,
         for lineno, line in enumerate(lines, start=1):
             if fenced[lineno - 1]:
                 continue
-            for match in _CI_RUNNERS_RE.finditer(line):
+            masked = _INLINE_SPAN_RE.sub(lambda m: " " * len(m.group(0)), line)
+            for match in _CI_RUNNERS_RE.finditer(masked):
                 found_any = True
                 names = {p.strip() for p in match.group(1).split(",") if p.strip()}
                 if names == declared_set:
