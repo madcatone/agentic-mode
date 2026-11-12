@@ -3,17 +3,23 @@ TEMPLATE: docs/WORKFLOW.md for ci.platform == "gitlab". This doc is ported as-is
 substitute only the H1 platform name, the Template-Source marker, and the {{PLACEHOLDER}} test/build
 commands (from AGENTS Development Commands). Do NOT re-author the review-loop body — the issue→branch→
 commit→MR→review conventions and red lines are platform constants.
+CI-RUNNERS line: resolve `{{CI_RUNNERS}}` from config `ci.runners` (comma-separated runner names,
+e.g. when pipelines run on an external runner). When config declares no `ci.runners`, DELETE the
+whole line. The doc gate checks the `ci-runners:` marker against config.
 BILINGUAL comment rule (dual-language external replies + EOF-terminated multi-line format) applies ONLY
 when config bilingual.enabled == true; if monolingual, replies are single-language (still self-contained,
 still EOF-terminated multi-line). Chat replies are never bound by the external-reply format.
 `glab` appears here because this is the GitLab platform doc — it is the ONLY doc allowed to name it.
 Harness-neutral otherwise: never name a specific agent product or model.
-Template-Source: agentic-bootstrap/WORKFLOW-gitlab@v1
+Template-Source: agentic-bootstrap/WORKFLOW-gitlab@v2
 -->
 
 # GitLab Workflow — Collaborator Rule
 
 This document is the authoritative GitLab workflow rule for anyone (human or agent) working in this repo. Read it before touching issues, branches, commits, or MRs. It complements `README.md` and `AGENTS.md` (code/scope/test discipline) — this file focuses on the issue → branch → commit → merge request (MR) → review loop. Assume the reader is new and has no chat history. All commands run from the repo root.
+
+CI runners executing this repo's pipelines: {{CI_RUNNERS}} <!-- ci-runners: {{CI_RUNNERS}} -->
+Single source of truth: `agentic-mode/config.json` (`ci.runners`). To change runners, change the config **and** this line in the same PR — the doc gate verifies the marker against config.
 
 ## 0. Iron Rules (apply in every context)
 
@@ -282,3 +288,16 @@ glab mr list
 - Reply to an issue without reading `glab issue view --comments <N>` in full.
 - Put chat context into a commit message or MR description.
 - Assume the reader remembers a prior conversation; MR/issue comments must be self-contained.
+
+## 11. Release checklist (tagged releases)
+
+One release = one squash-merged MR onto the default branch + one annotated tag. Run top to bottom; do not skip the verification steps — a green pipeline proves the build, not the artifact.
+
+1. Inventory changes since the last tag: `git log --oneline <last-tag>..<default-branch>`.
+2. Branch `release/vX.Y.Z` from the default branch. The prepare commit touches exactly the changelog (new section) and the version file — nothing else.
+3. Open the release MR against the default branch; merge **squash** (one commit per release on the default branch), after §4 verification and CI is green.
+4. Tag the squash commit: `git tag -a vX.Y.Z -m vX.Y.Z <sha> && git push origin vX.Y.Z`.
+5. If merging triggers a deployment, verify the deployed artifact itself (a fresh version timestamp, a live smoke test) — not just a green job; a job can skip by design and stay green. Encode the verification as a script in this repo; do not re-derive it from prose each release.
+6. Back-merge the default branch into the development branch via MR (`chore: merge vX.Y.Z back`).
+7. Optionally run the zero-context read-back probe (`agentic-mode/SELF-TEST.md` §D) before tagging — it catches semantic doc drift the structural gate cannot.
+8. Backfill post-merge deploy evidence into the release MR's VALIDATION block (post-merge clause, `docs/VALIDATION.md` header).

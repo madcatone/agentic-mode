@@ -77,13 +77,15 @@ python3 scripts/check_agentic_docs.py --config agentic-mode/config.json
 `2`（config 壞掉／I/O 錯誤）。config 本身會先被驗證：欄位型別錯誤、未知的
 `project.type`、未宣告的檢查依賴都 exit `2`（surface doc 依型別而定：`cli`／
 `web-service` 需要 `docs.user_guide`、`library` 需要 `docs.api_reference`、
-`docs-only` 兩者皆免）。檢查類別：
+`docs-only` 兩者皆免；把 surface doc 明示宣告為 `null` 是 Lite profile 的豁免——
+該文件刻意缺席，依賴它的檢查一律退場，但鍵未宣告仍視為錯誤）。檢查類別：
 
 | 類別 | 檢查什麼 |
 | --- | --- |
 | `id-continuity` | `PREFIX-NNN` ID 無跳號、無重複；其他所有受治理的 prose 文件引用的 ID 都有定義；雙語區塊共享相同 ID 集合。 |
 | `iteration-continuity` | *(選用)* iteration history 的編號（依文件順序）從 1 開始且無跳號。 |
 | `command-consistency` | 每條設定的指令字串逐字（不得內嵌於更長的識別字——`build-all` 不滿足 `build`）出現在每個該攜帶它的文件裡。 |
+| `ci-runners` | *(選用)* 受治理 prose 裡的每個 `<!-- ci-runners: ... -->` 標記（fenced code 不在此限）列的 runner 集合與 `ci.runners` 宣告完全一致；宣告了 runner 卻沒有任何標記會被報，沒有宣告卻有標記也會被報。 |
 | `neutrality` | deny words（僅掃 prose；backtick 或 `~~~` 圍欄——關欄須與開欄同字元——的程式碼區塊與 inline code span 不在此限）、內建 harness deny 清單、非 allowlist 的 URL host、*(選用)* IPv4 字面值／單機路徑，以及未閉合的 code fence（在開欄行被報；其後段視為 code，由 finding 公告這段略過的掃描）。 |
 | `line-limit` | 每檔行數上限（例如 `AGENTS.md`）。 |
 | `entrypoint` | 宣告的 entry point 存在；`.py` 者可 byte-compile。 |

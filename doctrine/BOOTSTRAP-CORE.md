@@ -272,4 +272,6 @@ The co-op profile signals to collaborators how strictly the append-only rules bi
 
 A profile is a starting point, not a fork of the rules. The target architecture remains the Full model; Lite and Standard simply defer lower-risk layers until the repo needs them.
 
+A Lite repo starts with the type-selected surface doc declared as an explicit `null` (`docs.user_guide: null` for `cli` / `web-service`, `docs.api_reference: null` for `library`) — REQUIREMENTS carries the surface until the upgrade — and the gate's checks that depend on that doc (its presence, cross-doc references, command-consistency targets) withdraw with it; an undeclared key remains a config error.
+
 When the seeded layers exist AND SELF-TEST passes, any new collaborator (human or agent) can read top-down per the Layered Reading Order and reach productive context in minutes, with no chat history required.

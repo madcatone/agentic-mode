@@ -26,10 +26,14 @@
 #       -- t1 supersedes it with the flipped contract)
 #   s*  follow-up fence findings (S1/S2, code spans)
 #   b*  docs-only adoption findings
-#   a*  api_reference surface dependency (type-mapped surface doc)
+#   a*  surface-doc dependency by project type (type-mapped surface doc):
+#       the explicit-null Lite exemption and the absent-key error (#49)
 #   g*  coverage gaps found in read-back (one firing case per check family)
 #   t*  tilde fences + fence-engine edge cases (indent leniency, fake
 #       closers) (#5)
+#   m*  ci-runners marker consistency (opt-in via config ci.runners):
+#       marker vs config mismatch, marker without declared runners,
+#       declared runners without any marker, and the satisfied control
 #
 # Neutrality rule: deny words in these fixtures are fictional
 # (vexide/zorpal/novera/fictool) and reach the deny list only via
@@ -174,16 +178,23 @@ expect 0 b-docs-only-user-guide-null-clean \
 expect 2 b-project-type-misspelled \
     "project.type \"docsonly\" (misspelled) -> enum config error"
 
-# ---- api_reference surface dependency (type-mapped) --------------------------
+# ---- surface doc by project type (type-mapped; #49 explicit-null Lite) ------
 expect 0 a1-library-api-reference-clean \
     "library project with api_reference declared (user_guide null) runs clean"
-expect 2 a2-library-api-reference-null \
-    "library project with api_reference null -> config error naming docs.api_reference"
-expect 2 a3-cli-user-guide-null \
-    "cli project with user_guide null still -> config error naming docs.user_guide"
+expect 0 a2-library-api-reference-null \
+    "library Lite: api_reference explicit null = surface exemption, runs clean"
+expect 0 a3-cli-user-guide-null \
+    "cli Lite: user_guide explicit null = exemption; command rule's user_guide target withdraws"
 expect 1 a4-api-reference-declared-missing \
     "declared api_reference file missing while config is valid -> flagged" \
     doc-presence
+expect 2 a5-cli-user-guide-absent \
+    "cli with the user_guide key absent (not null) -> still a config error"
+expect 2 a6-library-api-reference-absent \
+    "library with the api_reference key absent (not null) -> still a config error"
+expect 1 a7-lite-dangling-ref-still-fires \
+    "Lite exemption narrows to the surface doc: dangling ref in AGENTS still fires" \
+    id-continuity:DEM-099
 
 # ---- coverage gaps: one firing case per check family -------------------------
 expect 1 g1-line-limit-exceeded \
@@ -213,6 +224,19 @@ expect 0 t5-list-nested-fence-exempt \
 expect 1 t6-fake-close-ideographic-space \
     "a closer followed only by U+3000 is not a closer -> unclosed flagged" \
     neutrality:unclosed
+
+# ---- ci-runners marker consistency ----------------------------------------
+expect 1 m1-ci-runners-marker-mismatch \
+    "ci-runners marker lists one runner; config declares two" \
+    ci-runners
+expect 1 m2-marker-without-config-runners \
+    "a ci-runners marker when config declares no ci.runners" \
+    ci-runners
+expect 1 m3-runners-without-any-marker \
+    "config declares runners but no governed doc carries the marker" \
+    ci-runners:no ci-runners marker
+expect 0 m4-ci-runners-marker-clean \
+    "control: marker matches config ci.runners exactly -> clean"
 
 printf '\n%d cases: %d pass, %d fail\n' "$((pass + fail))" "$pass" "$fail"
 [ "$fail" -eq 0 ]

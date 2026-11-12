@@ -38,7 +38,9 @@ Check categories
    identifier-bounded on both edges (leading and trailing reject
    ``[A-Za-z0-9_]`` and ``-``): a longer token that merely contains the
    ``run`` string (``build-all`` for ``build``, ``unit-test`` for ``test``)
-   does not satisfy the rule.
+   does not satisfy the rule. A target declared as an explicit ``null``
+   under ``docs`` (e.g. the exempted surface doc) is skipped: no command can
+   be required to appear in a doc the project deliberately does not use.
 3. ``neutrality`` -- deny-listed words (config ``deny_words`` plus, when
    ``harness_neutrality.enabled``, a conservative built-in harness deny list)
    are flagged in prose only: lines inside a fenced code block are skipped
@@ -73,6 +75,12 @@ Check categories
    ``N.`` numbered entries must start at 1 (in document order) and be
    duplicate-free and gap-free; when bilingual, each language region's history
    is checked independently.
+8. ``ci-runners`` -- opt-in via config ``ci.runners``. A governed doc's
+   ``<!-- ci-runners: ... -->`` marker (comma-separated runner names; prose
+   lines only -- fenced code is exempt) must list exactly the runners the
+   config declares. When ``ci.runners`` is declared non-empty, at least one
+   marker must exist (the finding anchors to the workflow doc, or the readme);
+   a marker when config declares no runners is flagged as well.
 
 Config validation
 -----------------
@@ -101,7 +109,13 @@ with a message naming the offending key and an honest remedy:
   ``requirements``, ``validation``, and the observable-surface doc selected by
   ``project.type`` -- ``cli`` / ``web-service`` require ``user_guide``,
   ``library`` requires ``api_reference``, and ``docs-only`` requires neither
-  (no surface doc; REQUIREMENTS carries the surface). An absent
+  (no surface doc; REQUIREMENTS carries the surface). The surface doc admits
+  exactly one explicit exemption: declaring it as ``null`` (the key present,
+  value ``null``) is the Lite-profile opt-out -- the doc is deliberately
+  absent, so doc-presence skips it, cross-doc references do not scan it, and a
+  command rule's ``must_appear_in`` target naming it withdraws. A merely
+  *missing* surface key (and a ``null`` on any other dependency) remains an
+  error. An absent
   ``project.type`` takes the strict reading (a surface project, so
   ``user_guide``); ``iteration-continuity``
   (when enabled) requires ``requirements``. Checks without a disable switch
@@ -270,7 +284,11 @@ def validate_config(config: Dict) -> None:
       ``project.type`` takes the strict reading (a surface project, so
       ``user_guide``), so the dependency stays. A *declared*
       doc that cannot be read remains skippable inside the checks themselves;
-      doc-presence reports it as a finding.
+      doc-presence reports it as a finding. The type-selected surface doc
+      alone accepts an explicit ``null`` (key present, value ``null``) as the
+      Lite-profile exemption -- it withdraws doc-presence, cross-doc
+      references, and command-consistency targets for that doc; a missing
+      surface key, and a ``null`` on every other dependency, stay errors.
     - Type errors: a wrongly typed field the checker reads used to crash with
       a traceback (exit 1), be coerced silently (``int(limit)`` accepted
       ``"200"``; a falsy ``must_appear_in`` / ``deny_words`` silently became
@@ -388,6 +406,11 @@ def validate_config(config: Dict) -> None:
     optional_str_list(checks.get("entrypoints"), "checks.entrypoints")
     optional_str_list(checks.get("url_allowlist"), "checks.url_allowlist")
     optional_str_list(checks.get("ipv4_allowlist"), "checks.ipv4_allowlist")
+
+    ci = config.get("ci") or {}
+    if not isinstance(ci, dict):
+        raise ConfigError("config field ci must be an object")
+    optional_str_list(ci.get("runners"), "ci.runners")
     require_bool(checks, "forbid_ipv4", "checks.forbid_ipv4")
     require_bool(checks, "forbid_local_paths", "checks.forbid_local_paths")
 
@@ -416,8 +439,19 @@ def validate_config(config: Dict) -> None:
     # Declared-dependency checks. The opt-in check is verified first so its
     # remedy (the disable switch) is the one shown when it applies; checks
     # without a disable switch never suggest one.
-    def require(key: str, check: str, remedy: str) -> None:
-        if not docs.get(key):
+    def require(key: str, check: str, remedy: str,
+                null_ok: bool = False) -> None:
+        # null_ok (the type-selected surface doc only): an explicit ``null``
+        # -- the key present, value ``null`` -- is the Lite-profile
+        # exemption, so only a missing key (or an empty string) is an error.
+        # Every other dependency keeps the strict reading: ``null`` and a
+        # missing key alike mean "not declared".
+        value = docs.get(key)
+        if null_ok:
+            missing = value == "" or (value is None and key not in docs)
+        else:
+            missing = not value
+        if missing:
             raise ConfigError(
                 f"check '{check}' is active but docs.{key} is not declared; {remedy}"
             )
@@ -436,6 +470,10 @@ def validate_config(config: Dict) -> None:
     # web-service -> user_guide, library -> api_reference, docs-only -> none
     # (REQUIREMENTS carries the surface). An absent type keeps the strict
     # reading (a surface project, so user_guide) -- never silently docs-only.
+    # Declaring the surface key as an explicit ``null`` is the Lite-profile
+    # exemption: the doc is deliberately absent, so every check that would
+    # otherwise depend on it withdraws (doc presence, cross-doc references,
+    # command-consistency targets). Only a *missing key* is an error.
     surface_key = {
         "library": "api_reference",
         "docs-only": None,
@@ -443,9 +481,12 @@ def validate_config(config: Dict) -> None:
     if surface_key is not None:
         require(
             surface_key, "id-continuity (cross-doc references)",
-            "declare it as a path, or set project.type to match the "
-            "project (the required surface doc follows project.type; "
-            "this check has no disable switch)",
+            "declare it as a path, or as an explicit null for the Lite "
+            "profile (a null surface doc withdraws the checks that depend "
+            "on it), or set project.type to match the project (the "
+            "required surface doc follows project.type; this check has no "
+            "disable switch)",
+            null_ok=True,
         )
     require(
         "validation", "id-continuity (cross-doc references)",
@@ -879,6 +920,9 @@ def check_command_consistency(root: str, config: Dict, rel,
     longer token that merely contains the ``run`` string (``build-all`` for
     ``build``, ``unit-test`` for ``test``) does not satisfy the rule. A
     finding (scoped to the doc, line 0) is emitted per doc where it is absent.
+    A target declared as an explicit ``null`` under ``docs`` -- e.g. the
+    surface doc under its Lite-profile exemption -- is skipped: no command
+    can be required to appear in a doc the project deliberately does not use.
     """
     findings: List[Finding] = []
     checks = config.get("checks", {})
@@ -899,6 +943,13 @@ def check_command_consistency(root: str, config: Dict, rel,
             r"(?<![A-Za-z0-9_-])" + re.escape(run) + r"(?![A-Za-z0-9_-])"
         )
         for key in targets:
+            if key in docs and docs[key] is None:
+                # Explicit null = "not used by this project" (the surface
+                # doc's Lite exemption uses the same mechanism): the doc is
+                # deliberately withdrawn, so no command can be required to
+                # appear in it. A key missing from ``docs`` entirely keeps
+                # the finding below.
+                continue
             doc_path = resolve(root, docs.get(key))
             if not doc_path or doc_path not in spans_by_path:
                 # The doc is not present at all; doc-presence reports that.
@@ -912,6 +963,80 @@ def check_command_consistency(root: str, config: Dict, rel,
                     rel(doc_path), 0, "command-consistency",
                     f"required command missing from a code block: {run!r}",
                 ))
+    return findings
+
+
+# ---------------------------------------------------------------------------
+# 2b. ci-runners (opt-in, config ci.runners)
+# ---------------------------------------------------------------------------
+_CI_RUNNERS_RE = re.compile(r"<!--\s*ci-runners:\s*(.*?)\s*-->")
+
+
+def check_ci_runners(root: str, config: Dict, rel,
+                     contents: Dict[str, List[str]]) -> List[Finding]:
+    """``ci-runners`` markers in governed docs must equal ``ci.runners``.
+
+    The workflow doc declares the repo's pipeline runners on one line as
+    ``CI runners: <names> <!-- ci-runners: <names> -->`` (names comma-
+    separated). The gate reads the marker; the visible prose travels with it
+    on the same line, so editing one without the other becomes a finding
+    instead of silent drift. Markers inside fenced code blocks are exempt
+    (quoted, not declared).
+
+    - a marker whose names differ from ``ci.runners`` is flagged;
+    - a marker when config declares no runners is flagged;
+    - runners declared but no marker anywhere is flagged (anchored to the
+      workflow doc, or the readme when no workflow doc is declared).
+    """
+    findings: List[Finding] = []
+    declared = (config.get("ci") or {}).get("runners") or []
+    declared_set = set(declared)
+
+    found_any = False
+    for path, lines in contents.items():
+        fenced = in_code_block_flags(lines)
+        for lineno, line in enumerate(lines, start=1):
+            if fenced[lineno - 1]:
+                continue
+            for match in _CI_RUNNERS_RE.finditer(line):
+                found_any = True
+                names = {p.strip() for p in match.group(1).split(",") if p.strip()}
+                if names == declared_set:
+                    continue
+                listed = ", ".join(sorted(names)) or "(empty)"
+                if declared_set:
+                    expected = ", ".join(sorted(declared_set))
+                    findings.append(Finding(
+                        rel(path), lineno, "ci-runners",
+                        f"ci-runners marker lists {listed!r} but config "
+                        f"ci.runners declares {expected!r}",
+                    ))
+                else:
+                    findings.append(Finding(
+                        rel(path), lineno, "ci-runners",
+                        f"ci-runners marker lists {listed!r} but config "
+                        "declares no ci.runners (remove the marker or "
+                        "declare ci.runners)",
+                    ))
+
+    if declared_set and not found_any:
+        docs = doc_paths(config)
+        anchor = (resolve(root, docs.get("workflow"))
+                  or resolve(root, docs.get("readme")))
+        if anchor:
+            findings.append(Finding(
+                rel(anchor), 0, "ci-runners",
+                f"config ci.runners declares {len(declared_set)} runner(s) "
+                "but no ci-runners marker exists in any governed doc "
+                "(declare it on the CI-runners line of the workflow doc)",
+            ))
+        else:
+            findings.append(Finding(
+                "docs", 0, "ci-runners",
+                f"config ci.runners declares {len(declared_set)} runner(s) "
+                "but no ci-runners marker exists in any governed doc "
+                "(declare it on the CI-runners line of the workflow doc)",
+            ))
     return findings
 
 
@@ -1167,6 +1292,7 @@ def run(config_path: str, root_override: Optional[str]) -> int:
     findings.extend(check_id_continuity(root, config, rel, contents))
     findings.extend(check_iteration_history(root, config, rel, contents))
     findings.extend(check_command_consistency(root, config, rel, contents))
+    findings.extend(check_ci_runners(root, config, rel, contents))
 
     # Per-line neutrality scan across every governed prose doc.
     deny = _build_deny_words(config)
@@ -1183,6 +1309,7 @@ def run(config_path: str, root_override: Optional[str]) -> int:
         "id-continuity",
         "iteration-continuity",
         "command-consistency",
+        "ci-runners",
         "neutrality",
         "line-limit",
         "entrypoint",

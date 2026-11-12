@@ -91,13 +91,17 @@ It reports `<file>:<line>: [<category>] <message>` and exits `0` (clean), `1`
 wrong field types, an unknown `project.type`, and undeclared check
 dependencies exit `2` (the surface doc is required by type: `cli` /
 `web-service` need `docs.user_guide`, `library` needs `docs.api_reference`,
-`docs-only` needs neither). Check categories:
+`docs-only` needs neither; declaring the surface doc as an explicit `null` is
+the Lite-profile exemption — the doc is deliberately absent and every check
+that depends on it withdraws, while an undeclared key stays an error). Check
+categories:
 
 | Category | What it enforces |
 | --- | --- |
 | `id-continuity` | `PREFIX-NNN` IDs are gap-free and duplicate-free; IDs cited in every other governed prose doc are defined; bilingual regions share identical ID sets. |
 | `iteration-continuity` | *(opt-in)* the numbered Iteration History entries start at 1 (in document order) and are gap-free. |
 | `command-consistency` | each configured command string appears verbatim — not embedded in a longer identifier (`build-all` does not satisfy `build`) — in every doc that must carry it. |
+| `ci-runners` | *(opt-in)* every `<!-- ci-runners: ... -->` marker in governed prose (fenced code exempt) lists exactly the runners `ci.runners` declares; a declared runner set with no marker anywhere is flagged, and so is a marker without a declared set. |
 | `neutrality` | deny-listed words in prose (fenced code blocks — backtick or `~~~`, closed by the same character — and inline code spans are exempt), a built-in harness deny list, non-allowlisted URL hosts, *(opt-in)* IPv4 literals / single-machine paths, and unclosed code fences (flagged at the opening fence line; the remainder then reads as code, and the finding announces the skipped scan). |
 | `line-limit` | per-file maximum line counts (e.g. `AGENTS.md`). |
 | `entrypoint` | declared entry points exist; `.py` ones byte-compile. |

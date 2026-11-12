@@ -65,7 +65,7 @@ rules (a review canon, a defect taxonomy) take precedence over this playbook.**
 
 ## 4. Finding 格式（DoD）
 
-每條 finding：**`檔案:行號` ＋ 一句缺陷描述 ＋ 具體失效情境（什麼輸入 → 什麼錯誤結果）＋ severity ＋ `CONFIRMED`／`PLAUSIBLE` 標記 ＋ `introduced`／`pre-existing` 標記**。報告**第一行＝計數行**：**「共 N 個 finding：X 個 CONFIRMED／Y 個 PLAUSIBLE／Z 個 pre-existing」**——信心與起源是兩個正交維度，Z 計的是前兩項裡屬既有碼者；X 只計**經獨立複核同意**的 CONFIRMED（見「CONFIRMED 須他驗」）。找不到問題就回報「無 finding」＋檢查過哪些面向。
+每條 finding：**`檔案:行號` ＋ 一句缺陷描述 ＋ 具體失效情境（什麼輸入 → 什麼錯誤結果）＋ severity ＋ `CONFIRMED`／`PLAUSIBLE` 標記 ＋ `introduced`／`pre-existing` 標記**。報告**第一行＝計數行**：**「共 N 個 finding：X 個 CONFIRMED／Y 個 PLAUSIBLE／Z 個 pre-existing」**（總計形式）——信心與起源是兩個正交維度，Z 計的是前兩項裡屬既有碼者；X 只計**經獨立複核同意**的 CONFIRMED（見「CONFIRMED 須他驗」）。計數行形式依報告形態擇用：**單軸報告**以**軸別形式**開頭（「Standards 軸共 N 個 finding：…」）；**聚合報告**以**總計形式**開頭（各軸計數行隨後）**或**各軸計數行並列開頭——兩者皆合規（§5）。找不到問題就回報「無 finding」＋檢查過哪些面向。
 
 **severity 判準**：severity 評級前必答一題——**這條路徑存在的目的，在 finding 成立時還達成嗎？** 靜默擊敗改動自身目的的缺陷（例：修復的核心路徑實際 no-op）＝ **Major**，即使不崩潰、不損毀資料——「不崩潰」不是「low」的理由。
 
@@ -85,7 +85,7 @@ rules (a review canon, a defect taxonomy) take precedence over this playbook.**
 - 兩軸**各派一個獨立 agent 平行審**（**同一則訊息**一次派出、互不見對方 context）。
 - 主對話**聚合**兩份報告——**不合併、不重排、不跨軸挑贏家**，兩份並列呈報。
 - **聚合後、出報告前：獨立複核每個候選 CONFIRMED**（§4 他驗條件）——由未產出該 finding 的 fresh-context verifier 對照 `檔案:行號` 證據與失效情境重驗，只回「同意／不同意＋一句理由」；不同意者降為 PLAUSIBLE 並在報告保留其理由。計數行的 X 只計複核同意者。
-- **每軸報告以計數行開頭**（§4）——聚合呈報時兩行計數留在最前：決策者先看到規模（confirmed／plausible／pre-existing 各多少），再讀細節。
+- **每軸報告以計數行開頭**（§4）——聚合呈報時計數行置於最前，兩種形式皆合規：各軸計數行並列開頭，或總計計數行開頭、各軸行隨後（§4 消歧）——決策者先看到規模（confirmed／plausible／pre-existing 各多少），再讀細節。
 - **兩軸獨立命中同一位置＝高訊號事件**：聚合者不得只並列呈報，必須對該位置做**第三次合軸檢查**——把 Spec 軸的目標套到 Standards 軸的機制上，重問 §4 那題（goal-defeat），必要時派一個 mini verify。這不是跨軸重排名（不合併、不重排的原則不變），是對交會點的加驗。
 - 任一軸的輸入壞掉（票抓不到、diff 空、ref 解不出）在**派工前**就擋下，不要讓 agent 各自撞牆。
 

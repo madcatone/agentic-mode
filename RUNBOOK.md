@@ -48,11 +48,12 @@ scripts/check_agentic_docs.py  # the checker, copied verbatim from TOOLKIT/check
   "project": {"name": "str", "type": "cli|library|web-service|docs-only", "description": "str"},
   "id": {"prefix": "[A-Z]{2,6}"},
   "docs": {"index": "AGENTIC-MODE.md", "readme": "README.md", "agents": "AGENTS.md",
-           "requirements": "docs/REQUIREMENTS.md", "user_guide": "docs/USER_GUIDE.md",
+           "requirements": "docs/REQUIREMENTS.md",
+           "user_guide": "docs/USER_GUIDE.md or null",
            "api_reference": "docs/API_REFERENCE.md or null",
            "validation": "docs/VALIDATION.md", "workflow": "docs/WORKFLOW.md",
            "architecture": "docs/architecture.json or null"},
-  "bilingual": {"enabled": false, "secondary_language": "zh-TW",
+  "bilingual": {"enabled": false,
                 "primary_heading": "## English", "secondary_heading": "## 繁體中文"},
   "checks": {
     "line_limits": {"agents": 200},
@@ -66,14 +67,16 @@ scripts/check_agentic_docs.py  # the checker, copied verbatim from TOOLKIT/check
     "commands": [{"run": "str", "must_appear_in": ["agents", "readme"]}],
     "entrypoints": []
   },
-  "ci": {"platform": "gitlab|github|none"}
+  "ci": {"platform": "gitlab|github|none", "runners": []}
 }
 ```
 
 The checker is invoked exactly one way:
 `python scripts/check_agentic_docs.py --config agentic-mode/config.json`.
 (`forbid_ipv4`, `forbid_local_paths`, and `iteration_history` are opt-in leak /
-continuity sweeps — see [`checker/config.example.json`](checker/config.example.json)
+continuity sweeps; `ci.runners` is the opt-in runner-declaration sweep — when
+non-empty, the workflow doc must carry a matching `<!-- ci-runners: ... -->`
+marker. See [`checker/config.example.json`](checker/config.example.json)
 and the checker's module docstring.)
 
 The config is validated before any check runs; a violation exits `2` naming the
@@ -103,7 +106,14 @@ offending key and a remedy. Two families are rejected:
   selected by `project.type`: `cli` / `web-service` require
   `docs.user_guide`, `library` requires `docs.api_reference`, and
   `docs-only` requires neither (no surface doc — REQUIREMENTS carries the
-  surface). `iteration_history` (when enabled) requires `docs.requirements`.
+  surface). The type-selected surface doc admits exactly one explicit
+  exemption: declaring it as `null` (the key present, value `null`) is the
+  **Lite-profile opt-out** — the doc is deliberately absent, so
+  `doc-presence` skips it, cross-doc references do not scan it, and a
+  `command-consistency` rule's `must_appear_in` target naming it withdraws.
+  A merely *missing* surface key — and a `null` on any other dependency
+  (`docs.requirements`, `docs.validation`) — is still an error.
+  `iteration_history` (when enabled) requires `docs.requirements`.
   When `project.type` is absent the checker takes the strict reading (a
   surface project, so `docs.user_guide`) and the dependency stays. Checks
   without a disable switch tell you to declare the path; `iteration_history`
@@ -193,7 +203,7 @@ every `{{PLACEHOLDER}}` from the bundle, write the file into TARGET, then run it
 inline gate. **Do not advance on a failed gate.** Production order:
 
 1. **`docs/architecture.json`** *(optional — skip unless Q2/need calls for it; set `docs.architecture: null`)*. Gate: every `connection.from`/`.to` resolves; every component label naming a real symbol exists in source; JSON parses.
-2. **`docs/WORKFLOW.md`** — **ported as-is** (verbatim except its declared substitution points) from `WORKFLOW-<platform>.template.md`. Substitute the H1 platform name, the `Template-Source:` marker, and every `{{PLACEHOLDER}}` in the body (build/test/smoke commands, prefix, bilingual conditionals). Do **not** re-author its prose — the review loop, comment style, and red lines are platform constants.
+2. **`docs/WORKFLOW.md`** — **ported as-is** (verbatim except its declared substitution points) from `WORKFLOW-<platform>.template.md`. Substitute the H1 platform name, the `Template-Source:` marker, and every `{{PLACEHOLDER}}` in the body (build/test/smoke commands, prefix, bilingual conditionals). Resolve the CI-runners line from config `ci.runners` (comma-separated runner names), or **delete the whole line** when config declares no runners — the doc gate checks its `ci-runners:` marker against config. Do **not** re-author its prose — the review loop, comment style, and red lines are platform constants.
 3. **`docs/REQUIREMENTS.md`** — Problem/Goals/Non-Goals, enumerated `{{PREFIX}}-001..N` requirements (one per observable behavior), domain/event model, **empty** Iteration History (append-only from here), acceptance criteria, verification commands. Gate: every entry-point behavior maps to ≥1 ID; if bilingual, both tracks share identical ID set/count/order.
 4. **`docs/USER_GUIDE.md` or `docs/API_REFERENCE.md`** — the observable surface, template chosen by `project.type`. Each behavior subsection cites its owning `{{PREFIX}}-XXX`. Gate: every cited ID exists in REQUIREMENTS; surface tables match source 1:1.
 5. **`README.md`** — onboarding: entry table, quick start, architecture overview *derived from the JSON when present*, agent-onboarding pointer, verification commands, neutrality checklist, doc cross-links. Gate: every quick-start command appears in the surface doc; neutrality sweep clean.
