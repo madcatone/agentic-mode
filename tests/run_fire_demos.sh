@@ -237,6 +237,8 @@ expect 1 m3-runners-without-any-marker \
     ci-runners:no ci-runners marker
 expect 0 m4-ci-runners-marker-clean \
     "control: marker matches config ci.runners exactly -> clean"
+expect 0 m5-quoted-marker-inline-exempt \
+    "a marker quoted in an inline code span is a mention, not a declaration"
 
 printf '\n%d cases: %d pass, %d fail\n' "$((pass + fail))" "$pass" "$fail"
 [ "$fail" -eq 0 ]
