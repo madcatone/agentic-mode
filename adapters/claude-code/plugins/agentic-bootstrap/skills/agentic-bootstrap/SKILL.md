@@ -41,6 +41,10 @@ path. A skill can only read what it vendors.
    repo scan + 10-question interview, produce the docs in dependency order with
    each gate passing, copy `checker/check_agentic_docs.py` into the target's
    `scripts/`, place the CI file, and run the checker until it exits clean.
+   Render body prose in the TARGET's chosen language, but never translate the
+   section headings of `AGENTIC-MODE.md` / `agentic-mode/SELF-TEST.md` — they
+   are canonical English reference anchors, and translating them breaks every
+   cross-repo citation that names them.
 4. **Resolve paths correctly.** The RUNBOOK was authored in the canonical repo,
    so its internal links use the repo's own layout. In this vendored skill the
    mapping is:

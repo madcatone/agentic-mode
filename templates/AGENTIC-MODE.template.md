@@ -4,7 +4,14 @@ Filled from config.json: project.name, project.type, id.prefix, docs.*, ci.platf
 bilingual.enabled. The Doc Inventory rows are pruned to the layers this repo actually
 seeded (doc-set profile). This file is META and RESIDENT: it is meant to be read every
 session. Keep it short — it routes; it is not the content.
+The Canonical Questions section is seeded here (one list, one home) — SELF-TEST §D
+consumes it for the zero-context read-back probe.
+Render body prose in the TARGET's chosen language; keep the section headings in
+canonical English (they are cross-repo reference anchors — doctrine and upgrades
+cite them by name).
 Harness-neutral: never name a specific agent product, model, or proprietary tool.
+Template-Source: agentic-bootstrap/AGENTIC-MODE@v2  (@v2: added Canonical Questions
+section + Template-Source marker; headings rule made explicit)
 -->
 
 # AGENTIC-MODE.md — Doc Contract for Agent + Human Co-Development
@@ -57,8 +64,18 @@ It automates the mechanizable check classes — ID continuity (`{{PREFIX}}-NNN` 
 
 CI platform: **{{CI_PLATFORM}}**. When not `none`, the gate above runs on every change.
 
+## Canonical Questions — Answerable Cold From the Docs Alone
+
+These are the questions a **zero-context reviewer** (never seen this repo, no chat history) must be able to answer from the committed docs alone. Seed them from the Layered Reading Order, keep three to seven, and maintain them **here** — `agentic-mode/SELF-TEST.md` §D consumes this list for the read-back probe; it does not carry a second copy.
+
+1. What does this project do, and which entry point do I pick for {{PRIMARY_USE_CASE}}?
+2. What am I allowed and not allowed to do in this repo, and when must I stop and ask?
+3. What is the behavior contract for {{KEY_BEHAVIOR}}, and which `{{PREFIX}}-XXX` ID governs it?
+4. What is the observable surface for {{KEY_BEHAVIOR}} (the command / key / endpoint / API)?
+5. How do I prove a change to {{KEY_BEHAVIOR}} is done, and how do I move it through review?
+
 ## Routing
 
 - **Doctrine** (why the layers exist, ID discipline, append-only rules, adoption profiles) → the agentic-mode canonical repo's `doctrine/BOOTSTRAP-CORE.md`.
 - **Machine config** (paths, prefix, checks, profiles) → `agentic-mode/config.json`.
-- **Full cross-layer self-test** (all rows, manual + automated, guardrails, read-back probe) → `agentic-mode/SELF-TEST.md`.
+- **Full cross-layer self-test** (all rows, manual + automated, guardrails, read-back probe protocol) → `agentic-mode/SELF-TEST.md`; the questions it asks live in the Canonical Questions section above.

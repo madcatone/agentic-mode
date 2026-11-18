@@ -4,6 +4,31 @@ All notable changes to the agentic-mode toolkit. Versions track the
 `agentic-bootstrap` plugin version and the git tags on `main`. The date is
 the tag date.
 
+## [1.3.0] — 2026-11-18
+
+### Added
+- AGENTIC-MODE template: **Canonical Questions** section — the seed list of
+  questions a zero-context reviewer must answer cold now has a skeleton in the
+  resident index. SELF-TEST §D always pointed at "the resident index lists N
+  canonical questions" but no template ever carried that section; one adopter
+  built it by hand from the pointer, proving the demand. The section is now
+  canonical, and SELF-TEST consumes it instead of duplicating a list.
+- `Template-Source` markers for AGENTIC-MODE and SELF-TEST (@v2). These two
+  resident files were previously untrackable generations — only WORKFLOW
+  carried a marker — so an upgrade could not cite the base it ported from.
+- **Rendering-language rule** (doctrine "Rendering Language and Canonical
+  Headings" + RUNBOOK Phase B + bootstrap skill directive): body prose renders
+  in the target repo's language; section headings stay canonical English.
+  Root cause of the divergence found across adopters: nothing told the
+  bootstrapping agent that headings are cross-repo anchors, so three ad-hoc
+  heading translations appeared in one week and no cross-repo instruction
+  could resolve by name.
+
+### Changed
+- SELF-TEST template §D: the embedded five-question example list is removed;
+  the probe consumes the index's Canonical Questions section (one list, one
+  home — two copies could drift independently).
+
 ## [1.2.0] — 2026-11-12
 
 ### Added

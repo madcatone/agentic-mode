@@ -2,9 +2,13 @@
 TEMPLATE: agentic-mode/SELF-TEST.md — resident cross-layer coherence gate for the target repo.
 Filled from config.json (id.prefix, docs.*, ci.platform, checks.*). The automated section is a single
 command; the manual section is intentionally minimal. This file MUST carry the four guardrails and the
-zero-context read-back probe unchanged in spirit.
+zero-context read-back probe unchanged in spirit. The canonical questions the probe asks live in the
+resident index's Canonical Questions section — this file points at them, it does not duplicate them.
 Under the `light` co-op profile the append-only rows relax; every other row still binds.
+Render body prose in the TARGET's chosen language; keep the section headings in canonical English.
 Harness-neutral: never name a specific agent product, model, or proprietary tool.
+Template-Source: agentic-bootstrap/SELF-TEST@v2  (@v2: §D now points at the index's Canonical
+Questions section instead of embedding its own example list; Template-Source marker added)
 -->
 
 # SELF-TEST.md — Cross-Layer Self-Test
@@ -64,13 +68,7 @@ These are not style rules; they are stop conditions. A collaborator who violates
 
 The ultimate test of the contract is whether a **zero-context reviewer** (a human or agent who has never seen this repo or any chat history) can answer the repo's canonical questions using **only the committed docs**. This catches gaps the mechanical checker cannot: an ID that resolves but whose prose is incomprehensible cold, a workflow rule that reads fine to the author but not to a stranger.
 
-**Canonical questions.** The resident `{{INDEX_PATH}}` lists **N** canonical questions this repo's docs must answer cold. Seed them from the Layered Reading Order — for example:
-
-1. What does this project do, and which entry point do I pick for {{PRIMARY_USE_CASE}}?
-2. What am I allowed and not allowed to do in this repo, and when must I stop and ask?
-3. What is the behavior contract for {{KEY_BEHAVIOR}}, and which `{{PREFIX}}-XXX` ID governs it?
-4. What is the observable surface for {{KEY_BEHAVIOR}} (the command / key / endpoint / API)?
-5. How do I prove a change to {{KEY_BEHAVIOR}} is done, and how do I move it through review?
+**Canonical questions.** The resident `{{INDEX_PATH}}` lists **N** canonical questions this repo's docs must answer cold, in its **Canonical Questions** section. Seed and maintain them **there** — one list, one home; this probe consumes that list and does not carry a second copy. Seed from the Layered Reading Order (see BOOTSTRAP-CORE), keep three to seven questions.
 
 **Protocol.**
 1. Hand a zero-context reviewer *only* the repo's committed docs — no chat history, no walkthrough.
