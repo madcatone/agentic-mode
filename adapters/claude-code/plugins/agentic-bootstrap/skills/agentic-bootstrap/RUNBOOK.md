@@ -212,6 +212,10 @@ inline gate. **Do not advance on a failed gate.** Production order:
 
 Also write **`AGENTIC-MODE.md`** (root index) and **`agentic-mode/SELF-TEST.md`**
 (from their templates). These are resident meta files, not part of the chain.
+Render their body prose in the TARGET's chosen language, but keep the canonical
+English section headings and the `Template-Source:` markers exactly as the
+templates carry them — headings are cross-repo reference anchors (see
+BOOTSTRAP-CORE, "Rendering Language and Canonical Headings").
 
 If TARGET also seeds a local review canon (an optional `CODE-REVIEW.md`),
 seed it with an **empty** "what failure looks like" section — one line per

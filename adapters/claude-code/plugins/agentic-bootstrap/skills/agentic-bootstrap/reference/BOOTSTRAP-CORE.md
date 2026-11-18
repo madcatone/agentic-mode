@@ -168,6 +168,12 @@ When the team works in two languages:
 
 ---
 
+## Rendering Language and Canonical Headings
+
+Unlike bilingual tracks (config-gated), this rule always applies. **Body prose renders in the repo's chosen language; section headings in `AGENTIC-MODE.md` and `agentic-mode/SELF-TEST.md` stay in the canonical English the templates carry.** Never translate the headings — they are reference anchors: the doctrine, the RUNBOOK, upgrade notes, and cross-repo tooling cite sections by name ("Doc Inventory", "Canonical Questions", the SELF-TEST §A–D rows). A translated heading silently severs every one of those citations. The field evidence: three adopters translated headings three different ways in one week, and no cross-repo instruction could resolve.
+
+---
+
 ## Project-Neutrality Contract
 
 For tools meant to be reused across environments:
