@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "project": {
+    "name": "agentic-mode",
+    "type": "docs-only",
+    "description": "Canonical source of the agentic-mode documentation contract (the toolkit, not a bootstrapped target). It has no REQUIREMENTS or VALIDATION layer. docs.requirements and docs.validation both alias AGENTS.md so id-continuity's undeclared-dependency rule is satisfied without inventing those layers; id.prefix matches nothing in that file, so the ID check stays vacuous. The gate that matters here is the AGENTS.md line limit, command-consistency against Development Commands, and entrypoint existence."
+  },
+  "id": {
+    "prefix": "AMDOC"
+  },
+  "docs": {
+    "index": null,
+    "readme": null,
+    "agents": "AGENTS.md",
+    "requirements": "AGENTS.md",
+    "user_guide": null,
+    "api_reference": null,
+    "validation": "AGENTS.md",
+    "workflow": null,
+    "architecture": null
+  },
+  "bilingual": {
+    "enabled": false,
+    "primary_heading": "## English",
+    "secondary_heading": "## 繁體中文"
+  },
+  "checks": {
+    "line_limits": {
+      "agents": 200
+    },
+    "deny_words": [],
+    "harness_neutrality": {
+      "enabled": true,
+      "extra_deny": []
+    },
+    "url_allowlist": [],
+    "forbid_ipv4": false,
+    "ipv4_allowlist": ["127.0.0.1", "0.0.0.0"],
+    "forbid_local_paths": false,
+    "iteration_history": {
+      "enabled": false,
+      "heading": "Iteration History"
+    },
+    "commands": [
+      {
+        "run": "python3 -m py_compile checker/check_agentic_docs.py",
+        "must_appear_in": ["agents"]
+      },
+      {
+        "run": "python3 checker/check_agentic_docs.py --config agentic-mode/config.json",
+        "must_appear_in": ["agents"]
+      },
+      {
+        "run": "python3 checker/check_agentic_docs.py --config examples/minimal-cli/agentic-mode/config.json --root examples/minimal-cli",
+        "must_appear_in": ["agents"]
+      },
+      {
+        "run": "sh tests/run_fire_demos.sh",
+        "must_appear_in": ["agents"]
+      },
+      {
+        "run": "sh tests/run_review_eval_demos.sh",
+        "must_appear_in": ["agents"]
+      },
+      {
+        "run": "sh tests/run_sync_demos.sh",
+        "must_appear_in": ["agents"]
+      },
+      {
+        "run": "sh adapters/claude-code/plugins/team-kit/eng/tests/run-tests.sh",
+        "must_appear_in": ["agents"]
+      },
+      {
+        "run": "grep -rn '{{' examples/minimal-cli && echo \"FOUND\" || echo \"clean\"",
+        "must_appear_in": ["agents"]
+      },
+      {
+        "run": "python3 -m py_compile playbooks/scripts/doc_lint.py",
+        "must_appear_in": ["agents"]
+      },
+      {
+        "run": "cd playbooks && python3 scripts/doc_lint.py DOC-LINTER.md",
+        "must_appear_in": ["agents"]
+      },
+      {
+        "run": "python3 -m py_compile playbooks/scripts/okf_parse.py playbooks/scripts/okf_lint.py playbooks/scripts/okf_selftest.py",
+        "must_appear_in": ["agents"]
+      },
+      {
+        "run": "python3 playbooks/scripts/okf_lint.py --selftest",
+        "must_appear_in": ["agents"]
+      },
+      {
+        "run": "python3 scripts/sync_plugins.py --check",
+        "must_appear_in": ["agents"]
+      },
+      {
+        "run": "python3 -m json.tool .claude-plugin/marketplace.json >/dev/null && echo ok",
+        "must_appear_in": ["agents"]
+      },
+      {
+        "run": "grep -rn 'PLUGIN_ROOT' adapters/claude-code/plugins && echo \"FOUND\" || echo \"clean\"",
+        "must_appear_in": ["agents"]
+      }
+    ],
+    "entrypoints": [
+      "checker/check_agentic_docs.py",
+      "checker/config.example.json",
+      "RUNBOOK.md",
+      "scripts/sync_plugins.py",
+      "playbooks/scripts/doc_lint.py",
+      "playbooks/DOC-LINTER.md",
+      "playbooks/scripts/okf_parse.py",
+      "playbooks/scripts/okf_lint.py",
+      "playbooks/scripts/okf_selftest.py",
+      "tests/run_fire_demos.sh",
+      "tests/run_review_eval_demos.sh",
+      "tests/run_sync_demos.sh",
+      "adapters/claude-code/plugins/team-kit/eng/tests/run-tests.sh",
+      ".claude-plugin/marketplace.json",
+      "examples/minimal-cli/agentic-mode/config.json"
+    ]
+  },
+  "ci": {
+    "platform": "github",
+    "runners": []
+  }
+}

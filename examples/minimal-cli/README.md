@@ -53,8 +53,21 @@ docs gate.
 ```bash
 python3 -m py_compile todo.py
 python3 todo.py list
-# Docs coherence gate (ID continuity, command-surface consistency, neutrality)
+```
+
+Docs coherence gate (ID continuity, command-surface consistency, neutrality).
+Same check; run the invocation that matches your cwd.
+
+From this directory (`examples/minimal-cli/`):
+
+```bash
 python3 ../../checker/check_agentic_docs.py --config agentic-mode/config.json
+```
+
+From the agentic-mode repo root:
+
+```bash
+python3 checker/check_agentic_docs.py --config examples/minimal-cli/agentic-mode/config.json --root examples/minimal-cli
 ```
 
 ## Project-Neutrality Checklist

@@ -27,7 +27,9 @@ tool, model, or dispatch to use — that is your own environment's business. Rea
 
 - Build / compile: `python3 -m py_compile todo.py`
 - Smoke / run: `python3 todo.py list`
-- Docs coherence gate: `python3 ../../checker/check_agentic_docs.py --config agentic-mode/config.json`
+- Docs coherence gate. Same check; run the invocation that matches your cwd:
+  - From the agentic-mode repo root: `python3 checker/check_agentic_docs.py --config examples/minimal-cli/agentic-mode/config.json --root examples/minimal-cli`
+  - From this directory (`examples/minimal-cli/`): `python3 ../../checker/check_agentic_docs.py --config agentic-mode/config.json`
 
 Every command in `checks.commands` (config.json) that lists `"agents"` in
 `must_appear_in` MUST appear verbatim in this section — the checker verifies it.
