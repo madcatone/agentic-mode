@@ -1,8 +1,11 @@
 # Agentic-mode documentation gate (GitHub Actions).
 #
-# Runs the config-driven documentation-consistency checker against the worked
-# example (examples/minimal-cli). The example is a full, passing doc contract,
-# so this job proves the checker and the example stay coherent on every change.
+# Runs the config-driven documentation-consistency checker against this repo
+# (agentic-mode/config.json — line limit, command, and entrypoint checks on
+# the root contract) and against the worked example (examples/minimal-cli).
+# The example is a full, passing doc contract, so that step proves the checker
+# and the example stay coherent on every change. The remaining steps are the
+# verification commands from the root contract's Development Commands.
 #
 # To gate your OWN repo, copy checker/check_agentic_docs.py into it (e.g. as
 # scripts/check_agentic_docs.py), drop an agentic-mode/config.json beside it,
@@ -25,11 +28,21 @@ jobs:
           python-version: "3.12"
       - name: Byte-compile the checker
         run: python -m py_compile checker/check_agentic_docs.py
+      - name: Run the documentation gate on this repo
+        run: python3 checker/check_agentic_docs.py --config agentic-mode/config.json
       - name: Run the documentation gate on the worked example
         run: >-
           python checker/check_agentic_docs.py
           --config examples/minimal-cli/agentic-mode/config.json
           --root examples/minimal-cli
+      - name: Validate the marketplace manifest
+        run: python3 -m json.tool .claude-plugin/marketplace.json >/dev/null && echo ok
+      - name: Prove skills carry no harness-injected path variable
+        run: |
+          status=0; grep -rn 'PLUGIN_ROOT' adapters/claude-code/plugins || status=$?; if [ "$status" -eq 1 ]; then echo clean; elif [ "$status" -eq 0 ]; then echo FOUND; exit 1; else echo "grep error: exit ${status}"; exit "$status"; fi
+      - name: Sweep the example for leftover template placeholders
+        run: |
+          status=0; grep -rn '{{' examples/minimal-cli || status=$?; if [ "$status" -eq 1 ]; then echo clean; elif [ "$status" -eq 0 ]; then echo FOUND; exit 1; else echo "grep error: exit ${status}"; exit "$status"; fi
       - name: Check plugin vendoring is in sync with the canon
         run: python scripts/sync_plugins.py --check
       - name: Run the sync fire-demos

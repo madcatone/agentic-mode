@@ -14,7 +14,9 @@ model, or dispatch to use. Read [`README.md`](README.md) first, then this.
   `templates/`, or `checker/` may name a specific agent product, model, or
   proprietary tool. (The checker's built-in `HARNESS_DENY_WORDS` list is itself a
   list of harness names — detection data, not prose; this rule governs document
-  text.) Harness-specific content lives **only** under `adapters/`.
+  text.) Harness-specific content lives under `adapters/`. The one exception is
+  root `CLAUDE.md`: a single import line (`@AGENTS.md`) so a session that
+  autoloads that filename receives this contract, with no second copy of the rules.
 - **Project-neutral.** No hardcoded brands, hosts, IP literals, or absolute
   machine paths anywhere. The worked example uses a fictional project.
 - **Portable skills (iron rule).** Every `SKILL.md` under
@@ -23,7 +25,7 @@ model, or dispatch to use. Read [`README.md`](README.md) first, then this.
   harness-injected variable (`${CLAUDE_PLUGIN_ROOT}` and the like) or an absolute
   path: the open skills CLI installs these same directories into other agents'
   skill folders, where such a variable is undefined. See Development Commands for
-  the check.
+  the check. Adapter operational detail lives in `adapters/claude-code/AGENTS.md`.
 - **Hard-metric exemptions.** The checker intentionally exceeds normal
   per-file line limits because Phase C copies it whole as a zero-dependency
   drop-in. `templates/` intentionally exceeds normal per-directory file-count
@@ -38,31 +40,13 @@ model, or dispatch to use. Read [`README.md`](README.md) first, then this.
 
 - `README.md` / `README-ZH.md`: onboarding (English / Traditional Chinese).
 - `RUNBOOK.md`: the single executable protocol (bootstrap/adopt, Phases A–D).
-- `doctrine/BOOTSTRAP-CORE.md`: the doctrine behind every rule.
-- `doctrine/FIELD-NOTES.md`: field lessons from the origin project.
-- `checker/check_agentic_docs.py`: the config-driven gate (pure stdlib).
-- `checker/config.example.json`: an annotated config with every knob.
-- `templates/`: fill-in skeletons for every generated doc + CI files.
-- `playbooks/`: harness-neutral collaboration canon (commit messages, two-axis
-  review, review response, doc linting, OKF doc style) — optional, local rules
-  override them.
-- `playbooks/scripts/doc_lint.py`: the doc-linter's mechanical pass (pure stdlib).
-- `playbooks/scripts/okf_lint.py` (+ `okf_parse.py`): the OKF bundle linter's
-  mechanical pass (pure stdlib).
-- `NORMALIZATION.md`: the audience-split retrofit guide — reshape any repo's
-  README/AGENTS.md into human-facing vs machine-facing contracts.
-- `adapters/`: Claude Code plugins + marketplace.
-- `adapters/claude-code/plugins/team-kit/`: the four-role worker kit
-  (observer/coder/reviewer/fortify) with its rules, hook scripts, and state
-  contract — self-canonical, edited in place (see its STATE-CONTRACT.md).
-- `.claude-plugin/marketplace.json`: the Claude Code plugin marketplace manifest.
-- `scripts/sync_plugins.py`: one-way vendoring sync (canon → plugins) + `--check` gate.
+- `checker/check_agentic_docs.py` and `checker/config.example.json`: the gate
+  and every knob. This repo's own gate config is `agentic-mode/config.json`.
+- `adapters/claude-code/AGENTS.md`: adapter contract (plugins, marketplace,
+  vendoring, team-kit).
 - `examples/minimal-cli/`: a complete contract that passes the checker.
-- `tests/fire-demos/`: regression fixtures proving each check fires when
-  violated and passes when satisfied (run via `tests/run_fire_demos.sh`).
-- `tests/review-evals/`: planted-bug fixture + expected findings + a stdlib
-  scorer for two-axis-review reports — the review step itself runs outside
-  CI; CI runs the scorer's selftest (see `tests/run_review_eval_demos.sh`).
+
+Doctrine and templates are reached from `RUNBOOK.md`. Playbooks are reached from `README.md`. The test suites are the commands below.
 
 ## Development Commands
 
@@ -70,6 +54,15 @@ model, or dispatch to use. Read [`README.md`](README.md) first, then this.
 
 ```bash
 python3 -m py_compile checker/check_agentic_docs.py
+```
+
+- Run the gate on this repo (must exit 0). It enforces this file's line limit,
+  these commands, and the entry points in `agentic-mode/config.json`.
+  `docs.requirements` and `docs.validation` alias this file — the checker
+  requires those keys, and this repo has no separate layer for them:
+
+```bash
+python3 checker/check_agentic_docs.py --config agentic-mode/config.json
 ```
 
 - Run the gate on the worked example (must exit 0):
@@ -102,10 +95,10 @@ sh tests/run_sync_demos.sh
 sh adapters/claude-code/plugins/team-kit/eng/tests/run-tests.sh
 ```
 
-- Sweep for leftover template placeholders in the example:
+- Sweep for leftover template placeholders in the example (prints `clean` and exits 0 only when grep exits 1; a match or a grep error fails):
 
 ```bash
-grep -rn '{{' examples/minimal-cli && echo "FOUND" || echo "clean"
+status=0; grep -rn '{{' examples/minimal-cli || status=$?; if [ "$status" -eq 1 ]; then echo clean; elif [ "$status" -eq 0 ]; then echo FOUND; exit 1; else echo "grep error: exit ${status}"; exit "$status"; fi
 ```
 
 - Byte-compile the doc linter and lint its own playbook (must exit 0):
@@ -134,10 +127,10 @@ python3 scripts/sync_plugins.py --check
 python3 -m json.tool .claude-plugin/marketplace.json >/dev/null && echo ok
 ```
 
-- Prove the skills carry no harness-injected path variable (must print `clean`):
+- Prove the skills carry no harness-injected path variable (prints `clean` and exits 0 only when grep exits 1; a match or a grep error fails):
 
 ```bash
-grep -rn 'PLUGIN_ROOT' adapters/claude-code/plugins && echo "FOUND" || echo "clean"
+status=0; grep -rn 'PLUGIN_ROOT' adapters/claude-code/plugins || status=$?; if [ "$status" -eq 1 ]; then echo clean; elif [ "$status" -eq 0 ]; then echo FOUND; exit 1; else echo "grep error: exit ${status}"; exit "$status"; fi
 ```
 
 ## Change Flow (What "Done" Requires)
@@ -147,7 +140,8 @@ grep -rn 'PLUGIN_ROOT' adapters/claude-code/plugins && echo "FOUND" || echo "cle
    checker's module docstring are updated to match.
 3. If the doc-set changed, the templates and `RUNBOOK.md`'s layout/schema stay
    in sync (the config schema is stated in exactly one place — `RUNBOOK.md`).
-4. The worked example still passes the gate (see Development Commands).
+4. The worked example still passes the gate, and this repo's own gate
+   (`agentic-mode/config.json`) exits 0 (see Development Commands).
 5. If a `playbooks/` file or a vendored core file (`RUNBOOK.md`,
    `doctrine/BOOTSTRAP-CORE.md`, `templates/`, `checker/`) changed,
    `python3 scripts/sync_plugins.py` was run so the plugin copies match, and
@@ -155,7 +149,7 @@ grep -rn 'PLUGIN_ROOT' adapters/claude-code/plugins && echo "FOUND" || echo "cle
    copy under `adapters/claude-code/plugins/`. (Exception: the `fable5`,
    `commander`, `idea-to-spec`, `pstack`, and `team-kit` plugins are
    self-canonical — not vendored and not in the sync MANIFEST — so their files
-   are edited in place.)
+   are edited in place. Operational detail: `adapters/claude-code/AGENTS.md`.)
 6. `README.md` and `README-ZH.md` stay information-equivalent when either changes.
 
 ## Sign-Off Points
@@ -166,6 +160,12 @@ grep -rn 'PLUGIN_ROOT' adapters/claude-code/plugins && echo "FOUND" || echo "cle
 - A change to the checker must ship with both a passing example run and a
   demonstration that the new/changed check fires when violated; the fire-demo
   suite (`tests/run_fire_demos.sh`) provides this demonstration mechanically.
+- **Code wins over a stale instruction file.** When an instruction file (this
+  file, a playbook, a template, an adapter contract, or a guide) disagrees
+  with existing code or with a command that actually runs, follow the code and
+  report each mismatch in the final reply. Do not silently rewrite working
+  code to match the stale doc. Updating the doc is the normal fix; changing
+  the code still follows Change Flow.
 
 ## Stop-and-Ask (do NOT proceed silently)
 
@@ -176,7 +176,8 @@ Stop and ask a human before any of these, even if permissions allow it:
   `templates/`, `checker/`) — it belongs in `adapters/`.
 - **Irreversible deletion** of files or history; force-pushing; publishing.
 - **CI / release configuration** changes, or anything touching credentials.
-- A user premise the evidence contradicts — report the evidence first.
+- A user premise the evidence contradicts — report the evidence first, then
+  stop. A doc-vs-code mismatch follows Sign-Off (follow the code, report it).
 
 ## Change-Flow Boundary (defer to WORKFLOW)
 

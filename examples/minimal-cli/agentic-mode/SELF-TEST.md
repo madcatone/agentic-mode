@@ -3,10 +3,20 @@
 Run this once all seeded docs exist. Every row is a gate: a failure blocks
 hand-off. **Fix the offending doc, not the test.**
 
-## A. Automated section — one command
+## A. Automated section — the gate
+
+Same check; run the invocation that matches your cwd.
+
+From `examples/minimal-cli/`:
 
 ```bash
 python3 ../../checker/check_agentic_docs.py --config agentic-mode/config.json
+```
+
+From the agentic-mode repo root:
+
+```bash
+python3 checker/check_agentic_docs.py --config examples/minimal-cli/agentic-mode/config.json --root examples/minimal-cli
 ```
 
 It enforces, from `agentic-mode/config.json`:

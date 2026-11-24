@@ -113,8 +113,14 @@ Run the repo's real commands from AGENTS Development Commands, e.g.:
 python3 -m py_compile todo.py
 python3 todo.py list
 python3 todo.py add "smoke task"
-# Docs coherence gate:
+```
+Docs coherence gate — cwd `examples/minimal-cli/`:
+```bash
 python3 ../../checker/check_agentic_docs.py --config agentic-mode/config.json
+```
+Docs coherence gate — cwd the agentic-mode repo root (same check):
+```bash
+python3 checker/check_agentic_docs.py --config examples/minimal-cli/agentic-mode/config.json --root examples/minimal-cli
 ```
 **All green is the only "done."**
 
@@ -123,7 +129,7 @@ python3 ../../checker/check_agentic_docs.py --config agentic-mode/config.json
 - [ ] Add a new `TODO-XXX` requirement row if a new behavior surfaced.
 - [ ] VALIDATION — append a per-feature block.
 - [ ] README / observable-surface doc — update if a command, key, endpoint, or visible behavior changed.
-- [ ] `python3 ../../checker/check_agentic_docs.py --config agentic-mode/config.json` passes.
+- [ ] The docs gate passes. From `examples/minimal-cli/`: `python3 ../../checker/check_agentic_docs.py --config agentic-mode/config.json`. From the agentic-mode repo root: `python3 checker/check_agentic_docs.py --config examples/minimal-cli/agentic-mode/config.json --root examples/minimal-cli`.
 
 ## 5. Push and PR
 

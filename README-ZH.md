@@ -205,7 +205,8 @@ templates 與 RUNBOOK）會整包安裝——子目錄一併帶過去。
 核心（doctrine、RUNBOOK、templates、checker）是 **harness-neutral** 的——絕不指名任何
 特定 agent 產品、model 或專有工具。（檢查器內建的 harness deny 清單本身即是一份 harness
 名單——那是偵測資料而非行文；鐵則規範的是文件正文。）harness 專屬的包裝只放在
-[`adapters/`](adapters/)：
+[`adapters/`](adapters/)。唯一的根目錄例外是 [`CLAUDE.md`](CLAUDE.md)：一行指標
+`See @AGENTS.md`（匯入本 repo 的契約，不是第二份規則）：
 
 - [`adapters/claude-code/`](adapters/claude-code/)——一個 Claude Code plugin
   marketplace：`agentic-bootstrap` 工具包、五份 playbook，加上 self-canonical 的

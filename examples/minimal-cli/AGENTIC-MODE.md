@@ -36,10 +36,18 @@ Resolve by responsibility, not by recency.
 
 ## Enforcement
 
-Run the repo-local gate:
+Run the repo-local gate. Same check; run the invocation that matches your cwd.
+
+From this directory (`examples/minimal-cli/`):
 
 ```bash
 python3 ../../checker/check_agentic_docs.py --config agentic-mode/config.json
+```
+
+From the agentic-mode repo root:
+
+```bash
+python3 checker/check_agentic_docs.py --config examples/minimal-cli/agentic-mode/config.json --root examples/minimal-cli
 ```
 
 It automates ID continuity (`TODO-NNN` resolves and is cited), command-surface

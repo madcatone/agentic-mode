@@ -320,6 +320,8 @@ like any change.
   mechanism. Write to the weakest common primitive shared by every collaborator:
   *read a file, run a command, open a merge/pull request.* Say "any agent or
   human collaborator." Harness-specific packaging lives only under `adapters/`.
+  The sole root exception is the one-line `CLAUDE.md` pointer `See @AGENTS.md`
+  (an import of the contract, not a second copy of the rules).
 - **Gate before advancing.** Every Phase-B doc passes its inline gate before the
   next is produced. Phase C must exit the checker clean before Phase D.
 - **The config is the single machine truth.** Any command, path, prefix, or limit
