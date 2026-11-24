@@ -71,7 +71,7 @@
         "must_appear_in": ["agents"]
       },
       {
-        "run": "grep -rn '{{' examples/minimal-cli && echo \"FOUND\" || echo \"clean\"",
+        "run": "status=0; grep -rn '{{' examples/minimal-cli || status=$?; if [ \"$status\" -eq 1 ]; then echo clean; elif [ \"$status\" -eq 0 ]; then echo FOUND; exit 1; else echo \"grep error: exit ${status}\"; exit \"$status\"; fi",
         "must_appear_in": ["agents"]
       },
       {
@@ -99,7 +99,7 @@
         "must_appear_in": ["agents"]
       },
       {
-        "run": "grep -rn 'PLUGIN_ROOT' adapters/claude-code/plugins && echo \"FOUND\" || echo \"clean\"",
+        "run": "status=0; grep -rn 'PLUGIN_ROOT' adapters/claude-code/plugins || status=$?; if [ \"$status\" -eq 1 ]; then echo clean; elif [ \"$status\" -eq 0 ]; then echo FOUND; exit 1; else echo \"grep error: exit ${status}\"; exit \"$status\"; fi",
         "must_appear_in": ["agents"]
       }
     ],

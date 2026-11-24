@@ -46,7 +46,7 @@ model, or dispatch to use. Read [`README.md`](README.md) first, then this.
   vendoring, team-kit).
 - `examples/minimal-cli/`: a complete contract that passes the checker.
 
-Doctrine, templates, playbooks, and the test suites are reached from `RUNBOOK.md` and the commands below.
+Doctrine and templates are reached from `RUNBOOK.md`. Playbooks are reached from `README.md`. The test suites are the commands below.
 
 ## Development Commands
 
@@ -95,10 +95,10 @@ sh tests/run_sync_demos.sh
 sh adapters/claude-code/plugins/team-kit/eng/tests/run-tests.sh
 ```
 
-- Sweep for leftover template placeholders in the example:
+- Sweep for leftover template placeholders in the example (prints `clean` and exits 0 only when grep exits 1; a match or a grep error fails):
 
 ```bash
-grep -rn '{{' examples/minimal-cli && echo "FOUND" || echo "clean"
+status=0; grep -rn '{{' examples/minimal-cli || status=$?; if [ "$status" -eq 1 ]; then echo clean; elif [ "$status" -eq 0 ]; then echo FOUND; exit 1; else echo "grep error: exit ${status}"; exit "$status"; fi
 ```
 
 - Byte-compile the doc linter and lint its own playbook (must exit 0):
@@ -127,10 +127,10 @@ python3 scripts/sync_plugins.py --check
 python3 -m json.tool .claude-plugin/marketplace.json >/dev/null && echo ok
 ```
 
-- Prove the skills carry no harness-injected path variable (must print `clean`):
+- Prove the skills carry no harness-injected path variable (prints `clean` and exits 0 only when grep exits 1; a match or a grep error fails):
 
 ```bash
-grep -rn 'PLUGIN_ROOT' adapters/claude-code/plugins && echo "FOUND" || echo "clean"
+status=0; grep -rn 'PLUGIN_ROOT' adapters/claude-code/plugins || status=$?; if [ "$status" -eq 1 ]; then echo clean; elif [ "$status" -eq 0 ]; then echo FOUND; exit 1; else echo "grep error: exit ${status}"; exit "$status"; fi
 ```
 
 ## Change Flow (What "Done" Requires)

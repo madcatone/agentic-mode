@@ -51,10 +51,10 @@ resolve by paths **relative to its own skill directory**. Never use a
 harness-injected variable (`${CLAUDE_PLUGIN_ROOT}` and the like) or an absolute
 path — the open skills CLI installs these directories into other agents' skill
 folders, where that variable is undefined. The root contract's check must
-print `clean`:
+print `clean` and exit 0 only when grep exits 1 (a match or a grep error fails):
 
 ```bash
-grep -rn 'PLUGIN_ROOT' adapters/claude-code/plugins && echo "FOUND" || echo "clean"
+status=0; grep -rn 'PLUGIN_ROOT' adapters/claude-code/plugins || status=$?; if [ "$status" -eq 1 ]; then echo clean; elif [ "$status" -eq 0 ]; then echo FOUND; exit 1; else echo "grep error: exit ${status}"; exit "$status"; fi
 ```
 
 ## Commands
