@@ -239,7 +239,9 @@ The core (doctrine, RUNBOOK, templates, checker) is **harness-neutral** — it n
 names a specific agent product, model, or proprietary tool. (The checker's built-in
 harness deny-list is itself a list of harness names — that is detection data, not
 prose; the iron rule governs document text.) Harness-specific
-packaging lives only under [`adapters/`](adapters/):
+packaging lives only under [`adapters/`](adapters/). The sole root exception
+is [`CLAUDE.md`](CLAUDE.md): the one-line pointer `See @AGENTS.md` (an import
+of this repo's contract, not a second copy of the rules):
 
 - [`adapters/claude-code/`](adapters/claude-code/) — a Claude Code plugin
   marketplace: the `agentic-bootstrap` toolkit, the five playbooks, and the

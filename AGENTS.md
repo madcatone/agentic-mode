@@ -160,11 +160,12 @@ grep -rn 'PLUGIN_ROOT' adapters/claude-code/plugins && echo "FOUND" || echo "cle
 - A change to the checker must ship with both a passing example run and a
   demonstration that the new/changed check fires when violated; the fire-demo
   suite (`tests/run_fire_demos.sh`) provides this demonstration mechanically.
-- **Code wins over a stale instruction file.** When this file, a playbook, or a
-  template disagrees with existing code or with a command that actually runs,
-  follow the code and report each mismatch in the final reply. Do not silently
-  rewrite working code to match the stale doc. Updating the doc is the normal
-  fix; changing the code still follows Change Flow.
+- **Code wins over a stale instruction file.** When an instruction file (this
+  file, a playbook, a template, an adapter contract, or a guide) disagrees
+  with existing code or with a command that actually runs, follow the code and
+  report each mismatch in the final reply. Do not silently rewrite working
+  code to match the stale doc. Updating the doc is the normal fix; changing
+  the code still follows Change Flow.
 
 ## Stop-and-Ask (do NOT proceed silently)
 

@@ -39,14 +39,34 @@ jobs:
         run: python3 -m json.tool .claude-plugin/marketplace.json >/dev/null && echo ok
       - name: Prove skills carry no harness-injected path variable
         run: |
-          result=$(grep -rn 'PLUGIN_ROOT' adapters/claude-code/plugins && echo "FOUND" || echo "clean")
-          printf '%s\n' "$result"
-          test "$result" = "clean"
+          set +e
+          grep -rn 'PLUGIN_ROOT' adapters/claude-code/plugins
+          status=$?
+          set -e
+          if [ "$status" -eq 1 ]; then
+            echo clean
+          elif [ "$status" -eq 0 ]; then
+            echo FOUND
+            exit 1
+          else
+            echo "grep error: exit ${status}"
+            exit "$status"
+          fi
       - name: Sweep the example for leftover template placeholders
         run: |
-          result=$(grep -rn '{{' examples/minimal-cli && echo "FOUND" || echo "clean")
-          printf '%s\n' "$result"
-          test "$result" = "clean"
+          set +e
+          grep -rn '{{' examples/minimal-cli
+          status=$?
+          set -e
+          if [ "$status" -eq 1 ]; then
+            echo clean
+          elif [ "$status" -eq 0 ]; then
+            echo FOUND
+            exit 1
+          else
+            echo "grep error: exit ${status}"
+            exit "$status"
+          fi
       - name: Check plugin vendoring is in sync with the canon
         run: python scripts/sync_plugins.py --check
       - name: Run the sync fire-demos
