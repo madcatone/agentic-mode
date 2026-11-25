@@ -71,6 +71,10 @@
         "must_appear_in": ["agents"]
       },
       {
+        "run": "python3 -m py_compile adapters/claude-code/plugins/global-claude/skills/global-claude/scripts/detect_global_claude.py && python3 adapters/claude-code/plugins/global-claude/skills/global-claude/scripts/detect_global_claude.py --selftest",
+        "must_appear_in": ["agents"]
+      },
+      {
         "run": "rc=0; grep -rn '{{' examples/minimal-cli || rc=$?; if [ \"$rc\" -eq 1 ]; then echo clean; elif [ \"$rc\" -eq 0 ]; then echo FOUND; exit 1; else echo \"grep error: exit ${rc}\"; exit \"$rc\"; fi",
         "must_appear_in": ["agents"]
       },
@@ -117,6 +121,7 @@
       "tests/run_review_eval_demos.sh",
       "tests/run_sync_demos.sh",
       "adapters/claude-code/plugins/team-kit/eng/tests/run-tests.sh",
+      "adapters/claude-code/plugins/global-claude/skills/global-claude/scripts/detect_global_claude.py",
       ".claude-plugin/marketplace.json",
       "examples/minimal-cli/agentic-mode/config.json"
     ]

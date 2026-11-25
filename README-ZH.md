@@ -112,7 +112,7 @@ playbook**——任何協作者（人或 agent、用哪個工具）都能直接�
 ## 安裝為 Claude Code plugin
 
 本 repo 同時是一個 **Claude Code plugin marketplace**。發佈到 GitHub 後，加入
-marketplace 即可安裝十一個 plugin 中的任意子集——每個都獨立、可選：
+marketplace 即可安裝十二個 plugin 中的任意子集——每個都獨立、可選：
 
 ```
 /plugin marketplace add madcatone/agentic-mode
@@ -127,6 +127,7 @@ marketplace 即可安裝十一個 plugin 中的任意子集——每個都獨立
 /plugin install idea-to-spec@agentic-mode
 /plugin install pstack@agentic-mode
 /plugin install team-kit@agentic-mode
+/plugin install global-claude@agentic-mode
 ```
 
 | Plugin | 安裝什麼 | 正典來源 |
@@ -142,12 +143,13 @@ marketplace 即可安裝十一個 plugin 中的任意子集——每個都獨立
 | `idea-to-spec` | 規格合成 skill：一次性批次訪談、規模三級 triage、12 節 SPEC 模板。 | plugin 目錄本身（self-canonical） |
 | `pstack` | 36 個第三方工程 skill（MIT）：24 個設計／執行原則，加上 architect、arena、benchmark-checklist、blast-radius、create-verification-skill、figure-it-out、interrogate、maintain-verification-skill、tdd、technical-writing、typescript-best-practices、unslop。 | plugin 目錄本身（self-canonical；第三方，MIT 授權） |
 | `team-kit` | 四角色 worker kit：observer（純派工）、coder（實作＋SubagentStop verify 閘門）、reviewer（兩軸唯讀審查）、fortify（安全預檢）——附 team-rules 規範、hook 腳本與狀態面契約。 | plugin 目錄本身（self-canonical；見其 STATE-CONTRACT.md） |
+| `global-claude` | 檢查或建立使用者全域的 Claude Code 指示檔（`~/.claude/CLAUDE.md`，或已設定時的 `$CLAUDE_CONFIG_DIR/CLAUDE.md`）。以 `/global-claude` 叫用。 | plugin 目錄本身（self-canonical） |
 
 commit／review 慣例每個團隊偏好不同，所以做成可選 plugin 與可覆寫 playbook，而非併入
 core。上述這些 plugin 都 vendor 一份自足的正典拷貝；vendoring 與防漂移同步見
 [`adapters/claude-code/README.md`](adapters/claude-code/README.md)。
 
-`fable5`、`commander`、`idea-to-spec`、`pstack`、`team-kit` 是例外：五者都**沒有 harness-neutral
+`fable5`、`commander`、`idea-to-spec`、`pstack`、`team-kit`、`global-claude` 是例外：六者都**沒有 harness-neutral
 playbook 對應**。`fable5` 管的是你怎麼操作一個 *session*（主模型當 advisor／指揮官、subagent 分階、
 產出寫進使用者層級的 config home）；`commander` 出的是同一套教義**可實跑的 per-repo 實例**
 （一份憲章加上由 subagent CLI 驅動的派工／評分腳本）；`idea-to-spec` 是一套產出「某個專案的
@@ -155,7 +157,9 @@ SPEC」的互動式撰寫流程，正典就是這道程序本身，而非一份�
 是第三方 skill 包——36 個工程 skill 以 MIT 授權移植自外部 collection（出處見其
 `THIRD-PARTY-NOTICE.md`），正典就是引進的 collection 本身；`team-kit` 是四角色
 worker kit（純派工＋掛閘門的 worker），正典就是 kit 本身——規範、skill、狀態契約與
-hook 腳本同住在它的 plugin 目錄裡。五者都不是
+hook 腳本同住在它的 plugin 目錄裡。`global-claude` 檢查使用者全域的 Claude Code
+指示檔；檔案不存在時，提出一份短的全域範圍草稿，或在已有全域 AGENTS.md 時改成一行
+指標。沒有你明確同意，它不寫入。六者都不是
 某個 repo 的文件契約，所以無法放進中性 core。它們的 **plugin 目錄即正典**：不 vendor 任何
 東西進來，也不納入 `sync_plugins.py` 同步。
 
@@ -176,7 +180,7 @@ npx skills add madcatone/agentic-mode --all           # 全部 skill、全部 ag
 `--copy` 實體複製而非 symlink。專案層級安裝會把裝了什麼記在 `skills-lock.json`。
 
 帶附屬檔案的 skill（`commander` 的腳本與 reference 文件、`agentic-bootstrap` 的 checker、
-templates 與 RUNBOOK）會整包安裝——子目錄一併帶過去。
+templates 與 RUNBOOK、`global-claude` 的偵測器與草稿模板）會整包安裝——子目錄一併帶過去。
 
 > **貢獻者的約束。** 因為這些目錄會被複製進其他 agent 的 skill 資料夾，每份 `SKILL.md`
 > 以及它引用的每個檔案都必須用**相對於自己 skill 目錄**的路徑解析。用 harness 注入的變數
@@ -211,8 +215,8 @@ templates 與 RUNBOOK）會整包安裝——子目錄一併帶過去。
 - [`adapters/claude-code/`](adapters/claude-code/)——一個 Claude Code plugin
   marketplace：`agentic-bootstrap` 工具包、五份 playbook，加上 self-canonical 的
   `fable5` 指揮官操作模式、`commander` 派工評分迴圈、`idea-to-spec` 規格合成器、
-  `pstack` 第三方工程 skill 包（36 個 skill，MIT 授權）與 `team-kit`
-  四角色 worker kit，
+  `pstack` 第三方工程 skill 包（36 個 skill，MIT 授權）、`team-kit`
+  四角色 worker kit，與 `global-claude` 全域指示檔檢查，
   各自封裝成可選、可獨立安裝的 plugin（見[它的
   README](adapters/claude-code/README.md)與上面的
   [安裝為 Claude Code plugin](#安裝為-claude-code-plugin)）。

@@ -53,6 +53,8 @@ jobs:
         run: sh tests/run_review_eval_demos.sh
       - name: Run the team-kit plugin eng tests
         run: sh adapters/claude-code/plugins/team-kit/eng/tests/run-tests.sh
+      - name: Self-check the global instruction-file detector
+        run: python3 -m py_compile adapters/claude-code/plugins/global-claude/skills/global-claude/scripts/detect_global_claude.py && python3 adapters/claude-code/plugins/global-claude/skills/global-claude/scripts/detect_global_claude.py --selftest
       - name: Self-check the doc linter
         run: |
           python -m py_compile scripts/doc_lint.py

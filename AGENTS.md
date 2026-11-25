@@ -95,6 +95,12 @@ sh tests/run_sync_demos.sh
 sh adapters/claude-code/plugins/team-kit/eng/tests/run-tests.sh
 ```
 
+- Byte-compile the global instruction-file detector and run its selftest (must exit 0):
+
+```bash
+python3 -m py_compile adapters/claude-code/plugins/global-claude/skills/global-claude/scripts/detect_global_claude.py && python3 adapters/claude-code/plugins/global-claude/skills/global-claude/scripts/detect_global_claude.py --selftest
+```
+
 - Sweep for leftover template placeholders in the example (prints `clean` and exits 0 only when grep exits 1; a match or a grep error fails):
 
 ```bash
@@ -147,9 +153,9 @@ rc=0; grep -rn 'PLUGIN_ROOT' adapters/claude-code/plugins || rc=$?; if [ "$rc" -
    `python3 scripts/sync_plugins.py` was run so the plugin copies match, and
    `--check` exits 0. Never hand-edit a vendored
    copy under `adapters/claude-code/plugins/`. (Exception: the `fable5`,
-   `commander`, `idea-to-spec`, `pstack`, and `team-kit` plugins are
-   self-canonical — not vendored and not in the sync MANIFEST — so their files
-   are edited in place. Operational detail: `adapters/claude-code/AGENTS.md`.)
+   `commander`, `idea-to-spec`, `pstack`, `team-kit`, and `global-claude`
+   plugins are self-canonical — not vendored and not in the sync MANIFEST —
+   so their files are edited in place. See `adapters/claude-code/AGENTS.md`.)
 6. `README.md` and `README-ZH.md` stay information-equivalent when either changes.
 
 ## Sign-Off Points

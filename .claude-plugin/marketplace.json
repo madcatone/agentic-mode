@@ -1,6 +1,6 @@
 {
   "name": "agentic-mode",
-  "description": "Optional Claude Code plugins for the agentic-mode methodology: the doc-contract bootstrapper, five harness-neutral collaboration playbooks (commit messages, two-axis review, review response, document linting, OKF doc style), the fable5 commander-mode operating discipline, the commander dispatch-and-score loop, the idea-to-spec spec synthesizer that turns rough idea material into an executable development SPEC, the pstack pack of 36 third-party engineering skills ported under MIT, and the team-kit four-role worker kit (observer/coder/reviewer/fortify) with its team-rules canon, verify-gate hook scripts, and state contract. Install only the ones your team wants.",
+  "description": "Optional Claude Code plugins for the agentic-mode methodology: the doc-contract bootstrapper, five harness-neutral collaboration playbooks (commit messages, two-axis review, review response, document linting, OKF doc style), the fable5 commander-mode operating discipline, the commander dispatch-and-score loop, the idea-to-spec spec synthesizer that turns rough idea material into an executable development SPEC, the pstack pack of 36 third-party engineering skills ported under MIT, the team-kit four-role worker kit (observer/coder/reviewer/fortify) with its team-rules canon, verify-gate hook scripts, and state contract, and the global-claude checker for the user-global Claude Code instruction file (review an existing file, or seed a missing one only after an explicit yes). Install only the ones your team wants.",
   "owner": {
     "name": "agentic-mode maintainers"
   },
@@ -59,6 +59,11 @@
       "name": "team-kit",
       "source": "./adapters/claude-code/plugins/team-kit",
       "description": "A four-role worker kit for dispatch-style teamwork: observer (pure dispatcher), coder (implementation gated by a SubagentStop verify hook), reviewer (dual-axis read-only review), and fortify (security pre-check), plus the team-rules canon, hook scripts, and the runtime state contract in STATE-CONTRACT.md. 四角色協作 kit：observer 純派工、coder 實作＋verify 停止閘門、reviewer 兩軸唯讀審查、fortify 安全預檢，附 team-rules 規範、hook 腳本與狀態面契約（STATE-CONTRACT.md）。Self-canonical (no harness-neutral playbook counterpart, not part of the vendoring sync)."
+    },
+    {
+      "name": "global-claude",
+      "source": "./adapters/claude-code/plugins/global-claude",
+      "description": "Check the user-global Claude Code instruction file (~/.claude/CLAUDE.md, or $CLAUDE_CONFIG_DIR/CLAUDE.md when that variable is set). When the file is missing, offer a short global-scope starter — or a one-line See @ pointer if ~/.agents/AGENTS.md or ~/.codex/AGENTS.md already exists — and write only after an explicit yes. When the file exists, review it and propose a diff; do not edit until the user approves. Self-canonical (no harness-neutral playbook counterpart, not part of the vendoring sync)."
     }
   ]
 }
