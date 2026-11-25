@@ -1,3 +1,8 @@
+<!--
+Template-Source: agentic-bootstrap/AGENTIC-MODE@v2  (@v2: added Canonical Questions
+section + Template-Source marker; headings rule made explicit)
+-->
+
 # AGENTIC-MODE.md — Doc Contract for todo
 
 > The resident index for this repo's **layered, ID-joined, harness-neutral**
@@ -58,8 +63,18 @@ numbering check. Everything it cannot mechanize stays a manual review in
 
 CI platform: **github**. The gate runs on every change.
 
+## Canonical Questions — Answerable Cold From the Docs Alone
+
+These are the questions a **zero-context reviewer** (never seen this repo, no chat history) must be able to answer from the committed docs alone. Seed them from the Layered Reading Order, keep three to seven, and maintain them **here** — `agentic-mode/SELF-TEST.md` §D consumes this list for the read-back probe; it does not carry a second copy.
+
+1. What does `todo` do, and how do I add my first task?
+2. What am I allowed and not allowed to do here, and when must I stop and ask?
+3. What is the behavior contract for the store path, and which `TODO-XXX` governs it?
+4. What is the observable surface for `list` (the command and its `--all` flag)?
+5. How do I prove a change to `done` is complete, and how do I move it through review?
+
 ## Routing
 
 - **Doctrine** → the agentic-mode repo's `doctrine/BOOTSTRAP-CORE.md`.
 - **Machine config** → `agentic-mode/config.json`.
-- **Full cross-layer self-test** → `agentic-mode/SELF-TEST.md`.
+- **Full cross-layer self-test** → `agentic-mode/SELF-TEST.md`; the questions it asks live in the Canonical Questions section above.

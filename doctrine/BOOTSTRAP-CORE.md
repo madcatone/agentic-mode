@@ -272,7 +272,7 @@ Not every repo can adopt the full system on day one, and not every team wants th
 
 The co-op profile signals to collaborators how strictly the append-only rules bind; CI gate placement follows `ci.platform` independently (set it to `none` only when the repo genuinely wants no pipeline enforcement — the gate is otherwise placed for every profile, `docs-only` included).
 
-### Doc-set profile (how many layers to seed initially)
+### Doc-set profile (chosen at bootstrap — RUNBOOK.md Phase A, question 2)
 
 | Doc-set profile | Include | Use when | Upgrade trigger |
 |---|---|---|---|
