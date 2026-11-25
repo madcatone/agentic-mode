@@ -32,8 +32,8 @@ Follow these for the whole run.
 
 1. The only path you may write is the global `CLAUDE.md` from Step 1. Do not create or edit `~/.agents/AGENTS.md`, `~/.codex/AGENTS.md`, or any repo file.
 2. The detector is read-only. Do not add a write path to it.
-3. **Missing file.** Show the exact bytes. Write them only after an explicit write instruction: "write it", "create it", "yes, write that file", or "approve the write". "ok", "looks good", "thanks", and silence are not approval. If the user returns an edited body together with a write instruction, write the edited body.
-4. **Existing file.** Do not edit it as part of the review. A proposed diff is text in the report, not a write. Apply it only after a later reply that says "apply the diff" or names the item numbers to apply. "LGTM" is not approval.
+3. **Missing file.** Show the exact bytes. Write them only after an explicit instruction, in the language of the conversation, that approves writing this body. English examples that count: "write it", "create it", "yes, write that file", "approve the write". Chinese examples that count: "寫入", "建立這個檔", "同意寫入". These do not count: "ok", "looks good", "thanks", "好", "可以", "謝謝", and silence. If the user returns an edited body together with a write instruction, write the edited body.
+4. **Existing file.** Do not edit it as part of the review. A proposed diff is text in the report, not a write. Apply it only after a later reply that, in the conversation language, approves applying that diff or names the item numbers. English examples: "apply the diff", "apply items 1 and 3". Chinese examples: "套用 diff", "套用第 1 項". "LGTM", "看起來不錯", and "好" alone are not approval.
 5. Create the parent directory of `CLAUDE.md` only while performing an approved create, and only that directory. Write with exclusive create (`open(path, "x")`). On `FileExistsError`, stop and switch to the review branch. Never delete the file in order to recreate it.
 6. Re-run the detector immediately before any approved write. If the status is no longer the one you reported, stop and say what changed.
 7. Do not quote a secret. Report the line number and delete by line number when an approved edit removes it.
@@ -63,7 +63,7 @@ Read these keys:
 | `pointer_import` | Token to put after `@`, or `-` |
 | `secret_lines` | Candidate line numbers, or `none`. The line text is not printed |
 | `machine_path_lines` | Candidate line numbers, or `none` |
-| `pointer_target` | One row per `See @` target when `kind` is `pointer`; otherwise `-` |
+| `pointer_target` | One row per `See @` target when `kind` is `pointer`; status is `exists`, `missing`, `not_a_file`, `broken_symlink`, `unreadable`, or `unresolved`. Otherwise `-` |
 
 Resolution: a non-empty `CLAUDE_CONFIG_DIR` wins, including when `~/.claude/CLAUDE.md` also exists. Whitespace-only is unset. A global `AGENTS.md` is noted, not required. Prefer `~/.agents/AGENTS.md` over `~/.codex/AGENTS.md` when both exist.
 
@@ -86,13 +86,20 @@ Do not invent project names, hosts, absolute machine paths, or secrets in the bo
 
 Take this branch when `claude_md_status` is `exists`. Read the file. Do not edit it in this step.
 
-A `pointer` with exactly one target, that target existing, and that token equal to `pointer_import`, needs no change. Say so in a short report. Still list both AGENTS.md statuses. Two or more `See @` lines are P2 duplication: keep the one that equals `pointer_import` when that target exists, otherwise keep the first live target.
+Read `pointer_target` for every `See @` line. A target is live only when its status is `exists`.
 
-A `pointer` whose target is `missing` or `not_a_file` is a dangling pointer. Priority P0. Do not call language, stop-and-ask, or verification "missing"; they are not delegated until the target exists.
+- `exists` — the path is a file.
+- `missing` — nothing is at the path. Dangling. P0.
+- `not_a_file` — the path exists and is not a file. Dangling. P0.
+- `broken_symlink` — the path is a symlink and its target is absent. Dangling. P0. Do not create the missing target.
+- `unreadable` — the path could not be stat'd. P0. Do not call it live and do not call it missing.
+- `unresolved` — the token could not be resolved, for example `~nosuchuser/AGENTS.md`. P0. Do not guess a home directory.
 
-A live `pointer` whose token differs from `pointer_import`, while `preferred_agents_md` exists, is P1. Propose retargeting to `pointer_import`. Quote both tokens. Do not retarget a pointer that already matches.
+A pointer with exactly one live target whose token equals `pointer_import` needs no change. Say so in a short report. Still list both AGENTS.md statuses. Two or more `See @` lines are P2 duplication: keep the one that equals `pointer_import` when that target is live, otherwise keep the first live target.
 
-A live pointer delegates language, stop-and-ask, and verification to its target. Read the target. Mark the three as delegated only after you have seen them there. If the target lacks one, report that gap against the target path, and do not propose stuffing it back into `CLAUDE.md`.
+A live pointer whose token differs from `pointer_import`, while `preferred_agents_md` exists, is P1. Propose retargeting to `pointer_import`. Quote both tokens. Do not retarget a pointer that already matches.
+
+A live pointer delegates language, stop-and-ask, and verification to its target. Read the target. Mark the three as delegated only after you have seen them there. If the target lacks one, report that gap against the target path, and do not propose stuffing it back into `CLAUDE.md`. Those three are not delegated for any other target status.
 
 For `empty` and `prose`, write the report below. Check every item. A clean item goes under Passed with the evidence (detector key, or the section you read). An item you did not check goes under Not verified. Do not mark a check passed because you skipped it.
 
@@ -177,7 +184,7 @@ or "None."
 
 ## Proposed diff
 <unified diff, or "none">
-Not applied. Reply "apply the diff" or name item numbers to apply. Any other reply leaves the file untouched.
+Not applied. Ask in the user's language for an explicit apply instruction (English: "apply the diff" or item numbers; 繁體中文: "套用 diff" or "套用第 N 項"). Any other reply leaves the file untouched.
 ```
 
 Order findings P0, then P1, then P2. Every finding appears in the prioritized list. Cap the list at the 15 most important findings. Summarize the rest in one line.

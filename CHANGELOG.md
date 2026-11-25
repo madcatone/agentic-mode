@@ -18,6 +18,15 @@ the tag date.
   only when the user approves a diff. `scripts/detect_global_claude.py` is a
   read-only standard-library detector with `--selftest`.
 
+### Fixed
+
+- `global-claude` keeps a symlinked `~/.agents` as the preferred path
+  (a link to `~/.codex` still imports as `../.agents/AGENTS.md`). A
+  `See @~user/...` token whose account cannot be expanded is reported as
+  `unresolved` instead of crashing. The skill states every pointer-target
+  status, including `broken_symlink` and `unreadable`, and judges write
+  and apply approval in the conversation language.
+
 ## [1.3.0] — 2026-11-18
 
 ### Added

@@ -20,6 +20,7 @@ import contextlib
 import io
 import os
 import re
+import stat
 import sys
 import tempfile
 from pathlib import Path
@@ -80,17 +81,27 @@ def env_config_dir() -> Optional[Path]:
 
 
 def classify_path(path: Path) -> str:
-    """exists | missing | not_a_file | broken_symlink | unreadable."""
+    """exists | missing | not_a_file | broken_symlink | unreadable.
+
+    Uses ``lstat`` directly. ``Path.exists()`` swallows ``OSError`` and would
+    report a path inside an unsearchable directory as ``missing``.
+    """
     try:
-        if path.is_symlink() and not path.exists():
-            return "broken_symlink"
-        if not path.exists():
-            return "missing"
-        if not path.is_file():
-            return "not_a_file"
-        return "exists"
+        info = path.lstat()
+    except FileNotFoundError:
+        return "missing"
     except OSError:
         return "unreadable"
+    if stat.S_ISLNK(info.st_mode):
+        try:
+            info = path.stat()
+        except FileNotFoundError:
+            return "broken_symlink"
+        except OSError:
+            return "unreadable"
+    if not stat.S_ISREG(info.st_mode):
+        return "not_a_file"
+    return "exists"
 
 
 def _read_text(path: Path) -> Tuple[str, Optional[str]]:
@@ -140,13 +151,33 @@ def machine_path_line_numbers(text: str) -> List[int]:
     return found
 
 
-def resolve_import(claude_file: Path, token: str) -> Path:
-    if token.startswith("~"):
-        return Path(token).expanduser()
-    path = Path(token)
+def _logical_abs(path: Path) -> Path:
+    """Absolute path that keeps symlink components.
+
+    ``Path.resolve()`` would turn a ``~/.agents`` symlink to ``~/.codex`` into
+    the codex path. The selected home is the path the user named.
+    """
+    path = path.expanduser()
     if path.is_absolute():
         return path
-    return claude_file.parent / path
+    return Path.cwd() / path
+
+
+def resolve_import(claude_file: Path, token: str) -> Optional[Path]:
+    """Return the path a ``See @`` token names, or None when it cannot.
+
+    ``Path('~nosuchuser/...').expanduser()`` raises ``RuntimeError`` when the
+    account does not exist. That is a status, not a crash.
+    """
+    try:
+        if token.startswith("~"):
+            return Path(token).expanduser()
+        path = Path(token)
+        if path.is_absolute():
+            return path
+        return claude_file.parent / path
+    except (RuntimeError, OSError, ValueError):
+        return None
 
 
 def pointer_targets(claude_file: Path, text: str) -> List[Tuple[str, str]]:
@@ -156,14 +187,20 @@ def pointer_targets(claude_file: Path, text: str) -> List[Tuple[str, str]]:
         if not match:
             continue
         token = match.group(1)
-        targets.append((token, classify_path(resolve_import(claude_file, token))))
+        resolved = resolve_import(claude_file, token)
+        status = "unresolved" if resolved is None else classify_path(resolved)
+        targets.append((token, status))
     return targets
 
 
 def pointer_import(claude_file: Path, agents_file: Path) -> str:
-    """Short sibling hop, otherwise the absolute path of the AGENTS.md."""
-    claude_abs = claude_file.expanduser().resolve(strict=False)
-    agents_abs = agents_file.expanduser().resolve(strict=False)
+    """Short sibling hop, otherwise the absolute path of the AGENTS.md.
+
+    Uses the logical path, so a preferred ``~/.agents`` that is a symlink
+    still imports as ``../.agents/AGENTS.md``.
+    """
+    claude_abs = _logical_abs(claude_file)
+    agents_abs = _logical_abs(agents_file)
     try:
         relative = Path(os.path.relpath(agents_abs, claude_abs.parent))
     except ValueError:
@@ -182,7 +219,7 @@ def pointer_import(claude_file: Path, agents_file: Path) -> str:
 def _first_file(paths: Sequence[Path]) -> Optional[Path]:
     for path in paths:
         if classify_path(path) == "exists":
-            return path.expanduser().resolve(strict=False)
+            return _logical_abs(path)
     return None
 
 
@@ -358,6 +395,8 @@ def selftest() -> int:
         _case_pointer_and_dangling(check, root / "pointer")
         _case_not_a_file_and_broken_symlink(check, root / "special")
         _case_unreadable(check, root / "unreadable")
+        _case_agents_symlink_prefers_agents(check, root / "agents-link")
+        _case_pointer_target_statuses(check, root / "ptr-status")
         _case_cli_and_env(check, root / "cli")
     if check.fails:
         for failure in check.fails:
@@ -547,6 +586,99 @@ def _case_not_a_file_and_broken_symlink(check: _Check, home: Path) -> None:
     check.eq("symlink status", broken.claude_status, "broken_symlink")
     check.eq("symlink lines", broken.claude_lines, "-")
     check.true("symlink target not created", not (home / ".claude" / "nope").exists())
+
+
+def _case_agents_symlink_prefers_agents(check: _Check, home: Path) -> None:
+    """A ~/.agents symlink to ~/.codex still wins as the .agents path."""
+    codex = home / ".codex"
+    _write(codex / "AGENTS.md", "# canon\n")
+    (home / ".agents").symlink_to(codex, target_is_directory=True)
+    report = detect(home, None)
+    preferred = home.resolve() / ".agents" / "AGENTS.md"
+    rendered = render(report)
+    check.eq("link agents status", report.agents_status, "exists")
+    check.eq("link codex status", report.codex_status, "exists")
+    check.eq("link preferred", report.preferred, preferred)
+    check.true(
+        "link preferred keeps .agents",
+        report.preferred is not None and ".agents" in report.preferred.parts,
+        None if report.preferred is None else report.preferred.as_posix(),
+    )
+    check.eq("link import", report.pointer_import, "../.agents/AGENTS.md")
+    check.true(
+        "link preferred line",
+        "preferred_agents_md: {0}\n".format(preferred.as_posix()) in rendered,
+        rendered,
+    )
+    check.true(
+        "link import line",
+        "pointer_import: ../.agents/AGENTS.md\n" in rendered,
+        rendered,
+    )
+
+
+def _case_pointer_target_statuses(check: _Check, home: Path) -> None:
+    claude = home / ".claude" / "CLAUDE.md"
+    saved_home = os.environ.get("HOME")
+    os.environ["HOME"] = str(home.resolve())
+    try:
+        _write(claude, "See @~nosuch-global-claude-user/AGENTS.md\n")
+        unresolved = detect(home, None)
+        check.eq("tilde kind", unresolved.claude_kind, "pointer")
+        check.eq(
+            "tilde target",
+            unresolved.pointer_targets,
+            [("~nosuch-global-claude-user/AGENTS.md", "unresolved")],
+        )
+        check.true(
+            "tilde row",
+            "pointer_target: ~nosuch-global-claude-user/AGENTS.md unresolved\n"
+            in render(unresolved),
+        )
+    finally:
+        if saved_home is None:
+            os.environ.pop("HOME", None)
+        else:
+            os.environ["HOME"] = saved_home
+
+    agents = home / ".agents" / "AGENTS.md"
+    agents.parent.mkdir(parents=True, exist_ok=True)
+    if agents.exists() or agents.is_symlink():
+        agents.unlink()
+    agents.symlink_to(home / ".agents" / "missing-target")
+    _write(claude, "See @../.agents/AGENTS.md\n")
+    broken = detect(home, None)
+    check.eq(
+        "target symlink",
+        broken.pointer_targets,
+        [("../.agents/AGENTS.md", "broken_symlink")],
+    )
+    check.true(
+        "target symlink creates nothing",
+        not (home / ".agents" / "missing-target").exists(),
+    )
+
+    euid = getattr(os, "geteuid", lambda: 1)()
+    if euid == 0:
+        check.true("target unreadable skipped as root", True)
+        return
+    agents.unlink()
+    _write(agents, "hidden\n")
+    locked = home / ".agents" / "locked"
+    locked.mkdir()
+    secret = locked / "AGENTS.md"
+    _write(secret, "hidden\n")
+    locked.chmod(0)
+    try:
+        _write(claude, "See @../.agents/locked/AGENTS.md\n")
+        blocked = detect(home, None)
+    finally:
+        locked.chmod(0o700)
+    check.eq(
+        "target unreadable",
+        blocked.pointer_targets,
+        [("../.agents/locked/AGENTS.md", "unreadable")],
+    )
 
 
 def _case_unreadable(check: _Check, home: Path) -> None:
