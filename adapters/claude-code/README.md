@@ -25,6 +25,7 @@ installs any subset of plugins:
 /plugin install idea-to-spec@agentic-mode
 /plugin install pstack@agentic-mode
 /plugin install team-kit@agentic-mode
+/plugin install global-claude@agentic-mode
 ```
 
 Each plugin is independent and optional — install only what your team wants.
@@ -44,9 +45,10 @@ Each plugin is independent and optional — install only what your team wants.
 | [`idea-to-spec`](plugins/idea-to-spec) | The spec synthesizer: turn rough idea material into a development SPEC — batch interview, size triage, 12-section template. | The plugin directory itself (self-canonical — see below) |
 | [`pstack`](plugins/pstack) | Thirty-six third-party engineering skills under MIT: 24 design/execution principles plus architect, arena, benchmark-checklist, blast-radius, create-verification-skill, figure-it-out, interrogate, maintain-verification-skill, tdd, technical-writing, typescript-best-practices, and unslop. | The plugin directory itself (self-canonical — see below; third-party, see its `THIRD-PARTY-NOTICE.md`) |
 | [`team-kit`](plugins/team-kit) | The four-role worker kit: observer (pure dispatcher), coder (implementation under a SubagentStop verify gate), reviewer (dual-axis read-only review), fortify (security pre-check) — plus the team-rules canon, hook scripts, and the state contract. | The plugin directory itself (self-canonical — see below; see its `STATE-CONTRACT.md`) |
+| [`global-claude`](plugins/global-claude) | Check or seed the user-global Claude Code instruction file (`~/.claude/CLAUDE.md`, or `$CLAUDE_CONFIG_DIR/CLAUDE.md`). Invoke with `/global-claude`. | The plugin directory itself (self-canonical — see below) |
 
-`fable5`, `commander`, `idea-to-spec`, `pstack`, and `team-kit` are deliberately
-different from the other six: none of the five has a **harness-neutral playbook counterpart** in
+`fable5`, `commander`, `idea-to-spec`, `pstack`, `team-kit`, and `global-claude` are deliberately
+different from the other six: none of these six has a **harness-neutral playbook counterpart** in
 `playbooks/` — unlike the doc-contract core, there is no neutral source they
 could be lifted from. `fable5` and `commander` are harness-specific (they name
 model tiers, dispatch through a subagent tool or CLI, and write output into a
@@ -60,6 +62,11 @@ so its canon is the imported collection itself, which this repo does not author.
 `team-kit` is a four-role worker kit (dispatcher plus gated workers) whose canon
 is the kit itself — rules, skills, state contract, and hook scripts live together
 in its plugin directory.
+`global-claude` checks the user-global Claude Code instruction file
+(`~/.claude/CLAUDE.md`, or `$CLAUDE_CONFIG_DIR/CLAUDE.md` when set) and, when
+that file is missing, offers a short global-scope starter or a one-line pointer
+at `~/.agents/AGENTS.md` or `~/.codex/AGENTS.md`. It writes only after an
+explicit yes.
 Consequently each **plugin directory is its own
 canon**: nothing is vendored into them, and they are **not part of the
 `sync_plugins.py` MANIFEST** (there is no upstream canon that could drift from
@@ -70,7 +77,7 @@ them).
 A Claude Code skill can only read files **under its own directory** — it cannot
 reach back into the repo with `../`. So every synced plugin carries a **vendored
 copy** of whatever canonical file it needs (`fable5`, `commander`, `idea-to-spec`,
-`pstack`, and `team-kit` are self-canonical and are excluded from this sync):
+`pstack`, `team-kit`, and `global-claude` are self-canonical and are excluded from this sync):
 
 - The five playbook plugins keep their own `SKILL.md` frontmatter (the `name` +
   `description` that drive skill triggering) and take their **body verbatim**

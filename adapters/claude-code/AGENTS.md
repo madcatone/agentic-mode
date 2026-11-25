@@ -46,10 +46,12 @@ carry a vendored copy. The canon is authoritative in one direction:
 3. `python3 scripts/sync_plugins.py --check` must exit 0. Never hand-edit a
    vendored copy under `plugins/` for a plugin that is in the sync MANIFEST.
 
-`fable5`, `commander`, `idea-to-spec`, `pstack`, and `team-kit` are
-self-canonical: no neutral playbook counterpart, not in the sync MANIFEST,
-edited in place. Add a marketplace entry for a new self-canonical plugin; do
-not add a MANIFEST row.
+`fable5`, `commander`, `idea-to-spec`, `pstack`, `team-kit`, and
+`global-claude` are self-canonical: no neutral playbook counterpart, not in
+the sync MANIFEST, edited in place. Add a marketplace entry for a new
+self-canonical plugin; do not add a MANIFEST row. `global-claude` checks the
+user-global instruction file; its detector selftest is in the root
+Development Commands.
 
 ## Portable skills
 
@@ -73,6 +75,7 @@ Commands. Run these from the repo root:
 python3 scripts/sync_plugins.py --check
 python3 -m json.tool .claude-plugin/marketplace.json >/dev/null && echo ok
 sh adapters/claude-code/plugins/team-kit/eng/tests/run-tests.sh
+python3 -m py_compile adapters/claude-code/plugins/global-claude/skills/global-claude/scripts/detect_global_claude.py && python3 adapters/claude-code/plugins/global-claude/skills/global-claude/scripts/detect_global_claude.py --selftest
 ```
 
 The team-kit eng tests require `jq` on `PATH`.

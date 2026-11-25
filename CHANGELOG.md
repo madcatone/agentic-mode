@@ -4,6 +4,29 @@ All notable changes to the agentic-mode toolkit. Versions track the
 `agentic-bootstrap` plugin version and the git tags on `main`. The date is
 the tag date.
 
+## [Unreleased]
+
+### Added
+
+- `global-claude` plugin (self-canonical, under
+  `adapters/claude-code/plugins/global-claude`): one skill that checks the
+  user-global Claude Code instruction file (`~/.claude/CLAUDE.md`, or
+  `$CLAUDE_CONFIG_DIR/CLAUDE.md` when that variable is set). A missing file
+  is shown as a short global-scope starter, or as a one-line `See @` pointer
+  when `~/.agents/AGENTS.md` or `~/.codex/AGENTS.md` already exists, and is
+  written only after an explicit yes. An existing file is reviewed and edited
+  only when the user approves a diff. `scripts/detect_global_claude.py` is a
+  read-only standard-library detector with `--selftest`.
+
+### Fixed
+
+- `global-claude` keeps a symlinked `~/.agents` as the preferred path
+  (a link to `~/.codex` still imports as `../.agents/AGENTS.md`). A
+  `See @~user/...` token whose account cannot be expanded is reported as
+  `unresolved` instead of crashing. The skill states every pointer-target
+  status, including `broken_symlink` and `unreadable`, and judges write
+  and apply approval in the conversation language.
+
 ## [1.3.0] — 2026-11-18
 
 ### Added

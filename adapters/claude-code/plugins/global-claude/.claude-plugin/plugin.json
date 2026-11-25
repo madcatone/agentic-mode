@@ -1,0 +1,8 @@
+{
+  "name": "global-claude",
+  "description": "Check the user-global Claude Code instruction file (~/.claude/CLAUDE.md, or $CLAUDE_CONFIG_DIR/CLAUDE.md when that variable is set). When the file is missing, offer a short global-scope starter — or a one-line See @ pointer if ~/.agents/AGENTS.md or ~/.codex/AGENTS.md already exists — and write only after an explicit yes. When the file exists, review it and propose a diff; do not edit until the user approves. Self-canonical (no harness-neutral playbook counterpart, not part of the vendoring sync).",
+  "version": "1.0.0",
+  "author": {
+    "name": "agentic-mode maintainers"
+  }
+}
