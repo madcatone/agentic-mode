@@ -40,6 +40,10 @@ scripts/check_agentic_docs.py  # the checker, copied verbatim from TOOLKIT/check
 .gitlab-ci.yml | .github/workflows/agentic-docs.yml   # CI gate (placed unless ci.platform: none)
 ```
 
+The doc-set profile (Phase A, question 2) decides how much of this layout
+exists: a Lite target has neither the surface doc nor `docs/WORKFLOW.md`, and
+only a Full target has `docs/architecture.json` (Phase B).
+
 ## config.json — schema v1 (the single source of machine truth)
 
 ```json
@@ -47,11 +51,13 @@ scripts/check_agentic_docs.py  # the checker, copied verbatim from TOOLKIT/check
   "schema_version": 1,
   "project": {"name": "str", "type": "cli|library|web-service|docs-only", "description": "str"},
   "id": {"prefix": "[A-Z]{2,6}"},
-  "docs": {"index": "AGENTIC-MODE.md", "readme": "README.md", "agents": "AGENTS.md",
-           "requirements": "docs/REQUIREMENTS.md",
-           "user_guide": "docs/USER_GUIDE.md or null",
-           "api_reference": "docs/API_REFERENCE.md or null",
-           "validation": "docs/VALIDATION.md", "workflow": "docs/WORKFLOW.md",
+  "docs": {"index": "AGENTIC-MODE.md or null", "readme": "README.md or null",
+           "agents": "AGENTS.md or null",
+           "requirements": "docs/REQUIREMENTS.md — required; never null",
+           "user_guide": "docs/USER_GUIDE.md or null (surface rule below)",
+           "api_reference": "docs/API_REFERENCE.md or null (surface rule below)",
+           "validation": "docs/VALIDATION.md — required; never null",
+           "workflow": "docs/WORKFLOW.md or null",
            "architecture": "docs/architecture.json or null"},
   "bilingual": {"enabled": false,
                 "primary_heading": "## English", "secondary_heading": "## 繁體中文"},
@@ -71,12 +77,25 @@ scripts/check_agentic_docs.py  # the checker, copied verbatim from TOOLKIT/check
 }
 ```
 
+Under `docs`, a value is a path or `null`. `requirements` and `validation` must
+be declared as non-empty paths — `null` or a missing key is a config error. The
+surface doc selected by `project.type` must be a non-empty path or an explicit
+`null` — the Lite opt-out, spelled out under **Undeclared dependencies** below —
+and the other surface key is never required. Every other key (`index`, `readme`,
+`agents`, `workflow`, `architecture`) takes a path, `null`, or no key at all,
+and an undeclared doc gets no scans. Two edges are not config errors. A doc
+that a rule under `checks.commands` names in `must_appear_in` is skipped there
+only when it is declared `null`. Left out of `docs` entirely, it raises a
+`command-consistency` finding. `agents` left `null` while
+`checks.line_limits.agents` is set is a `line-limit` finding.
+
 The checker is invoked exactly one way:
 `python scripts/check_agentic_docs.py --config agentic-mode/config.json`.
 (`forbid_ipv4`, `forbid_local_paths`, and `iteration_history` are opt-in leak /
 continuity sweeps; `ci.runners` is the opt-in runner-declaration sweep — when
-non-empty, the workflow doc must carry a matching `<!-- ci-runners: ... -->`
-marker. See [`checker/config.example.json`](checker/config.example.json)
+non-empty, a governed doc must carry a matching `<!-- ci-runners: ... -->`
+marker. The workflow doc carries it by convention; the checker reads it in any
+governed doc. See [`checker/config.example.json`](checker/config.example.json)
 and the checker's module docstring.)
 
 The config is validated before any check runs; a violation exits `2` naming the
@@ -180,8 +199,8 @@ it sets the rigor for everything after:
    - `full`: append-only provenance enforced. *(default; repo expected to outlive one feature cycle.)*
    - `docs-only`: append-only provenance enforced. *(docs/knowledge repos.)*
    - `light`: **no append-only ritual** — iteration history + per-feature VALIDATION encouraged, not required.
-2. **Project type** — `cli` / `library` / `web-service` / `docs-only`? (Selects the observable-surface doc: `cli`→USER_GUIDE-cli, `library`→API_REFERENCE, `web-service`→USER_GUIDE-web, `docs-only`→none.)
-3. **CI platform** — `gitlab` / `github` / `none`? `none` governs only the CI **gate**; the WORKFLOW doc still follows the team's **actual review platform**.
+2. **Project type + doc-set profile** — `cli` / `library` / `web-service` / `docs-only`, and `Lite` / `Standard` / `Full`? (The type selects the observable-surface doc: `cli`→USER_GUIDE-cli, `library`→API_REFERENCE, `web-service`→USER_GUIDE-web, `docs-only`→none. The doc-set profile selects how many layers Phase B seeds, per the doctrine's doc-set table — Lite, Standard, or Full — and is independent of the co-op profile in Q1. Default `Full` for a repo expected to outlive one feature cycle, as the doctrine's table says.)
+3. **CI platform** — `gitlab` / `github` / `none`? `none` governs only the CI **gate**; the WORKFLOW doc, when the doc-set profile seeds one, still follows the team's **actual review platform**.
 4. **Primary language + test/build command** — the one command that compiles/builds and the one that runs tests, verbatim. No build step? Agree on a cheap static sanity command (syntax check, lint, byte-compile) to fill `{{BUILD_CMD}}`. A placeholder must never survive unresolved.
 5. **One-line purpose + audience** — internal tool vs external product; who reads/uses it.
 6. **Entry points** — which is primary maintained vs secondary/legacy.
@@ -191,27 +210,34 @@ it sets the rigor for everything after:
 10. **Runtime placeholders + neutrality** — which placeholders TARGET needs (e.g. `<package.name>`, `<device-serial>`), and whether the harness-neutrality sweep (and optional IPv4 / machine-path leak sweeps) should run.
 
 Record the answers as the **bootstrap input bundle** and write them into
-`TARGET/agentic-mode/config.json`.
+`TARGET/agentic-mode/config.json`. The doc-set profile has no key of its own:
+it reaches config only as the `null`s under `docs` that Phase B has you declare.
 
 ---
 
 ## Phase B — Produce docs in dependency order (each gated before the next)
 
 Read [`doctrine/BOOTSTRAP-CORE.md`](doctrine/BOOTSTRAP-CORE.md) now if you have
-not. For each doc: open the matching `TOOLKIT/templates/*.template.md`, resolve
-every `{{PLACEHOLDER}}` from the bundle, write the file into TARGET, then run its
-inline gate. **Do not advance on a failed gate.** Production order:
+not. The **doc-set profile** (Q2) decides which steps run, per the doctrine's
+doc-set table: every target runs steps 3, 5, 6, and 7 (Lite), Standard adds
+steps 2 and 4, and Full adds step 1 as well. For each doc: open the
+matching `TOOLKIT/templates/*.template.md`, resolve every `{{PLACEHOLDER}}`
+from the bundle, write the file into TARGET, then run its inline gate. **Do not
+advance on a failed gate.** A skipped step leaves no file behind: declare that
+doc `null` under `docs` in config, and delete every template row, bullet, or
+clause that names it, so no `{{PLACEHOLDER}}` survives. Production order:
 
-1. **`docs/architecture.json`** *(optional — skip unless Q2/need calls for it; set `docs.architecture: null`)*. Gate: every `connection.from`/`.to` resolves; every component label naming a real symbol exists in source; JSON parses.
-2. **`docs/WORKFLOW.md`** — **ported as-is** (verbatim except its declared substitution points) from `WORKFLOW-<platform>.template.md`. Substitute the H1 platform name, the `Template-Source:` marker, and every `{{PLACEHOLDER}}` in the body (build/test/smoke commands, prefix, bilingual conditionals). Resolve the CI-runners line from config `ci.runners` (comma-separated runner names), or **delete the whole line** when config declares no runners — the doc gate checks its `ci-runners:` marker against config. Do **not** re-author its prose — the review loop, comment style, and red lines are platform constants.
+1. **`docs/architecture.json`** *(Full profile — Lite and Standard skip this step; under Full the doctrine still gates the doc on `project.type` and need. Any skip sets `docs.architecture: null`.)* Gate: every `connection.from`/`.to` resolves; every component label naming a real symbol exists in source; JSON parses.
+2. **`docs/WORKFLOW.md`** *(Standard and Full — Lite skips this step and sets `docs.workflow: null`)* — **ported as-is** (verbatim except its declared substitution points) from `WORKFLOW-<platform>.template.md`. Substitute the H1 platform name, the `Template-Source:` marker, and every `{{PLACEHOLDER}}` in the body (build/test/smoke commands, prefix, bilingual conditionals). Resolve the CI-runners line from config `ci.runners` (comma-separated runner names), or **delete the whole line** when config declares no runners — the doc gate checks its `ci-runners:` marker against config. A Lite target has no WORKFLOW doc, so when its config declares runners it carries that line in README instead; the checker reads the marker in any governed doc. Do **not** re-author its prose — the review loop, comment style, and red lines are platform constants.
 3. **`docs/REQUIREMENTS.md`** — Problem/Goals/Non-Goals, enumerated `{{PREFIX}}-001..N` requirements (one per observable behavior), domain/event model, **empty** Iteration History (append-only from here), acceptance criteria, verification commands. Gate: every entry-point behavior maps to ≥1 ID; if bilingual, both tracks share identical ID set/count/order.
-4. **`docs/USER_GUIDE.md` or `docs/API_REFERENCE.md`** — the observable surface, template chosen by `project.type`. Each behavior subsection cites its owning `{{PREFIX}}-XXX`. Gate: every cited ID exists in REQUIREMENTS; surface tables match source 1:1.
-5. **`README.md`** — onboarding: entry table, quick start, architecture overview *derived from the JSON when present*, agent-onboarding pointer, verification commands, neutrality checklist, doc cross-links. Gate: every quick-start command appears in the surface doc; neutrality sweep clean.
+4. **`docs/USER_GUIDE.md` or `docs/API_REFERENCE.md`** *(Standard and Full)* — the observable surface, template chosen by `project.type`. Under Lite, do not write it: declare the type-selected key as an explicit `null` (`docs.user_guide: null` for `cli` / `web-service`, `docs.api_reference: null` for `library`) — the Lite opt-out, with REQUIREMENTS carrying the surface until the upgrade. `docs-only` has no surface doc at any profile. Each behavior subsection cites its owning `{{PREFIX}}-XXX`. A doc you write must also be declared: keep its key at the real path, because a written doc left `null` gets no scans. Gate: every cited ID exists in REQUIREMENTS; surface tables match source 1:1.
+5. **`README.md`** — onboarding: entry table, quick start, architecture overview *derived from the JSON when present*, agent-onboarding pointer, verification commands, neutrality checklist, doc cross-links. Gate: every quick-start command appears in the surface doc (under Lite or `docs-only`, in the REQUIREMENTS row that carries that surface); neutrality sweep clean.
 6. **`AGENTS.md`** — **lean**: repo facts + the co-op contract (change-flow, sign-off, Stop-and-Ask). *What/Done* only — **no** generic agent discipline, **no** platform-CLI rules. Gate: every Key-Files path exists; every dev command runs clean; **≤ `checks.line_limits.agents` lines**; no platform-CLI rule leaked in.
 7. **`docs/VALIDATION.md`** — seed **empty** with the file H1 and the per-feature block template in a comment, placeholders resolved to TARGET's real prefix and commands. Gate: file exists; seed parses; no `<command>`/`{{PLACEHOLDER}}` left.
 
 Also write **`AGENTIC-MODE.md`** (root index) and **`agentic-mode/SELF-TEST.md`**
-(from their templates). These are resident meta files, not part of the chain.
+(from their templates), under every doc-set profile. These are resident meta
+files, not part of the chain.
 Render their body prose in the TARGET's chosen language, but keep the canonical
 English section headings and the `Template-Source:` markers exactly as the
 templates carry them — headings are cross-repo reference anchors (see
@@ -228,19 +254,25 @@ sensitive area — for the code owner to fill in.
 1. **Copy the checker** verbatim: `TOOLKIT/checker/check_agentic_docs.py` →
    `TARGET/scripts/check_agentic_docs.py`.
 2. **Place the CI gate whenever `ci.platform` is `gitlab` or `github`** — for
-   every co-op profile, `docs-only` included; the placed gate runs the checker on
-   **all** changes (docs-only changes are not exempt). The only thing that skips
-   a CI file is `ci.platform: none`:
+   every co-op profile and every doc-set profile, `docs-only` included; the
+   placed gate runs the checker on **all** changes (docs-only changes are not
+   exempt). The only thing that skips a CI file is `ci.platform: none`:
    - gitlab → `templates/ci-gitlab.template.yml` → `.gitlab-ci.yml`
    - github → `templates/ci-github.template.yml` → `.github/workflows/agentic-docs.yml`
+
+   The doctrine's Full row also names "full SELF-TEST automation in CI". The
+   toolkit ships nothing beyond this gate for it: the gate runs the SELF-TEST
+   §A command for every profile, and §B stays manual.
 3. **Run** `python scripts/check_agentic_docs.py --config agentic-mode/config.json`.
    Fix the offending **doc**, not the checker, and re-run until it exits clean.
    A failed row blocks hand-off. (`checks.entrypoints` byte-compiles `.py`
    entries; non-Python entrypoints get an existence check only.)
-4. **Placeholder sweep.** The checker does not govern `AGENTIC-MODE.md`,
-   `agentic-mode/SELF-TEST.md`, or the CI file — sweep every generated file
-   yourself: `grep -rn '{{'` over the index, AGENTS, README, `docs/`,
-   `agentic-mode/`, and the CI file must return **nothing**.
+4. **Placeholder sweep.** No check in the checker looks for a leftover
+   placeholder, in any file: it scans a declared index for IDs and deny words
+   but never for `{{`, and it does not scan `agentic-mode/SELF-TEST.md` or the
+   CI file at all. Sweep every generated file yourself: `grep -rn '{{'` over
+   the index, AGENTS, README, `docs/`, `agentic-mode/`, and the CI file must
+   return **nothing**.
 
 ---
 
@@ -253,10 +285,11 @@ Summarize for the user:
   verification command: `python scripts/check_agentic_docs.py --config agentic-mode/config.json`.
 - **The daily loop** — for any behavior change: edit code → append/update the
   requirement ID in REQUIREMENTS (with an Iteration History entry) → update the
-  USER_GUIDE/API_REFERENCE subsection citing that ID → update README quick-start
-  if the surface changed → **append** a VALIDATION block citing the ID +
-  issue/MR/PR number → run the checker → move the change through
-  `docs/WORKFLOW.md`. The ID is the join key.
+  USER_GUIDE/API_REFERENCE subsection citing that ID (under Lite or
+  `docs-only` there is none; the requirement row carries the surface) → update README quick-start if the
+  surface changed → **append** a VALIDATION block citing the ID + issue/MR/PR
+  number → run the checker → move the change through `docs/WORKFLOW.md`
+  (Standard and Full; Lite has no WORKFLOW doc). The ID is the join key.
 - **The guardrails** — point them at `agentic-mode/SELF-TEST.md`: two failed
   fixes of one check → stop and escalate; the Stop-and-Ask list; "uncertainty =
   not done"; never mark done because budget/time ran out.
@@ -279,9 +312,10 @@ TARGET already carries some layers. **Merge, never clobber.**
    is trimmed toward the line limit only with the user's ok.
 4. **Reconcile the config.** Point `docs.*` at wherever the real files live
    (names may differ from defaults — the config is the indirection layer).
-5. **Wire enforcement + converge.** Copy the checker, add the CI gate per
-   profile, run the checker, and close the reported gaps until clean. Report
-   every gap you filled and every existing file you left untouched.
+5. **Wire enforcement + converge.** Copy the checker, add the CI gate whenever
+   `ci.platform` is `gitlab` or `github` (Phase C step 2), run the checker, and
+   close the reported gaps until clean. Report every gap you filled and every
+   existing file you left untouched.
 
 Adopt is deliberately conservative: the win is coherence and enforceability, not
 a rewrite.
@@ -290,10 +324,11 @@ a rewrite.
 
 ## Upgrading an adopted repo to a newer toolkit version
 
-Adopted repos carry two artifacts that age: the checker (copied verbatim in
-Phase C) and the ported WORKFLOW (versioned by its `Template-Source:` marker).
-A toolkit release changes neither silently — upgrade on purpose, and record it
-like any change.
+Adopted repos carry two kinds of artifact that age: the checker (copied
+verbatim in Phase C) and every doc rendered from a template that carries a
+`Template-Source:` marker — the ported WORKFLOW, the resident index
+(`AGENTIC-MODE.md`), and `agentic-mode/SELF-TEST.md`. A toolkit release changes
+none of them silently — upgrade on purpose, and record it like any change.
 
 1. **Read the delta before swapping.** Diff your checker against the new tag
    before replacing it (`git -C <toolkit-repo> show <tag>:checker/check_agentic_docs.py`
@@ -303,11 +338,13 @@ like any change.
 2. **Swap the checker verbatim from the tag**, byte-compile it, run the gate.
    A new check firing on your current docs is the upgrade working as designed —
    fix the docs (add the missing declaration), not the checker.
-3. **Re-port the template only at its declared substitution points** when
-   `Template-Source` bumps (@v1 → @v2): the template header lists what moved
-   (new lines, new sections). Port those into your WORKFLOW; local sections you
-   authored yourself (recipes, checklists) are yours to keep — `Template-Source`
-   records the base you ported from, not a lockstep contract.
+3. **Re-port each marked doc only at its declared substitution points** when
+   its `Template-Source` bumps (@v1 → @v2): the template header lists what moved
+   (new lines, new sections). Check every doc that carries a marker, not only
+   WORKFLOW, because a release can move the index or SELF-TEST template too. Port
+   the changes into your copy; local sections you authored yourself (recipes,
+   checklists) are yours to keep — `Template-Source` records the base you ported
+   from, not a lockstep contract.
 4. **Record it like any change**: REQUIREMENTS iteration-history entry +
    VALIDATION block citing the PR, with the diff-against-tag as evidence.
 

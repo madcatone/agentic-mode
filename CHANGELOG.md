@@ -58,7 +58,7 @@ the tag date.
   exemption principle the neutrality check already applies. New fire-demo
   `m5` proves a quoted marker stays clean while the real declaration gates.
 
-## [1.1.0] — 2026-11-11
+## [1.1.0] — 2026-11-12
 
 First tagged release.
 

@@ -5,6 +5,13 @@ Per-feature done evidence. One block per landed non-trivial change. A reviewer
 Each block cites the stable `TODO-NNN` IDs and the issue/PR number so the ID
 trail stays followable. Append-only: never rewrite a past block.
 
+**Post-merge evidence clause.** Evidence that exists only after merge — deployments,
+live previews — may be backfilled into the same block's Status subsection via a small
+chore PR: limited to adding a post-merge entry or replacing that block's explicit
+"unverified / pending" wording, and it must cite the original PR/MR. Every other
+subsection stays append-only. This is the only declared exception to "never rewrite
+a past block."
+
 ---
 
 ## Core task verbs (PR #1)

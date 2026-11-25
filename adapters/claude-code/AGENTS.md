@@ -27,6 +27,13 @@ do not belong there. The plugin catalog is [`README.md`](README.md).
   [`plugins/team-kit/STATE-CONTRACT.md`](plugins/team-kit/STATE-CONTRACT.md).
   When that contract and the kit code disagree, follow the code and update the
   contract (the file says the same).
+- [`dispatch/`](dispatch/): the dispatch kit, a dated snapshot of the origin
+  machine's `~/.claude/` commander-mode dispatch system (rule files and
+  subagent definitions). Install it by copying the contents of `home/` into
+  `~/.claude/`. The kit is not a plugin and has no marketplace entry. It is not
+  in the sync MANIFEST either, because its canon is on the origin machine. To
+  update it, re-package from that machine. It is the evolved counterpart to the
+  `fable5` founding prompt. See [`dispatch/README.md`](dispatch/README.md).
 
 ## Vendoring
 
@@ -54,7 +61,7 @@ folders, where that variable is undefined. The root contract's check must
 print `clean` and exit 0 only when grep exits 1 (a match or a grep error fails):
 
 ```bash
-status=0; grep -rn 'PLUGIN_ROOT' adapters/claude-code/plugins || status=$?; if [ "$status" -eq 1 ]; then echo clean; elif [ "$status" -eq 0 ]; then echo FOUND; exit 1; else echo "grep error: exit ${status}"; exit "$status"; fi
+rc=0; grep -rn 'PLUGIN_ROOT' adapters/claude-code/plugins || rc=$?; if [ "$rc" -eq 1 ]; then echo clean; elif [ "$rc" -eq 0 ]; then echo FOUND; exit 1; else echo "grep error: exit ${rc}"; exit "$rc"; fi
 ```
 
 ## Commands

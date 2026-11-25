@@ -1,20 +1,23 @@
 <!-- Copied from templates/WORKFLOW-github.template.md (agentic-mode).
-     Only the H1, the Template-Source marker, and the build/test/smoke command
-     placeholders were substituted; the review-loop body is unchanged.
-     Template-Source: agentic-bootstrap/WORKFLOW-github@v1 -->
+     Only the H1, the Template-Source marker, and the template's placeholders
+     (build/test/smoke commands, prefix, bilingual) were substituted; the
+     review-loop body is unchanged. One local exception is kept across template
+     refreshes. The docs gate runs through the parent repo's checker, because
+     this example ships no copy of it.
+     Template-Source: agentic-bootstrap/WORKFLOW-github@v2 -->
 
 
 # GitHub Workflow — Collaborator Rule
 
-> **Status: NEW — not yet battle-tested.** This mirrors the field-proven GitLab workflow onto GitHub's PR model. If a step does not fit `gh`'s actual behavior, fix it and note the deviation.
+> **Status: field-proven.** Initially mirrored from the GitLab workflow; since validated end-to-end in a real adoption (bootstrap → tagged releases). If a step does not fit `gh`'s actual behavior, fix it and note the deviation.
 
-This document is the authoritative GitHub workflow rule for anyone (human or agent) working in this repo. Read it before touching issues, branches, commits, or PRs. It complements `README.md` and `AGENTS.md` (code/scope/test discipline) — this file focuses on the issue → branch → commit → PR → review loop. Assume the reader is new and has no chat history. All commands run from the repo root.
+This document is the authoritative GitHub workflow rule for anyone (human or agent) working in this repo. Read it before touching issues, branches, commits, or PRs. It complements `README.md` and `AGENTS.md` (code/scope/test discipline) — this file focuses on the issue → branch → commit → pull request (PR) → review loop. Assume the reader is new and has no chat history. All commands run from the repo root.
 
 ## 0. Iron Rules (apply in every context)
 
 - **Without explicit user consent, do not commit, push, amend, rebase, force-push, or `--no-verify`.** "The user agreed once" is not standing consent; ask every time.
-- **No blanket staging** (`git add -A` / `git add .`). Stage files explicitly: `git add <file1> <file2>`.
-- **Never claim tests pass without running them.** Run the repo's real commands (from AGENTS Development Commands): build/compile `python3 -m py_compile todo.py`; tests `python3 todo.py list`. Green means you saw the passing summary.
+- **No blanket staging** (`git add -A` / `git add .`). Stage files explicitly: `git add <file1> <file2>`. Ignored directories can still let stray untracked files slip into the stage.
+- **Never claim tests pass without running them.** Run the repo's real commands (from AGENTS Development Commands): build/compile `python3 -m py_compile todo.py`; tests `python3 todo.py list`. Green means you saw the passing summary, not "should pass." (see §10 Red lines)
 - **A behavior change must sync docs in the same change** (REQUIREMENTS iteration history + observable-surface doc + VALIDATION). Otherwise it is not done.
 - **PR and issue comments must be self-contained.** The reader has not seen your chat history.
 - External replies posted to GitHub issues/PRs use an EOF-terminated multi-line format (HEREDOC). Chat replies are exempt.
@@ -27,7 +30,7 @@ gh issue view <N> --comments
 ```
 
 ### Post research / progress to an issue
-Summarize findings into at least one comment. When asked to "investigate and reply on the issue," use a HEREDOC:
+Keep the issue title in the primary title language the platform expects. Summarize findings into at least one comment. When asked to "investigate and reply on the issue," use a HEREDOC:
 ```bash
 gh issue comment <N> --body "$(cat <<'EOF'
 ## <title> — research
@@ -66,7 +69,7 @@ One issue → one branch → one PR. Do not smuggle unrelated changes into a bra
 ## 3. Commit
 
 ### Format
-Conventional commit (team convention — the canonical rules live in the team-skills plugin's `gcm` skill):
+Conventional commit (team convention — the canonical rules live in your team's commit-message playbook):
 ```
 <type>[ <TICKET>]: <Subject>
 
@@ -75,7 +78,7 @@ Conventional commit (team convention — the canonical rules live in the team-sk
 **Types:** `feat`, `fix`, `refactor`, `perf`, `test`, `docs`, `style`, `build`, `ci`, `ops`, `chore`, `revert` (dependency bumps are `build`, not `chore`; only CI-config changes are `ci`).
 **Ticket (as-needed):** when the change maps to a tracked ticket, put its ID between the type and the colon, space-separated, no parentheses (`fix PROJ-123: Correct session teardown`); omit it when there is no ticket.
 **Subject:** ≤ 50 chars, type lowercase, subject first letter capitalized, imperative, no trailing period.
-**Body:** a few tight lines; explain motivation/trade-offs/pitfalls; include measured evidence; reference the requirement ID ("implements TODO-0NN") and `Closes #N`. Omit the body entirely when the diff already shows the why.
+**Body:** 1–4 tight lines; explain motivation/trade-offs/pitfalls; include measured evidence; reference the requirement ID ("implements TODO-0NN") and `Closes #N`. Omit the body entirely when the diff already shows the why.
 **Precedence:** if this repo has a commit-msg hook or its own documented convention, that takes precedence over these defaults.
 
 ### HEREDOC example
@@ -175,7 +178,9 @@ Report the PR URL and key metadata (head→base, assignee, checks status) to the
 
 ## 6.a Code review — requesting
 - Review the PR the user names: `gh pr view <N> --comments` and `gh pr diff <N>`.
-- Find non-nitpick issues where possible.
+- Report every non-nitpick issue you find. If you find none after reading the full diff, say so explicitly.
+- Mark each finding `introduced` (created by this PR's diff) or `pre-existing` (already on the base branch — verify against the diff to base / `git blame`). Report pre-existing issues too, but marked as such: not introduced by this PR, so they do not block merge and are not the author's miss; file a separate issue instead of forcing the fix into this PR.
+- Open the review summary with a count line — `N findings: X confirmed / Y plausible / Z pre-existing` — before any detail.
 - Raise findings as PR review comments. If quality is fine, approve with `LGTM`.
 
 ```bash
@@ -198,12 +203,14 @@ gh pr view <N> --comments
 2. Fix blocking (mandatory) + cheap non-blocking (batch them).
 3. **One review round = one commit**, message `fix(<scope>): <what> (PR #N review)`.
 4. Re-run full verification (§4).
-5. Commit, push, then post a summary comment.
+5. Commit. Push only if the user has consented (a PR review commit must be pushed to appear — ask first). Then post a summary comment.
 
 ### Notes
-- **A bug fix must include a before/after repro** — reproduce the reviewer's condition (wrong result), fix, reproduce again (right result).
-- **Non-blocking trade-off:** if a change balloons scope, split it into a follow-up issue and say so.
+- **A bug fix must include a before/after repro plus a one-line root cause** — reproduce the reviewer's condition (wrong result), fix, reproduce again (right result), and state in one line which cause the fix targets (not just the symptom).
+- **Non-blocking trade-off:** if fixing a non-blocking item touches files outside the current issue's scope, or adds a new behavior, split it into a follow-up issue and say so in the comment.
 - **Do not silently drop a reviewer's point:** argue the case in reply rather than ignoring it.
+- **Pre-existing findings** (marked by the reviewer as not introduced by this PR): respond with one of — open a follow-up issue, record it on the backlog, or state why it will not be fixed here. Never leave one unanswered; never force the fix into this PR.
+- **Third round without convergence:** if the reviewer suggests stepping back and rethinking the approach, re-examine the approach against the issue — do not patch the same line yet again.
 
 ```bash
 gh pr comment <N> --body "$(cat <<'EOF'
@@ -226,7 +233,7 @@ EOF
 - Reading an approval / `LGTM` means the code quality is accepted; no further review needed.
 
 ## 7. Cleanup after merge
-- After the PR merges, the local branch may be deleted: `git branch -d <branch>` (merged only; never `-D`).
+- After the PR merges, you may delete the local branch: `git branch -d <branch>` (delete only if merged; never `-D`).
 - GitHub can auto-delete the head branch on merge (repo setting); do not force it manually.
 
 ## 8. gh quick reference
@@ -261,3 +268,16 @@ gh pr list
 - Reply to an issue without reading `gh issue view <N> --comments` in full.
 - Put chat context into a commit message or PR description.
 - Assume the reader remembers a prior conversation; PR/issue comments must be self-contained.
+
+## 11. Release checklist (tagged releases)
+
+One release = one squash-merged PR onto the default branch + one annotated tag. Run top to bottom; do not skip the verification steps — a green pipeline proves the build, not the artifact.
+
+1. Inventory changes since the last tag: `git log --oneline <last-tag>..<default-branch>`.
+2. Branch `release/vX.Y.Z` from the default branch. The prepare commit touches exactly the changelog (new section) and the version file — nothing else.
+3. Open the release PR against the default branch; merge **squash** (one commit per release on the default branch), after §4 verification and CI is green.
+4. Tag the squash commit: `git tag -a vX.Y.Z -m vX.Y.Z <sha> && git push origin vX.Y.Z`.
+5. If merging triggers a deployment, verify the deployed artifact itself (a fresh version timestamp, a live smoke test) — not just a green job; a job can skip by design and stay green. Encode the verification as a script in this repo; do not re-derive it from prose each release.
+6. Back-merge the default branch into the development branch via PR (`chore: merge vX.Y.Z back`).
+7. Optionally run the zero-context read-back probe (`agentic-mode/SELF-TEST.md` §D) before tagging — it catches semantic doc drift the structural gate cannot.
+8. Backfill post-merge deploy evidence into the release PR's VALIDATION block (post-merge clause, `docs/VALIDATION.md` header).

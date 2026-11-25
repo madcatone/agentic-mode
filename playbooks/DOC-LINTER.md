@@ -24,7 +24,7 @@ Follow these steps in order.
 ### Step 1 — Classify the document
 
 Identify:
-- **Document type**: skill / claude-md / handoff / readme / runbook-or-prompt / generic. Ask the user when the file name and the content point to different types.
+- **Document type**: skill / claude-md / handoff / readme / runbook / generic. Ask the user when the file name and the content point to different types.
 - **Language**: English / Traditional Chinese / mixed. Lint rules apply to all languages. Write the report in the language the user speaks in the conversation.
 
 ### Step 2 — Build the terminology map
@@ -278,7 +278,7 @@ Apply the section that matches the document type. These add to the rule catalog;
 - **D-RM2 · error** — Setup commands are complete and copy-pasteable: they include the working directory and prerequisites, and they run in the order written.
 - **D-RM3 · warning** — The README states which parts an agent may rely on as stable (commands, paths) versus descriptive prose that may lag the code.
 
-## runbook-or-prompt (runbooks, slash commands, system prompts)
+## runbook (runbooks, slash commands, system prompts)
 
 - **D-RB1 · error** — The trigger condition is explicit: exactly when does this procedure apply, and when does it not.
 - **D-RB2 · error** — Every step with a side effect (deploy, delete, send, publish) states its precondition and its rollback or abort path.

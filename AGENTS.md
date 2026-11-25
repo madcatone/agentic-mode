@@ -98,7 +98,7 @@ sh adapters/claude-code/plugins/team-kit/eng/tests/run-tests.sh
 - Sweep for leftover template placeholders in the example (prints `clean` and exits 0 only when grep exits 1; a match or a grep error fails):
 
 ```bash
-status=0; grep -rn '{{' examples/minimal-cli || status=$?; if [ "$status" -eq 1 ]; then echo clean; elif [ "$status" -eq 0 ]; then echo FOUND; exit 1; else echo "grep error: exit ${status}"; exit "$status"; fi
+rc=0; grep -rn '{{' examples/minimal-cli || rc=$?; if [ "$rc" -eq 1 ]; then echo clean; elif [ "$rc" -eq 0 ]; then echo FOUND; exit 1; else echo "grep error: exit ${rc}"; exit "$rc"; fi
 ```
 
 - Byte-compile the doc linter and lint its own playbook (must exit 0):
@@ -130,7 +130,7 @@ python3 -m json.tool .claude-plugin/marketplace.json >/dev/null && echo ok
 - Prove the skills carry no harness-injected path variable (prints `clean` and exits 0 only when grep exits 1; a match or a grep error fails):
 
 ```bash
-status=0; grep -rn 'PLUGIN_ROOT' adapters/claude-code/plugins || status=$?; if [ "$status" -eq 1 ]; then echo clean; elif [ "$status" -eq 0 ]; then echo FOUND; exit 1; else echo "grep error: exit ${status}"; exit "$status"; fi
+rc=0; grep -rn 'PLUGIN_ROOT' adapters/claude-code/plugins || rc=$?; if [ "$rc" -eq 1 ]; then echo clean; elif [ "$rc" -eq 0 ]; then echo FOUND; exit 1; else echo "grep error: exit ${rc}"; exit "$rc"; fi
 ```
 
 ## Change Flow (What "Done" Requires)
