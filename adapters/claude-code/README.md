@@ -43,7 +43,7 @@ Each plugin is independent and optional — install only what your team wants.
 | [`fable5`](plugins/fable5) | Commander-mode operating discipline + the strong-model founding prompt. | The plugin directory itself (self-canonical — see below) |
 | [`commander`](plugins/commander) | The runnable per-repo dispatch-and-score loop: constitution, report protocol, task template, dispatch + scoring scripts, ledger scaffold. | The plugin directory itself (self-canonical — see below) |
 | [`idea-to-spec`](plugins/idea-to-spec) | The spec synthesizer: turn rough idea material into a development SPEC — batch interview, size triage, 12-section template. | The plugin directory itself (self-canonical — see below) |
-| [`pstack`](plugins/pstack) | Thirty-six third-party engineering skills under MIT: 24 design/execution principles plus architect, arena, benchmark-checklist, blast-radius, create-verification-skill, figure-it-out, interrogate, maintain-verification-skill, tdd, technical-writing, typescript-best-practices, and unslop. | The plugin directory itself (self-canonical — see below; third-party, see its `THIRD-PARTY-NOTICE.md`) |
+| [`pstack`](plugins/pstack) | Forty-five third-party engineering skills under MIT: 24 design/execution principles plus 21 workflow skills, including the nine added in the 0.15.48 resync (poteto-help, ketchup, in-your-own-words, sharpen, create-formal-verification-skill, maintain-formal-verification-skill, statechart, ketchup-video, reframe). Operator guide: [`plugins/pstack/docs/new-skills.md`](plugins/pstack/docs/new-skills.md) and [`new-skills-zh.md`](plugins/pstack/docs/new-skills-zh.md). | The plugin directory itself (self-canonical — see below; third-party, see its `THIRD-PARTY-NOTICE.md`) |
 | [`team-kit`](plugins/team-kit) | The four-role worker kit: observer (pure dispatcher), coder (implementation under a SubagentStop verify gate), reviewer (dual-axis read-only review), fortify (security pre-check) — plus the team-rules canon, hook scripts, and the state contract. | The plugin directory itself (self-canonical — see below; see its `STATE-CONTRACT.md`) |
 | [`global-claude`](plugins/global-claude) | Check or seed the user-global Claude Code instruction file (`~/.claude/CLAUDE.md`, or `$CLAUDE_CONFIG_DIR/CLAUDE.md`). Invoke with `/global-claude`. | The plugin directory itself (self-canonical — see below) |
 
@@ -56,7 +56,7 @@ per-user config home or a per-repo ledger); `fable5` is the machine-wide doctrin
 and founding prompt, and `commander` is the runnable per-repo instance of it.
 `idea-to-spec` is an interactive authoring workflow whose product is one
 project's SPEC, so its canon is the procedure itself rather than a rules document
-a reader could apply by hand. `pstack` is a third-party skill pack — 36 skills
+a reader could apply by hand. `pstack` is a third-party skill pack — 45 skills
 ported under MIT from an external collection (see its `THIRD-PARTY-NOTICE.md`) —
 so its canon is the imported collection itself, which this repo does not author.
 `team-kit` is a four-role worker kit (dispatcher plus gated workers) whose canon

@@ -162,7 +162,7 @@ independent and optional:
 | `fable5` | Commander-mode operating discipline + the strong-model founding prompt. | The plugin directory itself (self-canonical) |
 | `commander` | The runnable per-repo dispatch-and-score loop: constitution, report protocol, task template, dispatch + scoring scripts, ledger scaffold. | The plugin directory itself (self-canonical) |
 | `idea-to-spec` | The spec-synthesizer skill: batch interview, size triage, 12-section SPEC template. | The plugin directory itself (self-canonical) |
-| `pstack` | Thirty-six third-party engineering skills under MIT: 24 design/execution principles plus architect, arena, benchmark-checklist, blast-radius, create-verification-skill, figure-it-out, interrogate, maintain-verification-skill, tdd, technical-writing, typescript-best-practices, and unslop. | The plugin directory itself (self-canonical; third-party under MIT) |
+| `pstack` | Forty-five third-party engineering skills under MIT: 24 design/execution principles plus 21 workflow skills (architect, arena, benchmark-checklist, blast-radius, create-formal-verification-skill, create-verification-skill, figure-it-out, in-your-own-words, interrogate, ketchup, ketchup-video, maintain-formal-verification-skill, maintain-verification-skill, poteto-help, reframe, sharpen, statechart, tdd, technical-writing, typescript-best-practices, unslop). | The plugin directory itself (self-canonical; third-party under MIT) |
 | `team-kit` | The four-role worker kit: observer (pure dispatcher), coder (implementation under a SubagentStop verify gate), reviewer (dual-axis read-only review), fortify (security pre-check) — plus the team-rules canon, hook scripts, and the state contract. | The plugin directory itself (self-canonical; see its STATE-CONTRACT.md) |
 | `global-claude` | Check or seed the user-global Claude Code instruction file (`~/.claude/CLAUDE.md`, or `$CLAUDE_CONFIG_DIR/CLAUDE.md`). Invoke with `/global-claude`. | The plugin directory itself (self-canonical) |
 
@@ -179,7 +179,7 @@ into a per-user config home); `commander` ships the runnable per-repo instance o
 that same doctrine (a constitution plus dispatch/scoring scripts a subagent CLI
 drives); `idea-to-spec` is an interactive authoring workflow that produces one
 project's SPEC, so its canon is the skill procedure itself rather than a rules
-document a reader could apply by hand. `pstack` is a third-party skill pack — 36
+document a reader could apply by hand. `pstack` is a third-party skill pack — 45
 engineering skills ported under MIT from an external collection, attribution in
 its `THIRD-PARTY-NOTICE.md` — so its canon is the imported collection itself.
 `team-kit` is a four-role worker kit (dispatcher plus gated workers) whose canon
@@ -222,6 +222,28 @@ their subdirectories come along.
 > variable such as `${CLAUDE_PLUGIN_ROOT}`, or an absolute path, breaks the
 > install everywhere except Claude Code. See [`AGENTS.md`](AGENTS.md).
 
+## pstack skills added in the 0.15.48 resync
+
+Nine workflow skills joined the existing 36. The full rules, an example
+session, and the analysis for each one are in
+[`adapters/claude-code/plugins/pstack/docs/new-skills.md`](adapters/claude-code/plugins/pstack/docs/new-skills.md)
+(Traditional Chinese:
+[`new-skills-zh.md`](adapters/claude-code/plugins/pstack/docs/new-skills-zh.md)).
+Upstream commit `9e278fe4d4ecd8bfe98b1b79bf4be662efb338cc`. Local plugin
+version 1.1.0.
+
+| Skill | What it enforces, and where it stops | How to run it | When to use it, and the trap |
+| --- | --- | --- | --- |
+| `in-your-own-words` | Restate the goal and the problem. Stop there. | `/in-your-own-words` on a long ask. Output is the restatement `interrogate` uses as intent. | Start of a messy thread. Trap: treating the restatement as permission to start work. |
+| `sharpen` | Four points (what a specialist would add, the raw material, the methods, the outside check), then a rewritten prompt that prototypes experiment-settled choices. Do not do the task. | `/sharpen` on the prompt you were about to send. | Before a non-trivial prompt. Trap: adding features instead of depth. |
+| `reframe` | If the description could be two or three problems, list them with the sign that tells them apart, then 8–12 checked terms, 2–3 neighboring fields, and a rewritten description. Cut any citation you did not open. | `/reframe` on your description plus the files. | Before design, when the everyday words could name two objects. Trap: a rewrite that adds scope. |
+| `ketchup` | Read-only catch-up since your last message in this chat, under 100 words plus pictures you already have, and every call that waits on you. Invent no call and no screenshot. | `/ketchup`. Output: opening sentence, pictures, one spoken line per request, action items with a pick, evidence, and risk. | When you return to a long chat. Trap: marking done a thing that still waits on you. |
+| `ketchup-video` | Same window and action items as `ketchup`, shown as a silent slide video (at most 10 slides, ten-word subtitles, holds checked on the rendered frames). | `/ketchup-video`. If no slide-to-video tool exists, the reply names the missing tool and falls back to the `ketchup` text. | When the chat already has something to point at. Trap: a screen recording, or a subtitle that covers the slide. |
+| `poteto-help` | Answer which shipped skill fits. One prompt, one link. Do not start the work. The catalog is the 45 skills in this pack. | `/poteto-help` with a question, not a task. | When you do not know the slash name. Trap: recommending a skill this pack does not ship. |
+| `create-formal-verification-skill` | Verify one high-cost, rarely-tested property and leave a project-local skill that has been run on a scratch break. Do not weaken the property. A TLA+ result is read with `statechart`. | `/create-formal-verification-skill`, or "prove this invariant". | Races, retries, parsers, unsafe code. Trap: a check that has never been seen to fail. |
+| `maintain-formal-verification-skill` | After later commits, class drift versus bugs. Outcomes: in sync, updated, bug, blocked. Edit the verification only. Move the sync commit only for a check you brought back. | `/maintain-formal-verification-skill` after merges in covered code. | When a stale model would still pass. Trap: editing product code in the same pass. |
+| `statechart` | Draw a TLA+ model as a Mermaid statechart and report the shortest path to each broken rule. Scratch folder outside the repo. Chart stays at 20 arrows or fewer. | `/statechart`. First run installs TLC and Java and needs a network. | Product flows and models from the formal skill. Trap: merging two broken rules into one state. |
+
 ## Repo map
 
 | Path | What it is |
@@ -253,7 +275,7 @@ of this repo's contract, not a second copy of the rules):
   marketplace: the `agentic-bootstrap` toolkit, the five playbooks, and the
   self-canonical `fable5` commander-mode discipline, `commander`
   dispatch-and-score loop, `idea-to-spec` spec synthesizer, `pstack`
-  third-party engineering-skill pack (36 skills under MIT), `team-kit`
+  third-party engineering-skill pack (45 skills under MIT), `team-kit`
   four-role worker kit, and `global-claude` global instruction-file check packaged as
   optional, independently installable plugins (see
   [its README](adapters/claude-code/README.md) and [Install as Claude Code
