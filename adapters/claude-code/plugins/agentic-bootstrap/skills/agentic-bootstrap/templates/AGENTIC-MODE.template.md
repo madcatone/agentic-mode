@@ -6,6 +6,9 @@ bilingual.enabled, and the surface row's `{{SURFACE_DOC_ROLE}}`. `{{SURFACE_DOC_
 `endpoints` for one with no screens, `the public API` for a library (RUNBOOK Phase B, step 4).
 `{{TOOLKIT_LOCATION}}` is where a reader opens the toolkit's doctrine.
 RUNBOOK Phase A sets it.
+The project-neutral sentence in the Project line stays at every target, because it
+states the rule. A target with no runtime placeholders drops only the words from
+`replace any placeholder` to `runtime values`.
 Rows and cells that name an optional doc sit inside `{{IF ...}}` regions,
 resolved per BOOTSTRAP-CORE, "Conditional Text in Templates". This file is META and RESIDENT:
 it is meant to be read every session. Keep it short — it routes; it is not the content.
