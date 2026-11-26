@@ -10,6 +10,7 @@ checks the `ci-runners:` marker against config.
 `{{TEST_CMD}}`: a target with no tests deletes the words
 `; tests {{TEST_CMD}}` from the Iron Rules bullet that lists the commands,
 and keeps the rest of the bullet.
+`{{IF_BILINGUAL: <text>}}`: delete it together with the space before it.
 BILINGUAL comment rule (dual-language external replies + EOF-terminated multi-line format) applies ONLY
 when config bilingual.enabled == true; if monolingual, replies are single-language (still self-contained,
 still EOF-terminated multi-line). Chat replies are never bound by the external-reply format.

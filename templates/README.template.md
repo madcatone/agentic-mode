@@ -16,6 +16,8 @@ Main Components: `{{SYMBOL_n}}` is one bullet per public function, class, or mod
 point. Leave out a name that starts with an underscore unless a requirement row cites it.
 `{{SECONDARY_USE_CASE_TITLE_OR_DELETE}}`: a second quick start the target has. When there is none,
 delete the heading and its code block. It is not the secondary entry point of Phase A question 6.
+`{{REGION_LIST_FROM_JSON}}`: with no regions in the architecture doc,
+write `none`.
 Data Flow: one numbered step per stage, from what enters to what leaves. The two lines are samples.
 Harness-neutral: never name a specific agent product, model, or proprietary tool.
 Resolve `{{IF ...}}` regions per BOOTSTRAP-CORE, "Conditional Text in Templates".

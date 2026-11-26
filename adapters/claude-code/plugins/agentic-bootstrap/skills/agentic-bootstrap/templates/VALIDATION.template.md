@@ -16,7 +16,7 @@ Harness-neutral: never name a specific agent product, model, or proprietary tool
 Template-Source: agentic-bootstrap/VALIDATION@v2  (@v2: the block template's slots are plain words,
 so a rendered seed passes the Phase-C placeholder sweep; a read-back record template sits beside
 the block template; no angle-bracket token remains in the file;
-the ID example uses three digits)
+the ID example uses three digits; the record template's instructions sit above its fill-in lines)
 Rendered copies keep the Template-Source lines in a comment at the top of the file; the rest of this header is not rendered.
 -->
 
@@ -69,12 +69,14 @@ One paragraph: what is covered and any intentional exclusions. If a requirement 
 
 ==== READ-BACK RECORD TEMPLATE — append at the bottom when a read-back runs (SELF-TEST §D) ====
 
-DATE is the ISO date. SCOPE is `bootstrap`, `adoption`, `doc-set upgrade`, or the name of the change that was read back.
+Replace every slot below. DATE is the ISO date. SCOPE is `bootstrap`, `adoption`, `doc-set upgrade`,
+or the name of the change that was read back. There is one Question line per question, and a failure
+names the gap instead of a citation. A probe that could not run gets the Probe line alone.
 ## Read-back — DATE (SCOPE)
 
 - Reader: who or what read back, with no chat history.
-- Question 1: pass, answered from file:section. One line per question. A failure names the gap.
-- Probe not run: the reason. Write only this line when no zero-context reader was available.
+- Question 1: pass, answered from file:section.
+- Probe not run: the reason.
 
 ==== END READ-BACK RECORD TEMPLATE ====
 -->

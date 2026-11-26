@@ -10,6 +10,7 @@ checks the `ci-runners:` marker against config.
 `{{TEST_CMD}}`: a target with no tests deletes the words
 `; tests {{TEST_CMD}}` from the Iron Rules bullet that lists the commands,
 and keeps the rest of the bullet.
+`{{IF_BILINGUAL: <text>}}`: delete it together with the space before it.
 NOTE: initially a structural mirror of the GitLab variant; since validated end-to-end in a real
 adoption (bootstrap through multiple tagged releases, including a CI-runner migration). Treat
 deviations found in your own use as bugs to report upstream.

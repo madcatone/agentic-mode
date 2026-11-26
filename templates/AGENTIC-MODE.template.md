@@ -7,8 +7,9 @@ bilingual.enabled, and the surface row's `{{SURFACE_DOC_ROLE}}`. `{{SURFACE_DOC_
 `{{TOOLKIT_LOCATION}}` is where a reader opens the toolkit's doctrine.
 RUNBOOK Phase A sets it.
 The project-neutral sentence in the Project line stays at every target, because it
-states the rule. A target with no runtime placeholders drops only the words from
-`replace any placeholder` to `runtime values`.
+states the rule. A target with no runtime placeholders drops the words from
+`replace any placeholder` up to and including the semicolon. That leaves
+`It is project-neutral — do not hardcode brand/host/serial tokens.`
 Rows and cells that name an optional doc sit inside `{{IF ...}}` regions,
 resolved per BOOTSTRAP-CORE, "Conditional Text in Templates". This file is META and RESIDENT:
 it is meant to be read every session. Keep it short — it routes; it is not the content.
