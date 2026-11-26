@@ -106,7 +106,7 @@ Three rules the block enforces:
 
 1. **Each `User Requirements Met` bullet MUST cite a stable ID** drawn from the REQUIREMENTS table — not prose.
 2. **Each feature block header MUST cite its issue or MR/PR number**, matching a `Closes #N` / `MR !N` / `PR #N` marker in Iteration History. A doc-set upgrade that no issue or MR/PR covers cites the upgrade commit instead. A read-back record is not a feature block. Its heading cites the date and the scope, and it follows the record template in `docs/VALIDATION.md`.
-3. **Verification Commands MUST include** (a) a build/compile of touched entry points, (b) a test step, (c) ≥1 smoke run against a fixture or example — sourced from AGENTS.md Development Commands, not reinvented.
+3. **Verification Commands MUST include** (a) a build/compile of touched entry points, (b) a test step, when the project has tests, (c) ≥1 smoke run against a fixture or example — sourced from AGENTS.md Development Commands, not reinvented.
 
 **Verification procedures live in scripts, not prose.** A checker can verify that a command *exists* in a doc; it cannot verify that the procedure the doc describes still matches reality — prose steps drift as platforms change, while an in-repo script either runs or fails. Record *where the procedure lives* (the script), not the procedure itself. And record the **verification action** (a fresh version timestamp, a live smoke test), not a status name ("green," "deployed") — platforms silently redefine status semantics (a job can skip by design and stay green), while an action's truth re-generates on every run.
 
@@ -140,6 +140,8 @@ Two collaborator-facing docs, with different jobs:
 Keeping them separate avoids one giant rules file that no one re-reads.
 
 **The `WORKFLOW.md` doc is ported as-is** — verbatim except its declared substitution points. When adopting this mode in a new repo, copy the canonical platform workflow doc, then resolve only those points: every `{{PLACEHOLDER}}` the template header lists (build/test/smoke commands, prefix, bilingual conditionals). The `Template-Source:` marker lines stay as the template carries them. Do not re-author its prose: the review loop, comment style, and red lines are platform constants and out of scope for regeneration.
+A step that does not fit the platform's actual behavior may be fixed locally,
+and the doc's header note declares the exception.
 
 **Boundary test:** if a candidate AGENTS.md rule names the platform CLI or a platform-specific comment style, it belongs in WORKFLOW, not AGENTS.md.
 
@@ -227,7 +229,7 @@ The rule is not "never repeat words." The rule is "never let duplicated facts be
 | Fact type | Canonical owner | Allowed mirrors | Owner not seeded: the stand-in | Update rule |
 |---|---|---|---|---|
 | Development / verification commands | `AGENTS.md` Development Commands | README Verification, REQUIREMENTS Verification Commands, per-feature VALIDATION blocks | Not applicable. Every profile seeds the owner. | Mirrors copy the current command or explicitly say they are a focused subset. |
-| User-visible commands, flags, keys, endpoints, API signatures | `docs/USER_GUIDE.md` or `docs/API_REFERENCE.md` | README Quick Start, REQUIREMENTS requirement rows | **REQUIREMENTS requirement rows.** Each row states the behavior and the exact command or call that exercises it, with what the user observes. | Mirrors must be checked by the command-surface parity tests (SELF-TEST §A). |
+| User-visible commands, flags, keys, endpoints, API signatures | `docs/USER_GUIDE.md` or `docs/API_REFERENCE.md` | README Quick Start, REQUIREMENTS requirement rows | **REQUIREMENTS requirement rows.** Each row states the behavior and the exact command or call that exercises it, with what the user observes. | The checker verifies every command that `checks.commands` lists (SELF-TEST §A). Parity beyond those commands is a review matter. |
 | Behavior contract and stable IDs | `docs/REQUIREMENTS.md` | USER_GUIDE/API_REFERENCE citations, VALIDATION `Requirements Met`, commits/MRs | Not applicable. Every profile seeds the owner. | Mirrors cite IDs; they do not redefine the requirement. |
 | Per-feature completion evidence | `docs/VALIDATION.md` | MR/PR description, issue closure comment | Not applicable. Every profile seeds the owner. | Mirrors may summarize, but the validation block is the re-verification home. |
 | Workflow / review commands | `docs/WORKFLOW.md` | AGENTS one-line deferral | **AGENTS.md "MR / PR Governance" and "Git Hygiene"**, the platform-neutral policy that every profile keeps. While `ci.runners` is declared, the CI-runners line sits in README Verification. | Do not duplicate platform-specific steps in AGENTS. |

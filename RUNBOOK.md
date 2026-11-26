@@ -100,7 +100,9 @@ must sit next to the config file. Phase A and Adopt write `true`. The default
 stays `false`, so a config written before the switch existed still passes.
 
 The checker is invoked exactly one way:
-`python3 scripts/check_agentic_docs.py --config agentic-mode/config.json`.
+`python3 scripts/check_agentic_docs.py --config agentic-mode/config.json`, with
+`python` or another interpreter name where the target's hosts name Python 3
+that way.
 (`forbid_ipv4`, `forbid_local_paths`, and `iteration_history` are opt-in leak /
 continuity sweeps; `ci.runners` is the opt-in runner-declaration sweep — when
 non-empty, a governed doc must carry a matching `<!-- ci-runners: ... -->`
@@ -201,7 +203,8 @@ Scan TARGET first; only ask what the scan cannot derive. The scan is
   exported library index, a service entrypoint. List dirs and read the manifest.
 - **Existing commands.** Read build/test/lint commands from wherever TARGET
   declares them (Makefile, package scripts, `pyproject`/`tox`, `justfile`,
-  existing CI). **Mine, do not invent.** The smoke command is the one exception (Q4).
+  existing CI). **Mine, do not invent.** Q4 names the exceptions: each of its
+  three commands has a remedy for when TARGET declares none.
 - **Test surface.** Locate tests/fixtures/examples — each encodes a behavior that
   will need a requirement ID.
 - **Platform.** Inspect the remote to tell GitLab vs GitHub; this decides which
@@ -244,6 +247,10 @@ iteration log gap-free. Under `light` leave it `false`.
 `project.name` is Q7's component name. `project.description` is Q5's one-line
 purpose.
 
+`{{TOOLKIT_LOCATION}}` is where a reader opens the toolkit's doctrine: the
+repository URL you loaded the toolkit from. When it has no public location,
+write `the agentic-mode toolkit; ask its maintainer for a copy`.
+
 Fill the two lists under `checks` from the scan and the answers:
 
 - `checks.entrypoints`: the path of every entry point from Q6, the primary
@@ -254,10 +261,11 @@ Fill the two lists under `checks` from the scan and the answers:
   `must_appear_in: ["agents", "readme"]`. One rule per command, and a rule's
   `run` is one line of a code block or one code span. When a command is both
   a dev command and a quick-start command, write one rule whose
-  `must_appear_in` names every doc that must quote it. Decide here which
-  one or two commands README's Quick Start carries, and write one rule for
-  each with `["readme", "user_guide"]`, or `["readme", "api_reference"]` for
-  a library. Step 5 writes that section with exactly those commands. A
+  `must_appear_in` names every doc that must quote it. Decide here what
+  README's Quick Start carries, one or two use cases with the command lines
+  each needs, and write one rule per command line with
+  `["readme", "user_guide"]`, or `["readme", "api_reference"]` for a library.
+  Step 5 writes that section with exactly those commands. A
   quick-start rule's `run` is the command without its sample argument
   values. Subcommands, flags, methods, and paths stay. A flag goes when the
   value it takes goes. While no surface doc is seeded, the quick-start rules
@@ -267,7 +275,7 @@ Fill the two lists under `checks` from the scan and the answers:
   `workflow`. A rule that names a doc declared `null` is skipped. A rule
   that names a missing key or any other word fails the gate.
 
-Every other key in config takes the value the schema block in this file shows.
+Every key no answer covers takes the value the schema block in this file shows.
 
 ---
 
@@ -290,8 +298,9 @@ does not have, such as a second entry point, a tests directory, or runtime
 placeholders. In a table cell, write `none`. In a sentence or a list item,
 delete the sentence or the item, with its heading when the section exists
 only for it, and keep what remains true. In a fenced code block, delete the
-line. Never write `N/A` or leave empty brackets. A placeholder named
-`..._OR_NONE` or `..._OR_DELETE` follows the same rule.
+line, and the fence too when nothing remains in it. Never write `N/A` or
+leave empty brackets. A placeholder named `..._OR_NONE` or `..._OR_DELETE`
+follows the same rule.
 
 **Sample lines.** A numbered or repeated line whose placeholder names end
 in a number or a sequence letter (`{{goal_1}}`, `{{goal_n}}`, `{{SYMBOL_1}}`,
@@ -327,9 +336,10 @@ whole, and so do the markers the checker reads.
 the step's own output can satisfy, and do not advance on a clause that
 fails. A clause that names a later file, or that needs the checker, has
 not run yet, so it has not failed. Each step says where such a clause runs.
-The Key-Files path clause of step 6 is the one that runs after step 7. It
-waits for the two resident files. The command clauses, and the neutrality
-sweep of step 5, run in Phase C step 3.
+The Key-Files path clause of step 6 is the one that runs after step 7,
+because Key Files names `docs/VALIDATION.md`. It runs once the two resident
+files are written. The command clauses, and the neutrality sweep of step 5,
+run in Phase C step 3.
 
 Production order:
 
@@ -361,7 +371,15 @@ Production order:
    | `regions[]` | Optional boundaries; README's Architecture Overview lists their labels. |
 
    Gate: JSON parses; every `connections[].from` and `.to` is a `components[].id`; every component or connection label that names a symbol or a flag exists in source.
-2. **`docs/WORKFLOW.md`** *(Standard and Full — Lite skips this step and `docs.workflow` stays `null`)* — **ported as-is** (verbatim except its declared substitution points) from `WORKFLOW-<platform>.template.md`. The platform is the team's review platform, not `ci.platform`: when neither Q3 nor the remote settles it, ask which one before porting. Substitute every `{{PLACEHOLDER}}` in the body (build/test/smoke commands, prefix, bilingual conditionals). The `Template-Source:` marker lines stay as the template carries them. Resolve the CI-runners line from config `ci.runners` (comma-separated runner names), or **delete the CI-runners line and the sentence under it** when config declares no runners, leaving one blank line — the doc gate checks its `ci-runners:` marker against config. While no WORKFLOW doc is seeded and config declares runners, that line sits in README instead: the README template's stand-in for this doc carries it. The checker reads the marker in any governed doc. Do **not** re-author its prose — the review loop, comment style, and red lines are platform constants. Gate: no `{{` remains in the doc, and it differs from its template only at its declared substitution points.
+2. **`docs/WORKFLOW.md`** *(Standard and Full — Lite skips this step and `docs.workflow` stays `null`)* — **ported as-is** (verbatim except its declared substitution points) from `WORKFLOW-<platform>.template.md`. The platform is the team's review platform, not `ci.platform`: when neither Q3 nor the remote settles it, ask which one before porting.
+   The toolkit carries a WORKFLOW template for GitHub and for GitLab only.
+   For any other platform, ask the user whether to hand-write `docs/WORKFLOW.md`
+   with the same sections or to leave `docs.workflow` `null` and keep the
+   review policy in `AGENTS.md`.
+   Substitute every `{{PLACEHOLDER}}` in the body (build/test/smoke commands, prefix, bilingual conditionals). The `Template-Source:` marker lines stay as the template carries them.
+   A target with no tests deletes the words `; tests {{TEST_CMD}}` from the
+   sentence that lists the commands, and keeps the rest of the rule.
+   Resolve the CI-runners line from config `ci.runners` (comma-separated runner names), or **delete the CI-runners line and the sentence under it** when config declares no runners, leaving one blank line — the doc gate checks its `ci-runners:` marker against config. While no WORKFLOW doc is seeded and config declares runners, that line sits in README instead: the README template's stand-in for this doc carries it. The checker reads the marker in any governed doc. Do **not** re-author its prose — the review loop, comment style, and red lines are platform constants. Gate: no `{{` remains in the doc, and it differs from its template only at its declared substitution points.
 3. **`docs/REQUIREMENTS.md`** — Problem/Goals/Non-Goals, enumerated `{{PREFIX}}-001..N` requirements (one per observable behavior), domain/event model when the component has one, **empty** Iteration History (append-only from here), acceptance criteria, verification commands. Gate: every entry-point behavior maps to ≥1 ID; while no surface doc is seeded, every row carries, in a code span, the command / call that exercises it; if bilingual, both tracks share identical ID set/count/order.
 4. **`docs/USER_GUIDE.md` or `docs/API_REFERENCE.md`** *(Standard and Full)* — the observable surface, template chosen by `project.type`. Under Lite, do not write it: the type-selected key stays the explicit `null` Phase A declared (`docs.user_guide: null` for `cli` / `web-service`, `docs.api_reference: null` for `library`) — the Lite opt-out, with REQUIREMENTS carrying the surface until the upgrade. `docs-only` has no surface doc at any profile. `{{SURFACE_DOC_ROLE}}` is the kind of surface: `commands, flags, and output` for a CLI, `endpoints and screens` for a web service, or `endpoints` for one with no screens, `the public API` for a library. Each behavior subsection cites its owning `{{PREFIX}}-XXX`. A doc you write must also be declared: keep its key at the real path, because a written doc left `null` gets no scans. USER_GUIDE-cli carries sections for an interactive tool. A CLI with no views, keys, or highlighting loses the Views, Keyboard Controls, and Highlighting and Error Semantics sections, headings included. The prompts that assume a screen are rewritten for a plain run. Gate: every cited ID exists in REQUIREMENTS; surface tables match source 1:1.
 5. **`README.md`** — onboarding: entry table, quick start, architecture overview *derived from the JSON when present*, agent-onboarding pointer, verification commands, neutrality checklist, doc cross-links. Gate: every quick-start command appears in the surface doc (under Lite or `docs-only`, in the REQUIREMENTS row that carries that surface). The neutrality sweep is the checker's own scan, so it runs in Phase C step 3. While no surface doc is seeded, a quick-start command's `must_appear_in` names `readme` and `requirements` instead of the surface key: a rule that targets only the unseeded surface key withdraws.
@@ -412,9 +430,12 @@ sensitive area — for the code owner to fill in.
    outside TARGET is not checked: the toolkit's own docs, or a file
    the program writes at run time. A name a doc cites only as an example is
    not checked either. Last, run the command clauses that waited. Each command
-   in `AGENTS.md` Development Commands exits clean in TARGET. The checker's
-   clean run above is the neutrality sweep. The gate byte-compiles
-   each `.py` entry point and leaves a `__pycache__/` directory beside it.
+   in `AGENTS.md` Development Commands exits clean in TARGET. A command TARGET
+   already had, one that fails before any of your changes, is reported to the
+   user and stays listed. It does not block hand-off. A command Phase A agreed
+   or composed must pass. The checker's clean run above is the neutrality
+   sweep. The gate byte-compiles each `.py` entry point and leaves a
+   `__pycache__/` directory beside it.
    Before anything is committed, make sure the ignore file lists
    `__pycache__/` and every file the program writes at run time. Create a
    `.gitignore` with those lines when the repo has no ignore file.
@@ -503,10 +524,11 @@ profile.
    `ci.platform` is `gitlab` or `github` (Phase C step 2), then run Phase C
    steps 3 to 5: the checker with the commands in `AGENTS.md` Development
    Commands, the placeholder sweep, and the read-back. Close every reported
-   gap and re-run until clean. Under `full` and `docs-only`, turn
+   gap and re-run until clean. Then, under `full` and `docs-only`, turn
    `checks.iteration_history.enabled` on when the existing iteration history
-   passes that check. When it does not, report the gap to the user and leave
-   it off. A hand-written history is never rewritten to satisfy it. Report
+   passes that check. When it does not, report that gap to the user instead
+   of closing it, and leave the switch off. A hand-written history is never
+   rewritten to satisfy it. Report
    every gap you filled and every existing file you left untouched, and
    summarize as Phase D does.
 
@@ -527,7 +549,7 @@ When a trigger in the doctrine's doc-set table fires, move up to the row the req
 1. **Write the layer** with its Phase B step and gate, in Phase B order, and declare the layer's path under `docs` in the same step. There is no interview bundle here: resolve placeholders from the target's own config and AGENTS Development Commands. A written doc that is left `null` gets no scans. A layer whose file already exists keeps that file, declared or not; a hand-written doc is never rewritten. Everything else in this step still applies to it: the declaration, the `must_appear_in` move, and the gate. For a surface doc, also move each quick-start command's `must_appear_in` target from `requirements` to the surface key, so the new doc becomes the one the checker reads. The quick-start commands are the ones README's Quick Start lists; other command rules stay as they are. The surface key is `docs.user_guide`, or `docs.api_reference` for a library. For the WORKFLOW doc, port the platform template that matches the team's review platform, and ask which one if the interview did not settle it.
 2. **Move what the stand-in held for the layer.** The content a stand-in kept for the layer now has its home in the new doc: when config declares runners, the CI-runners line leaves README for the WORKFLOW doc, and the surface doc carries the exercising commands it took from the requirement rows when step 1 wrote it. Remove every stand-in whose region has an empty first branch: search the templates for the layer's opener followed directly by `{{ELSE}}`. What a stand-in wrote for itself stays where it is as an allowed mirror. For a surface doc that is the exercising commands in the requirement rows. For the architecture doc those are README Main Components, README Data Flow, and AGENTS Key Files. `AGENTS.md` keeps its MR / PR Governance and Git Hygiene sections at every profile. The Controlled-Duplication table in BOOTSTRAP-CORE lists these mirrors.
 3. **Port the regions.** Search the templates for `{{IF <PLACEHOLDER>}}` with the new layer's placeholder: `SURFACE_DOC_PATH` for a surface doc, `WORKFLOW_PATH` for the WORKFLOW doc, `ARCHITECTURE_PATH` for the architecture doc. Each region is one item to port into the doc that was rendered from that template, and one line can hold several regions. Where the doc carries the stand-in, replace it with the first branch. Where the region left nothing behind, add its first branch where the region sits in the template. A region whose first branch is empty was handled in step 2. If the doc already carries the first branch where the region sits, leave it as it is, so a re-run after an interruption adds nothing twice. Then re-read the fill-in text you wrote at bootstrap that describes the doc set: it sits in no region, and it is found where a placeholder asked for it, in README's sentence listing what `docs/` contains, its onboarding text, AGENTS Project Scope and Key Files, and the index's inventory prose. Name the new layer where it belongs, and rewrite any sentence that still describes the doc set as it was. Re-run the Phase B gate of every doc you changed.
-4. **Prove the upgrade.** Run the checker, the Phase-C hand check of paths and section names, and the Phase-C placeholder sweep. Run each command in `AGENTS.md` Development Commands, and confirm the ignore file lists `__pycache__/`. Then check the regions themselves, because the checker does not. For each region of each new layer's placeholder: the first branch, when it has text, must be in the doc that was rendered from its template, and its stand-in must be gone from that doc. Search that doc only, and skip its `Template-Source` note, which quotes a stand-in on purpose. Once a WORKFLOW doc exists, README must no longer carry the CI-runners line. Once a surface doc exists, each quick-start command's `must_appear_in` names the surface key. Then read the fill-in text from step 3: no search finds a stale sentence for you, and it must describe the doc set as it is now. A failed check points back to its step: a failed gate to step 1 (repair a file this upgrade wrote; a hand-written doc that fails its gate is reported to the user, not rewritten), a remaining stand-in whose region has an empty first branch (the CI-runners line is one) to step 2, a missing first branch or any other remaining stand-in to step 3, and a stale fill-in sentence to step 3 as well. Redo that step, then prove again.
+4. **Prove the upgrade.** Run the checker, the Phase-C hand check of paths and section names, and the Phase-C placeholder sweep. Run each command in `AGENTS.md` Development Commands, and confirm the ignore file lists `__pycache__/`. Then check the regions themselves, because the checker does not. For each region of each new layer's placeholder: the first branch, when it has text, must be in the doc that was rendered from its template, and its stand-in must be gone from that doc. Search that doc only, outside its `Template-Source` note. Once a WORKFLOW doc exists, README must no longer carry the CI-runners line. Once a surface doc exists, each quick-start command's `must_appear_in` names the surface key. Then read the fill-in text from step 3: no search finds a stale sentence for you, and it must describe the doc set as it is now. A failed check points back to its step: a failed gate to step 1 (repair a file this upgrade wrote; a hand-written doc that fails its gate is reported to the user, not rewritten), a remaining stand-in whose region has an empty first branch (the CI-runners line is one) to step 2, a missing first branch or any other remaining stand-in to step 3, and a stale fill-in sentence to step 3 as well. Redo that step, then prove again.
 5. **Record the upgrade once.** The record cites the change that carries the upgrade: its issue or MR/PR, or else the commit that completes steps 1 to 4. When you commit, commit on the branch the target's WORKFLOW doc prescribes, and commit steps 1 to 4 first. When the repo's rules forbid committing without consent, ask first, as its Stop-and-Ask list requires. Add an Iteration History entry and a VALIDATION block with that citation. The block follows the block template in the target's `docs/VALIDATION.md`, and its User Requirements Met lists the IDs that moved to the new doc or states that no requirement changed. The upgrade is a major doc change, so also run the read-back probe (SELF-TEST §D) and record its outcome; when no zero-context reader is available, record the probe as not run. Then run the checker once more. On a re-run, an entry and a block that already record this upgrade stay as they are: add nothing.
 
 A target that was rendered from these templates goes through these steps when it changes its doc-set profile. Adopt mode does not do this for it.
@@ -536,10 +558,11 @@ A target that was rendered from these templates goes through these steps when it
 
 ## Upgrading an adopted repo to a newer toolkit version
 
-Adopted repos carry two kinds of artifact that age: the checker (copied
-verbatim in Phase C) and every doc rendered from a Markdown template — each
-carries a `Template-Source:` marker. A toolkit release changes none of them
-silently — upgrade on purpose, and record it like any change.
+Adopted repos carry three kinds of artifact that age: the checker (copied
+verbatim in Phase C), every doc rendered from a Markdown template, each with
+a `Template-Source:` marker, and the CI gate file, copied as-is from a CI
+template. A toolkit release changes none of them silently — upgrade on
+purpose, and record it like any change.
 
 1. **Read the delta before swapping.** Diff your checker against the new tag
    before replacing it (`git -C <toolkit-repo> show <tag>:checker/check_agentic_docs.py`
@@ -553,15 +576,23 @@ silently — upgrade on purpose, and record it like any change.
    it as `true` once the resident index and `agentic-mode/SELF-TEST.md` exist.
 3. **Re-port each marked doc only at its declared substitution points** when
    its `Template-Source` bumps (@v1 → @v2): the marker lists what moved
-   (new lines, new sections). Check every doc that carries a marker, not only
-   WORKFLOW, because a release can move the index or SELF-TEST template too. A
+   (new lines, new sections). When a copy's marker is more than one
+   version behind, the notes of every version in between apply. The toolkit's
+   history of the template holds them. Check every doc that carries a marker,
+   not only WORKFLOW, because a release can move the index or SELF-TEST
+   template too. A
    doc rendered from a template that gained its marker in a later release
    carries none yet: port what that first marked version's note lists, then add
    the marker. Port the changes into your copy; local sections you authored
    yourself (recipes, checklists) are yours to keep — `Template-Source` records
-   the base you ported from, not a lockstep contract.
+   the base you ported from, not a lockstep contract. Then re-port the CI gate
+   file: diff it against `templates/ci-github.template.yml` or
+   `templates/ci-gitlab.template.yml`, whichever you placed, and bring over
+   every difference that is not one of your own steps.
 4. **Record it like any change**: REQUIREMENTS iteration-history entry +
    VALIDATION block citing the PR, with the diff-against-tag as evidence.
+   A re-port that moved the index or SELF-TEST is a major doc change, so it
+   also gets a read-back record (Phase C step 5).
 
 ---
 

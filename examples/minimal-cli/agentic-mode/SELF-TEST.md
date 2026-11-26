@@ -2,7 +2,8 @@
 Template-Source: agentic-bootstrap/SELF-TEST@v4  (@v4: §A names where each check that is not
 machine-checked lives and no longer cites a toolkit doc; §D carries no question count and no
 seeding instruction; a read-back record follows the VALIDATION record template, and a probe that
-could not run is recorded as not run; the §B read-back row accepts that record)
+could not run is recorded as not run; the §B read-back row accepts that record;
+the §B dev-command row names every listed command; commands run `python3`)
 -->
 
 # SELF-TEST.md — Cross-Layer Self-Test
@@ -37,7 +38,7 @@ Run it until it exits clean before touching the manual rows. **CI:** platform is
 
 Walk these by hand (kept deliberately short — the script owns everything mechanizable):
 
-- [ ] **Dev commands actually run clean.** From a fresh checkout, the AGENTS Development Commands build/compile and smoke all exit 0 with the expected output. This example carries no test command. The script checks that they are *cited*; only a human/agent run proves they *work*.
+- [ ] **Dev commands actually run clean.** From a fresh checkout, each command in the AGENTS Development Commands exits 0 with the expected output. This example carries no test command. The script checks that they are *cited*; only a human/agent run proves they *work*.
 - [ ] **Append-only provenance holds.** REQUIREMENTS Iteration History and VALIDATION blocks were appended, not rewritten — verifiable via `git diff` across recent commits (only appends, plus the one post-merge backfill the VALIDATION header declares). *(Relaxed under the `light` co-op profile.)*
 - [ ] **Process-doc boundary holds.** `AGENTS.md` defers change-flow to `docs/WORKFLOW.md` and names no platform CLI. The WORKFLOW doc is the copied-as-is template with only its declared substitution points resolved, or a hand-written doc, with any local exception declared in its header.
 - [ ] **Read-back probe passes**, or the latest read-back record in `docs/VALIDATION.md` says not run (section D below).

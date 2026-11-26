@@ -17,7 +17,7 @@ This document is the authoritative GitHub workflow rule for anyone (human or age
 
 - **Without explicit user consent, do not commit, push, amend, rebase, force-push, or `--no-verify`.** "The user agreed once" is not standing consent; ask every time.
 - **No blanket staging** (`git add -A` / `git add .`). Stage files explicitly: `git add <file1> <file2>`. Ignored directories can still let stray untracked files slip into the stage.
-- **Never claim tests pass without running them.** Run the repo's real commands (from AGENTS Development Commands): build/compile `python3 -m py_compile todo.py`; tests none (this example carries no test command; `python3 todo.py list` is its smoke run). Green means you saw the passing summary, not "should pass." (see §10 Red lines)
+- **Never claim tests pass without running them.** Run the repo's real commands (from AGENTS Development Commands): build/compile `python3 -m py_compile todo.py`. Green means you saw the passing summary, not "should pass." (see §10 Red lines)
 - **A behavior change must sync docs in the same change** (REQUIREMENTS iteration history + the observable surface + VALIDATION). Otherwise it is not done.
 - **PR and issue comments must be self-contained.** The reader has not seen your chat history.
 - External replies posted to GitHub issues/PRs use an EOF-terminated multi-line format (HEREDOC). Chat replies are exempt.
@@ -114,8 +114,7 @@ EOF
 Run the repo's real commands from AGENTS Development Commands, e.g.:
 ```bash
 python3 -m py_compile todo.py
-python3 todo.py list
-python3 todo.py add "smoke task"
+python3 todo.py add "smoke task" && python3 todo.py list
 ```
 Docs coherence gate — cwd `examples/minimal-cli/`:
 ```bash

@@ -21,7 +21,8 @@ Harness-neutral: never name a specific agent product, model, or proprietary tool
 Resolve `{{IF ...}}` regions per BOOTSTRAP-CORE, "Conditional Text in Templates".
 Template-Source: agentic-bootstrap/REQUIREMENTS@v2  (@v2: the Event Model heading is one
 descriptive slot; the two Iteration History entries are samples and the history starts empty;
-the superseded-row note shows a three-digit ID)
+the superseded-row note shows a three-digit ID;
+the rule that superseded rows stay is a rendered sentence)
 Rendered copies keep the Template-Source lines in a comment at the top of the file; the rest of this header is not rendered.
 -->
 
@@ -55,8 +56,9 @@ Rendered copies keep the Template-Source lines in a comment at the top of the fi
 | {{PREFIX}}-001 | The {{component}} shall {{testable behavior statement — no "fast/better/improved"}}. |
 | {{PREFIX}}-002 | {{next behavior}}. |
 
-<!-- One row per observable behavior (each CLI flag / key / endpoint / public API / documented output).
-     Superseded rows stay, marked e.g. "(superseded by {{PREFIX}}-NNN)" — never deleted. -->
+Rows are never deleted. A superseded row stays, marked for example as "(superseded by {{PREFIX}}-NNN)".
+
+<!-- Repeat one row per observable behavior: each CLI flag, key, endpoint, public API, or documented output. -->
 
 ### {{event model heading: the domain or timeline name}}
 {{If the component has an in-memory model or event ordering, describe the canonical flow here as a fenced text diagram. Otherwise delete this section.}}

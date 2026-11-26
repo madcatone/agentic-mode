@@ -1,7 +1,8 @@
 <!--
 Template-Source: agentic-bootstrap/README@v2  (@v2: Data Flow is two sample lines, the two component
 bullets name their own job slot, and the header states the no-value rule and the sample rule for
-this template's slots; the verification sentence no longer says "above")
+this template's slots; the verification sentence no longer says "above";
+commands run `python3`)
 -->
 
 # todo
@@ -78,7 +79,7 @@ docs gate.
 
 ```bash
 python3 -m py_compile todo.py
-python3 todo.py list
+python3 todo.py add "smoke task" && python3 todo.py list
 ```
 
 Every command in `checks.commands` (config.json) that lists `"readme"` in `must_appear_in` MUST appear verbatim in this file.

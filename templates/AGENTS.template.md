@@ -35,7 +35,8 @@ Harness-neutral: never name a specific agent product, model, or proprietary tool
 Resolve `{{IF ...}}` regions per BOOTSTRAP-CORE, "Conditional Text in Templates".
 Template-Source: agentic-bootstrap/AGENTS@v2  (@v2: Git Hygiene allows deleting a merged local
 branch, as the WORKFLOW doc does; the header states the light-profile note and the no-value rule
-for this template's optional slots; the Change-Flow Boundary heading drops its parenthetical)
+for this template's optional slots; the Change-Flow Boundary heading drops its parenthetical;
+commands run `python3`)
 Rendered copies keep the Template-Source lines in a comment at the top of the file; the rest of this header is not rendered.
 -->
 

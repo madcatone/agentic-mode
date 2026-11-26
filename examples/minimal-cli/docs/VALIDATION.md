@@ -1,7 +1,8 @@
 <!--
 Template-Source: agentic-bootstrap/VALIDATION@v2  (@v2: the block template's slots are plain words,
 so a rendered seed passes the Phase-C placeholder sweep; a read-back record template sits beside
-the block template; no angle-bracket token remains in the file)
+the block template; no angle-bracket token remains in the file;
+the ID example uses three digits)
 -->
 
 # todo — Implementation Validation
@@ -91,7 +92,7 @@ A slot in this template is a plain word or phrase with no marker around it. Repl
 ```bash
 # Copied from AGENTS Development Commands.
 python3 -m py_compile todo.py
-python3 todo.py list
+python3 todo.py add "smoke task" && python3 todo.py list
 ```
 
 ### Status

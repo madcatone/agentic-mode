@@ -7,6 +7,9 @@ CI-RUNNERS line: resolve `{{CI_RUNNERS}}` from config `ci.runners` (comma-separa
 e.g. when pipelines run on an external runner). When config declares no `ci.runners`, DELETE two
 lines, the CI-runners line and the whole `Single source of truth` sentence under it, and leave one blank line where they stood. The doc gate
 checks the `ci-runners:` marker against config.
+`{{TEST_CMD}}`: a target with no tests deletes the words
+`; tests {{TEST_CMD}}` from the Iron Rules bullet that lists the commands,
+and keeps the rest of the bullet.
 NOTE: initially a structural mirror of the GitLab variant; since validated end-to-end in a real
 adoption (bootstrap through multiple tagged releases, including a CI-runner migration). Treat
 deviations found in your own use as bugs to report upstream.

@@ -2,12 +2,13 @@
 Template-Source: agentic-bootstrap/AGENTIC-MODE@v4  (@v4: the inventory lists the layers in reading
 order, architecture third; the Enforcement paragraph routes each non-mechanized check to where it
 lives instead of to SELF-TEST §B; the Canonical Questions carry no seeding instruction; the
-doctrine pointers say this repo keeps no copy; the requirements row allows for no event model; the process-rules row no longer names the H1 as a substitution point)
+doctrine pointers say this repo keeps no copy; the requirements row allows for no event model; the process-rules row no longer names the H1 as a substitution point;
+the doctrine pointers take the toolkit's location; commands run `python3`)
 -->
 
 # AGENTIC-MODE.md — Doc Contract for Agent + Human Co-Development
 
-> What this is: the resident index for a **layered, ID-joined, harness-neutral** documentation contract. Any collaborator — human or agent, in any tool, with no chat history — reads top-down from here and reaches productive context in minutes. This file is **meta and resident**: read it every session. It owns *What* (repo facts, behavior contract) and *Done* (acceptance evidence); it never dictates *How/Who* (which tool or model you use). Doctrine lives in the toolkit's `doctrine/BOOTSTRAP-CORE.md`. This repo keeps no copy of it. The machine config is `agentic-mode/config.json`.
+> What this is: the resident index for a **layered, ID-joined, harness-neutral** documentation contract. Any collaborator — human or agent, in any tool, with no chat history — reads top-down from here and reaches productive context in minutes. This file is **meta and resident**: read it every session. It owns *What* (repo facts, behavior contract) and *Done* (acceptance evidence); it never dictates *How/Who* (which tool or model you use). Doctrine lives in the toolkit's `doctrine/BOOTSTRAP-CORE.md`, at the root of the repository that contains this example. This repo keeps no copy of it. The machine config is `agentic-mode/config.json`.
 
 Project: **todo** (cli). ID prefix: `TODO`. It is project-neutral — replace any placeholder such as `<package.name>` with your own runtime values; do not hardcode brand/host/serial tokens.
 
@@ -68,6 +69,6 @@ These are the questions a **zero-context reviewer** (never seen this repo, no ch
 
 ## Routing
 
-- **Doctrine** (why the layers exist, ID discipline, append-only rules, adoption profiles) → the toolkit's `doctrine/BOOTSTRAP-CORE.md`, in the repo or skill the bootstrap ran from. This repo keeps no copy.
+- **Doctrine** (why the layers exist, ID discipline, append-only rules, adoption profiles) → the toolkit's `doctrine/BOOTSTRAP-CORE.md`, at the root of the repository that contains this example. This repo keeps no copy.
 - **Machine config** (paths, prefix, checks, and the `null`s that record which layers are deferred) → `agentic-mode/config.json`.
 - **Full cross-layer self-test** (all rows, manual + automated, guardrails, read-back probe protocol) → `agentic-mode/SELF-TEST.md`; the questions it asks live in the Canonical Questions section above.

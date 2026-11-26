@@ -25,7 +25,8 @@ declares no runners, DELETE that whole line. The doc gate checks the `ci-runners
 against config.
 Template-Source: agentic-bootstrap/README@v2  (@v2: Data Flow is two sample lines, the two component
 bullets name their own job slot, and the header states the no-value rule and the sample rule for
-this template's slots; the verification sentence no longer says "above")
+this template's slots; the verification sentence no longer says "above";
+commands run `python3`)
 Rendered copies keep the Template-Source lines in a comment at the top of the file; the rest of this header is not rendered.
 -->
 

@@ -1,7 +1,8 @@
 <!--
 Template-Source: agentic-bootstrap/AGENTS@v2  (@v2: Git Hygiene allows deleting a merged local
 branch, as the WORKFLOW doc does; the header states the light-profile note and the no-value rule
-for this template's optional slots; the Change-Flow Boundary heading drops its parenthetical)
+for this template's optional slots; the Change-Flow Boundary heading drops its parenthetical;
+commands run `python3`)
 -->
 
 # AGENTS.md — todo
@@ -32,7 +33,7 @@ tool, model, or dispatch to use — that is your own environment's business. Rea
 ## Development Commands
 
 - Build / compile: `python3 -m py_compile todo.py`
-- Smoke / run: `python3 todo.py list`
+- Smoke / run: `python3 todo.py add "smoke task" && python3 todo.py list`
 - Docs coherence gate. Same check; run the invocation that matches your cwd:
   - From the agentic-mode repo root: `python3 checker/check_agentic_docs.py --config examples/minimal-cli/agentic-mode/config.json --root examples/minimal-cli`
   - From this directory (`examples/minimal-cli/`): `python3 ../../checker/check_agentic_docs.py --config agentic-mode/config.json`
