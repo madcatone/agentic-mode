@@ -21,7 +21,8 @@ BILINGUAL dual-language external replies apply ONLY when config bilingual.enable
 Harness-neutral otherwise: never name a specific agent product or model.
 Template-Source: agentic-bootstrap/WORKFLOW-github@v4  (@v4: with no runners in config the sentence
 under the CI-runners line goes too; commands run `python3`; the ID example uses three digits; the
-header states the cut for a target with no tests and both renderings of the bilingual conditional)
+all-green line exempts a command that failed before the change; the header states the cut for a
+target with no tests and both renderings of the bilingual conditional)
 Rendered copies keep the Template-Source lines in a comment at the top of the file; the rest of this header is not rendered.
 -->
 
@@ -140,7 +141,7 @@ Run the repo's real commands from AGENTS Development Commands, e.g.:
 # Docs coherence gate:
 python3 scripts/check_agentic_docs.py --config agentic-mode/config.json
 ```
-**All green is the only "done."**
+**All green is the only "done."** A command that already failed before this change is reported, and does not count against it.
 
 ### Docs sync checklist (every behavior change)
 - [ ] REQUIREMENTS — append an iteration-history entry {{IF_BILINGUAL: one per language track, kept in lock-step}}.

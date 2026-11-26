@@ -17,7 +17,7 @@ The Canonical Questions section is seeded here (one list, one home) — SELF-TES
 consumes it for the zero-context read-back probe. The five Canonical Questions below are the seed,
 drawn from the doctrine's Layered Reading Order (BOOTSTRAP-CORE). Resolve their placeholders.
 Keep between three and seven questions.
-Render body prose in the TARGET's chosen language; keep the section headings in
+Render body prose in the TARGET's primary language; keep the section headings in
 canonical English (they are cross-repo reference anchors — doctrine and upgrades
 cite them by name).
 Harness-neutral: never name a specific agent product, model, or proprietary tool.

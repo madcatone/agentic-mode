@@ -9,7 +9,7 @@ Under the `light` co-op profile the append-only rows relax; every other row stil
 The index template seeds the Canonical Questions. This file only points at them. The manual section
 stays short on purpose. A check that is review's job is named in §A and is not added as a §B row.
 
-Render body prose in the TARGET's chosen language; keep the section headings in canonical English.
+Render body prose in the TARGET's primary language; keep the section headings in canonical English.
 Harness-neutral: never name a specific agent product, model, or proprietary tool.
 Resolve `{{IF ...}}` regions per BOOTSTRAP-CORE, "Conditional Text in Templates".
 Template-Source: agentic-bootstrap/SELF-TEST@v4  (@v4: §A names where each check that is not

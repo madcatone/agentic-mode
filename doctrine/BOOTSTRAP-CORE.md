@@ -170,13 +170,13 @@ When the team works in two languages:
 - **External replies on the issue/MR platform use the platform's required multi-line comment format, in both languages.** Chat replies are not bound by this.
 - **Match the author's language in replies.** A reply matches the language of the issue/MR it answers.
 
-**Detection.** The bootstrap interview (RUNBOOK.md Phase A, the bilingual question) decides this. If yes, both REQUIREMENTS and the observable-surface doc get two full tracks; VALIDATION stays single-language (checklists are bilingual-neutral). If monolingual, drop this section and collapse the templates to one track. The `## English` heading goes with the second track, and each `###` heading of the remaining track becomes `##`. RUNBOOK.md Phase B states both cuts.
+**Detection.** The bootstrap interview (RUNBOOK.md Phase A, the bilingual question) decides this. If yes, both REQUIREMENTS and the observable-surface doc get two full tracks; VALIDATION stays single-language (checklists are bilingual-neutral). In the second track, a heading the checker reads by name keeps its English words. If monolingual, drop this section and collapse the templates to one track. The `## English` heading goes with the second track, and each `###` heading of the remaining track becomes `##`. RUNBOOK.md Phase B states both cuts.
 
 ---
 
 ## Rendering Language and Canonical Headings
 
-Unlike bilingual tracks (config-gated), this rule always applies. **Body prose renders in the repo's chosen language; section headings in `AGENTIC-MODE.md` and `agentic-mode/SELF-TEST.md` stay in the canonical English the templates carry.** Never translate the headings — they are reference anchors: the doctrine, the RUNBOOK, upgrade notes, and cross-repo tooling cite sections by name ("Doc Inventory", "Canonical Questions", the SELF-TEST §A–D rows). A translated heading silently severs every one of those citations. The field evidence: three adopters translated headings three different ways in one week, and no cross-repo instruction could resolve.
+Unlike bilingual tracks (config-gated), this rule always applies. **Body prose renders in the repo's primary language; section headings in `AGENTIC-MODE.md` and `agentic-mode/SELF-TEST.md` stay in the canonical English the templates carry.** Never translate the headings — they are reference anchors: the doctrine, the RUNBOOK, upgrade notes, and cross-repo tooling cite sections by name ("Doc Inventory", "Canonical Questions", the SELF-TEST §A–D rows). A translated heading silently severs every one of those citations. The field evidence: three adopters translated headings three different ways in one week, and no cross-repo instruction could resolve.
 
 ---
 

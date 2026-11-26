@@ -6,7 +6,8 @@
      the parent repo's checker, because this example ships no copy of it.
 Template-Source: agentic-bootstrap/WORKFLOW-github@v4  (@v4: with no runners in config the sentence
 under the CI-runners line goes too; commands run `python3`; the ID example uses three digits; the
-header states the cut for a target with no tests and both renderings of the bilingual conditional) -->
+all-green line exempts a command that failed before the change; the header states the cut for a
+target with no tests and both renderings of the bilingual conditional) -->
 
 # GitHub Workflow — Collaborator Rule
 
@@ -125,7 +126,7 @@ Docs coherence gate — cwd the agentic-mode repo root (same check):
 ```bash
 python3 checker/check_agentic_docs.py --config examples/minimal-cli/agentic-mode/config.json --root examples/minimal-cli
 ```
-**All green is the only "done."**
+**All green is the only "done."** A command that already failed before this change is reported, and does not count against it.
 
 ### Docs sync checklist (every behavior change)
 - [ ] REQUIREMENTS — append an iteration-history entry.

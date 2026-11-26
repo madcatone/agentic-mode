@@ -259,10 +259,10 @@ Fill the two lists under `checks` from the scan and the answers:
 - `checks.commands`: one rule per command that a doc must quote verbatim.
   Each of the build, test, and smoke commands in the bundle gets
   `must_appear_in: ["agents", "readme"]`. One rule per command, and a rule's
-  `run` is one line of a code block or one code span. When a command is both
-  a dev command and a quick-start command, write one rule whose
-  `must_appear_in` names every doc that must quote it. That rule's
-  `run` is the quick-start form, the one without sample values. A
+  `run` is one line of a code block or one code span, or the start of such a
+  line. When a command is both a dev command and a quick-start command, write
+  one rule whose `must_appear_in` names every doc that must quote it. That
+  rule's `run` is the quick-start form, the one without sample values. A
   command that is only a dev command keeps its whole line as `run`.
   Decide here what README's Quick Start carries, one or two use cases with the
   command lines each needs, and write one rule per command line with
@@ -326,7 +326,10 @@ observable-surface templates render.
   `bilingual.primary_heading`, which replaces the template's `## English`.
   The second track's heading is `bilingual.secondary_heading`. Mirror every
   section of the first track in the second, with the same IDs in the same
-  order. The marker line itself goes.
+  order. The marker line itself goes. Write the second track's subsection
+  headings in its language, but keep the English words of a heading the
+  checker reads by name. The Iteration History heading becomes, for example,
+  `### 迭代歷程 (Iteration History)`.
 
 **Template comments.** The header comment does not render. A comment in the
 body that tells you to repeat or delete something is an instruction to you.
@@ -383,7 +386,7 @@ Production order:
    backtick-wrapped `{{TEST_CMD}}` that follows them, and keeps the rest of the rule.
    Resolve the CI-runners line from config `ci.runners` (comma-separated runner names), or **delete the CI-runners line and the sentence under it** when config declares no runners, leaving one blank line — the doc gate checks its `ci-runners:` marker against config. While no WORKFLOW doc is seeded and config declares runners, that line sits in README instead: the README template's stand-in for this doc carries it. The checker reads the marker in any governed doc. Do **not** re-author its prose — the review loop, comment style, and red lines are platform constants. Gate: no `{{` remains in the doc, and it differs from its template only at its declared substitution points.
 3. **`docs/REQUIREMENTS.md`** — Problem/Goals/Non-Goals, enumerated `{{PREFIX}}-001..N` requirements (one per observable behavior), domain/event model when the component has one, **empty** Iteration History (append-only from here), acceptance criteria, verification commands. Gate: every entry-point behavior maps to ≥1 ID; while no surface doc is seeded, every row carries, in a code span, the command / call that exercises it; if bilingual, both tracks share identical ID set/count/order.
-4. **`docs/USER_GUIDE.md` or `docs/API_REFERENCE.md`** *(Standard and Full)* — the observable surface, template chosen by `project.type`. Under Lite, do not write it: the type-selected key stays the explicit `null` Phase A declared (`docs.user_guide: null` for `cli` / `web-service`, `docs.api_reference: null` for `library`) — the Lite opt-out, with REQUIREMENTS carrying the surface until the upgrade. `docs-only` has no surface doc at any profile. `{{SURFACE_DOC_ROLE}}` is the kind of surface: `commands, flags, and output` for a CLI, `endpoints and screens` for a web service, or `endpoints` for one with no screens, `the public API` for a library. Each behavior subsection cites its owning `{{PREFIX}}-XXX`. A doc you write must also be declared: keep its key at the real path, because a written doc left `null` gets no scans. USER_GUIDE-cli carries sections for an interactive tool. A CLI with no views, keys, or highlighting loses the Views, Keyboard Controls, and Highlighting and Error Semantics sections, headings included. The prompts that assume a screen are rewritten for a plain run. Gate: every cited ID exists in REQUIREMENTS; surface tables match source 1:1.
+4. **`docs/USER_GUIDE.md` or `docs/API_REFERENCE.md`** *(Standard and Full)* — the observable surface, template chosen by `project.type`. Under Lite, do not write it: the type-selected key stays the explicit `null` Phase A declared (`docs.user_guide: null` for `cli` / `web-service`, `docs.api_reference: null` for `library`) — the Lite opt-out, with REQUIREMENTS carrying the surface until the upgrade. `docs-only` has no surface doc at any profile. `{{SURFACE_DOC_ROLE}}` is the kind of surface: `commands, flags, and output` for a CLI, `endpoints and screens` for a web service, or `endpoints` for one with no screens, `the public API` for a library. Each behavior subsection cites its owning `{{PREFIX}}-XXX`. A doc you write must also be declared: keep its key at the real path, because a written doc left `null` gets no scans. USER_GUIDE-cli carries sections for an interactive tool. A CLI with no views, keys, or highlighting loses the Views, Keyboard Controls, and Highlighting and Error Semantics sections, headings included. The prompts that assume a screen are rewritten for a plain run. Gate: every cited ID exists in REQUIREMENTS; surface tables match source 1:1; if bilingual, the second track mirrors the first section for section.
 5. **`README.md`** — onboarding: entry table, quick start, architecture overview *derived from the JSON when present*, agent-onboarding pointer, verification commands, neutrality checklist, doc cross-links. Gate: every quick-start command appears in the surface doc (under Lite or `docs-only`, in the REQUIREMENTS row that carries that surface). The neutrality sweep is the checker's own scan, so it runs in Phase C step 3. While no surface doc is seeded, a quick-start command's `must_appear_in` names `readme` and `requirements` instead of the surface key: a rule that targets only the unseeded surface key withdraws.
 6. **`AGENTS.md`** — **lean**: repo facts + the co-op contract (change-flow, sign-off, Stop-and-Ask). *What/Done* only — **no** generic agent discipline, **no** platform-CLI rules. `{{LIGHT_PROFILE_NOTE_OR_DELETE}}` takes this text under the `light` co-op profile and is deleted under every other one: ``*(Under the `light` co-op profile this entry and the VALIDATION block in item 5 of this list are encouraged, not required.)*`` Gate: **≤ `checks.line_limits.agents` lines**; no platform-CLI rule leaked in, and the template's own `git branch -d` line does not count. Two clauses wait. The Key-Files path clause runs after the resident files, because Key Files names `docs/VALIDATION.md` from step 7. `Every dev command runs clean` runs in Phase C step 3, because one of those commands is the checker.
 7. **`docs/VALIDATION.md`** — seed **empty** with the file H1 and the two record templates in a comment, the per-feature block and the read-back record. Resolve `{{COMPONENT_NAME}}`, the prefix, and the commands in the block template to TARGET's real values. The slots inside both templates are plain words with no marker around them. Leave them as they are. They are filled when a block or a record is appended. Gate: file exists. The H1 names the real component. The block template's commands are TARGET's real commands. No `{{` is left in the file.
@@ -392,7 +395,7 @@ Also write **`AGENTIC-MODE.md`** (root index) and **`agentic-mode/SELF-TEST.md`*
 (from their templates), under every doc-set profile. These are resident meta
 files, not part of the chain. Gate: every path in the index's Doc Inventory
 and precedence tables exists, and every section a precedence cell names exists.
-Render their body prose in the TARGET's chosen language, but keep the canonical
+Render their body prose in the TARGET's primary language, but keep the canonical
 English section headings and the `Template-Source:` markers exactly as the
 templates carry them — headings are cross-repo reference anchors (see
 BOOTSTRAP-CORE, "Rendering Language and Canonical Headings"). Then run the
