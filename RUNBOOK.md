@@ -217,7 +217,7 @@ it sets the rigor for everything after:
    - `light`: **no append-only ritual** — iteration history + per-feature VALIDATION encouraged, not required.
 2. **Project type + doc-set profile** — `cli` / `library` / `web-service` / `docs-only`, and `Lite` / `Standard` / `Full`? (The type selects the observable-surface doc: `cli`→USER_GUIDE-cli, `library`→API_REFERENCE, `web-service`→USER_GUIDE-web, `docs-only`→none. The doc-set profile selects how many layers Phase B seeds, per the doctrine's doc-set table — Lite, Standard, or Full — and is independent of the co-op profile in Q1. Default `Full` for a repo expected to outlive one feature cycle, as the doctrine's table says. Under `Full`, also settle the architecture doc. Write it unless TARGET has one entry point and no other component, or is `docs-only`. Ask the user in those two cases. A skip sets `docs.architecture: null` and leaves the profile at `Full`.)
 3. **CI platform** — `gitlab` / `github` / `none`? `none` governs only the CI **gate**; the WORKFLOW doc, when the doc-set profile seeds one, still follows the team's **actual review platform**.
-4. **Primary language + build, test, and smoke commands** — the one command that compiles/builds, the one that runs tests, and the one that runs the primary entry point on a fixture or an example, each verbatim from TARGET. The third is the smoke command. No build step? Agree on a cheap static sanity command (syntax check, lint, byte-compile) to fill `{{BUILD_CMD}}`. No declared test command? Compose one from the test framework the test files import, run it, and use it. No smoke command to mine? Compose the shortest one-line shell command that runs the primary entry point on its primary flow, leaves the repo as it found it, and exits 0. A file the program writes at run time does not count. When several commands qualify, take the one that exercises the primary flow over one that only prints help or an empty list. For a service that runs until stopped, the command starts it, calls one endpoint, and stops it. When no one line can do that, add one small script to TARGET and make its path the smoke command. Use only what TARGET already depends on. Run it, and use it. For a `docs-only` target the smoke command is the docs gate command. TARGET has no tests? Say so in the bundle. The templates then lose their test lines (Phase B, "A placeholder with no value"). A placeholder must never survive unresolved.
+4. **Primary language + build, test, and smoke commands** — the one command that compiles/builds, the one that runs tests, and the one that runs the primary entry point on a fixture or an example, each verbatim from TARGET. The third is the smoke command. No build step? Agree on a cheap static sanity command (syntax check, lint, byte-compile) to fill `{{BUILD_CMD}}`. No declared test command? Compose one from the test framework the test files import, run it, and use it. No smoke command to mine? Compose the shortest one-line shell command that runs the primary entry point on its primary flow, leaves the repo as it found it, and exits 0. A file the program writes at run time is not a change. When several commands qualify, take the one that exercises the primary flow over one that only prints help or an empty list. For a service that runs until stopped, the command starts it, calls one endpoint, and stops it. When no one line can do that, add one small script to TARGET and make its path the smoke command. Use only what TARGET already depends on. Run it, and use it. For a `docs-only` target the smoke command is the docs gate command. TARGET has no tests? Say so in the bundle. The templates then lose their test lines (Phase B, "A placeholder with no value"). A placeholder must never survive unresolved.
 5. **One-line purpose + audience** — internal tool vs external product; who reads/uses it.
 6. **Entry points** — which is primary maintained vs secondary/legacy.
 7. **Component name + ID prefix** for REQUIREMENTS (`^[A-Z]{2,6}$`, one prefix per component).
@@ -490,15 +490,15 @@ profile.
    is trimmed toward the line limit only with the user's ok.
    Three rules hold for every partial doc. Hand-written text never moves. A
    template piece that sits under no heading goes right after the
-   hand-written opening paragraph, and each missing section goes after the
-   last hand-written section, in the template's order. Skip only a sentence
-   or a bullet whose content the hand-written text already states. A
-   hand-written quick start is the text that shows a first run. The
-   `Quick Start` heading goes on its own line directly above that text, which
-   splits a paragraph it shares with other sentences. Its wording, its inline
-   commands, and its shape stay as they are. A doc you added
-   pieces to carries that template's `Template-Source:` marker from then on, so
-   a later upgrade finds its regions.
+   hand-written text between the H1 and the first hand-written heading, and
+   each missing section goes after the last hand-written section, in the
+   template's order. Skip only a sentence or a bullet whose content the
+   hand-written text already states. A hand-written quick start is the text
+   that shows a first run. The `Quick Start` heading goes on its own line
+   directly above that text, which splits a paragraph it shares with other
+   sentences. Its wording, its inline commands, and its shape stay as they
+   are. A doc you added pieces to carries that template's `Template-Source:`
+   marker from then on, so a later upgrade finds its regions.
 5. **Wire enforcement + converge.** Copy the checker, add the CI gate whenever
    `ci.platform` is `gitlab` or `github` (Phase C step 2), then run Phase C
    steps 3 to 5: the checker with the commands in `AGENTS.md` Development
