@@ -1,8 +1,9 @@
 <!--
 Template-Source: agentic-bootstrap/VALIDATION@v2  (@v2: the block template's slots are plain words,
 so a rendered seed passes the Phase-C placeholder sweep; a read-back record template sits beside
-the block template; no angle-bracket token remains in the file;
-the ID example uses three digits; the record template's instructions sit above its fill-in lines)
+the block template, and the opening paragraph gains a sentence about the record; no angle-bracket
+token remains in the file; the ID example uses three digits; the record template's instructions
+sit above its fill-in lines)
 -->
 
 # todo — Implementation Validation

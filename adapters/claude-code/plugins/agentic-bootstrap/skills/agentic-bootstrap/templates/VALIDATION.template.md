@@ -15,8 +15,9 @@ Under the `light` co-op profile these blocks are encouraged, not required.
 Harness-neutral: never name a specific agent product, model, or proprietary tool.
 Template-Source: agentic-bootstrap/VALIDATION@v2  (@v2: the block template's slots are plain words,
 so a rendered seed passes the Phase-C placeholder sweep; a read-back record template sits beside
-the block template; no angle-bracket token remains in the file;
-the ID example uses three digits; the record template's instructions sit above its fill-in lines)
+the block template, and the opening paragraph gains a sentence about the record; no angle-bracket
+token remains in the file; the ID example uses three digits; the record template's instructions
+sit above its fill-in lines)
 Rendered copies keep the Template-Source lines in a comment at the top of the file; the rest of this header is not rendered.
 -->
 

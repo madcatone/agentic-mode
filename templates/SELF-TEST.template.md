@@ -15,8 +15,9 @@ Resolve `{{IF ...}}` regions per BOOTSTRAP-CORE, "Conditional Text in Templates"
 Template-Source: agentic-bootstrap/SELF-TEST@v4  (@v4: §A names where each check that is not
 machine-checked lives and no longer cites a toolkit doc; §D carries no question count and no
 seeding instruction; a read-back record follows the VALIDATION record template, and a probe that
-could not run is recorded as not run; the §B read-back row accepts that record;
-the §B dev-command row names every listed command; commands run `python3`)
+could not run is recorded as not run; the §B read-back row accepts that record; the §B
+dev-command row names every listed command and exempts one that failed before the change under
+test; commands run `python3`)
 Rendered copies keep the Template-Source lines in a comment at the top of the file; the rest of this header is not rendered.
 -->
 
@@ -51,7 +52,7 @@ Run it until it exits clean before touching the manual rows. **CI:** platform is
 Walk these by hand (kept deliberately short — the script owns everything mechanizable):
 
 {{IF ARCHITECTURE_PATH}}- [ ] **Architecture ↔ prose coherence.** Every entry point in README is a component in `{{ARCHITECTURE_PATH}}` and vice-versa; component labels naming a symbol exist in source; connection labels naming a flag match a real flag.{{END IF}}
-- [ ] **Dev commands actually run clean.** From a fresh checkout, each command in the AGENTS Development Commands exits 0 with the expected output. The script checks that they are *cited*; only a human/agent run proves they *work*.
+- [ ] **Dev commands actually run clean.** From a fresh checkout, each command in the AGENTS Development Commands exits 0 with the expected output. A command that already failed before the change under test is reported, and does not fail this row. The script checks that they are *cited*; only a human/agent run proves they *work*.
 - [ ] **Append-only provenance holds.** REQUIREMENTS Iteration History and VALIDATION blocks were appended, not rewritten — verifiable via `git diff` across recent commits (only appends, plus the one post-merge backfill the VALIDATION header declares). *(Relaxed under the `light` co-op profile.)*
 {{IF WORKFLOW_PATH}}- [ ] **Process-doc boundary holds.** `{{AGENTS_PATH}}` defers change-flow to `{{WORKFLOW_PATH}}` and names no platform CLI. The WORKFLOW doc is the copied-as-is template with only its declared substitution points resolved, or a hand-written doc, with any local exception declared in its header.{{ELSE}}- [ ] **Process-doc boundary holds.** `{{AGENTS_PATH}}` names no platform CLI and carries the platform-neutral review policy in full. No WORKFLOW doc is seeded.{{END IF}}
 - [ ] **Bilingual lock-step** *(only if `bilingual.enabled`)* — both tracks share identical ID set/count/order and identical surface tables; cross-language citations are descriptive, not numeric.

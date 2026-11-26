@@ -1,9 +1,11 @@
 <!--
 Template-Source: agentic-bootstrap/AGENTIC-MODE@v4  (@v4: the inventory lists the layers in reading
-order, architecture third; the Enforcement paragraph routes each non-mechanized check to where it
-lives instead of to SELF-TEST §B; the Canonical Questions carry no seeding instruction; the
-doctrine pointers say this repo keeps no copy; the requirements row allows for no event model; the process-rules row no longer names the H1 as a substitution point;
-the doctrine pointers take the toolkit's location; commands run `python3`)
+order, architecture third, and a sentence under it says so; the Enforcement paragraph routes each
+non-mechanized check to where it lives instead of to SELF-TEST §B, and ends with two sentences on
+the placeholder sweep; the Canonical Questions carry no seeding instruction; the doctrine pointers
+say this repo keeps no copy and take the toolkit's location; the requirements row allows for no
+event model; the process-rules row no longer names the H1 as a substitution point; commands run
+`python3`)
 -->
 
 # AGENTIC-MODE.md — Doc Contract for Agent + Human Co-Development

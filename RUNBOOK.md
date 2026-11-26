@@ -510,7 +510,7 @@ profile.
    existing AGENTS gains the template's missing sections by their headings, from
    Project Scope and Key Files through MR / PR Governance and Git Hygiene, and
    is trimmed toward the line limit only with the user's ok.
-   Three rules hold for every partial doc. Hand-written text never moves. A
+   These rules hold for every partial doc. Hand-written text never moves. A
    template piece that sits under no heading goes after the hand-written text
    between the H1 and the first heading, whether that heading is hand-written
    or one this step adds. Each missing section goes after the last
