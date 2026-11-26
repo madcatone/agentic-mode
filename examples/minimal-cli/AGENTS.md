@@ -2,7 +2,7 @@
 Template-Source: agentic-bootstrap/AGENTS@v2  (@v2: Git Hygiene allows deleting a merged local
 branch, as the WORKFLOW doc does; the header states the light-profile note and the no-value rule
 for this template's optional slots; the Change-Flow Boundary heading drops its parenthetical;
-commands run `python3`)
+Change Flow step 6 exempts a command that failed before the change; commands run `python3`)
 -->
 
 # AGENTS.md — todo
@@ -55,7 +55,9 @@ key that keeps them in sync:
 4. `README.md` — quick-start updated **iff** a user-visible command changed.
 5. `docs/VALIDATION.md` — a per-feature block is **appended**, citing the
    `TODO-XXX` ID and the issue/PR number.
-6. Verification commands run clean and the docs gate exits clean.
+6. Verification commands run clean and the docs gate exits clean. A
+   command that already failed before this change is reported, and does not
+   fail this step.
 
 ## Sign-Off Points
 

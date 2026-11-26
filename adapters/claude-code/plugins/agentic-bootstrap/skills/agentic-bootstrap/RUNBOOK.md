@@ -261,10 +261,11 @@ Fill the two lists under `checks` from the scan and the answers:
   `must_appear_in: ["agents", "readme"]`. One rule per command, and a rule's
   `run` is one line of a code block or one code span. When a command is both
   a dev command and a quick-start command, write one rule whose
-  `must_appear_in` names every doc that must quote it.
-  Its `run` is the form without sample values. Decide here what
-  README's Quick Start carries, one or two use cases with the command lines
-  each needs, and write one rule per command line with
+  `must_appear_in` names every doc that must quote it. That rule's
+  `run` is the quick-start form, the one without sample values. A
+  command that is only a dev command keeps its whole line as `run`.
+  Decide here what README's Quick Start carries, one or two use cases with the
+  command lines each needs, and write one rule per command line with
   `["readme", "user_guide"]`, or `["readme", "api_reference"]` for a library.
   Step 5 writes that section with exactly those commands. A
   quick-start rule's `run` is the command without its sample argument

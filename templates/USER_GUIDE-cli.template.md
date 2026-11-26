@@ -12,8 +12,9 @@ Harness-neutral: never name a specific agent product, model, or proprietary tool
 Template-Source: agentic-bootstrap/USER_GUIDE-cli@v2  (@v2: the title takes the component-name
 slot; no descriptive slot holds a second placeholder; a command sketch marks its argument as a
 value, not a placeholder; the ID examples use three digits; the header names the sections that
-belong to an interactive tool; the instruction above the feature subsections is a comment, not a
-heading; each command sample is its own fenced block with a lead sentence)
+belong to an interactive tool and the cut for a CLI whose flags take no value; the instruction
+above the feature subsections is a comment, not a heading; each command sample is its own fenced
+block with a lead sentence)
 `{{FLAG_1}}` and `{{FLAG_2}}`: one bullet per flag that takes a value. A target
 with no such flag loses the Project-Neutral Usage section, headings included.
 Rendered copies keep the Template-Source lines in a comment at the top of the file; the rest of this header is not rendered.

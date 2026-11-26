@@ -15,7 +15,7 @@ resolved per BOOTSTRAP-CORE, "Conditional Text in Templates". This file is META 
 it is meant to be read every session. Keep it short — it routes; it is not the content.
 The Canonical Questions section is seeded here (one list, one home) — SELF-TEST §D
 consumes it for the zero-context read-back probe. The five Canonical Questions below are the seed,
-one per layer of the doctrine's Layered Reading Order (BOOTSTRAP-CORE). Resolve their placeholders.
+drawn from the doctrine's Layered Reading Order (BOOTSTRAP-CORE). Resolve their placeholders.
 Keep between three and seven questions.
 Render body prose in the TARGET's chosen language; keep the section headings in
 canonical English (they are cross-repo reference anchors — doctrine and upgrades
@@ -27,7 +27,8 @@ routes each non-mechanized check to where it lives instead of to SELF-TEST §B, 
 sentences on the placeholder sweep; the Canonical Questions carry no seeding instruction and no
 question count; the doctrine pointers say this repo keeps no copy and take the toolkit's
 location; the requirements row allows for no event model; the process-rules row no longer names
-the H1 as a substitution point; commands run `python3`)
+the H1 as a substitution point; commands run `python3`; the header says which words a target
+without runtime placeholders drops)
 Rendered copies keep the Template-Source lines in a comment at the top of the file; the rest of this header is not rendered.
 -->
 

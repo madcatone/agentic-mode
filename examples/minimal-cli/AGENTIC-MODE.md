@@ -5,7 +5,8 @@ routes each non-mechanized check to where it lives instead of to SELF-TEST §B, 
 sentences on the placeholder sweep; the Canonical Questions carry no seeding instruction and no
 question count; the doctrine pointers say this repo keeps no copy and take the toolkit's
 location; the requirements row allows for no event model; the process-rules row no longer names
-the H1 as a substitution point; commands run `python3`)
+the H1 as a substitution point; commands run `python3`; the header says which words a target
+without runtime placeholders drops)
 -->
 
 # AGENTIC-MODE.md — Doc Contract for Agent + Human Co-Development

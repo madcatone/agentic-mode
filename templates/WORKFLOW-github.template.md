@@ -10,7 +10,9 @@ checks the `ci-runners:` marker against config.
 `{{TEST_CMD}}`: a target with no tests deletes the words `; tests` together
 with the backtick-wrapped `{{TEST_CMD}}` that follows them, from the Iron Rules
 bullet that lists the commands, and keeps the rest of the bullet.
-`{{IF_BILINGUAL: <text>}}`: delete it together with the space before it.
+`{{IF_BILINGUAL: <text>}}`: a keep-or-delete region for `bilingual.enabled`. With it false,
+delete the whole marker together with the space before it. With it true, keep the text and drop
+only the markers.
 NOTE: initially a structural mirror of the GitLab variant; since validated end-to-end in a real
 adoption (bootstrap through multiple tagged releases, including a CI-runner migration). Treat
 deviations found in your own use as bugs to report upstream.
@@ -18,7 +20,8 @@ BILINGUAL dual-language external replies apply ONLY when config bilingual.enable
 `gh` appears here because this is the GitHub platform doc — it is the ONLY doc allowed to name it.
 Harness-neutral otherwise: never name a specific agent product or model.
 Template-Source: agentic-bootstrap/WORKFLOW-github@v4  (@v4: with no runners in config the sentence
-under the CI-runners line goes too; commands run `python3`; the ID example uses three digits)
+under the CI-runners line goes too; commands run `python3`; the ID example uses three digits; the
+header states the cut for a target with no tests and both renderings of the bilingual conditional)
 Rendered copies keep the Template-Source lines in a comment at the top of the file; the rest of this header is not rendered.
 -->
 

@@ -5,7 +5,8 @@
      exception is kept across template refreshes. The docs gate runs through
      the parent repo's checker, because this example ships no copy of it.
 Template-Source: agentic-bootstrap/WORKFLOW-github@v4  (@v4: with no runners in config the sentence
-under the CI-runners line goes too; commands run `python3`; the ID example uses three digits) -->
+under the CI-runners line goes too; commands run `python3`; the ID example uses three digits; the
+header states the cut for a target with no tests and both renderings of the bilingual conditional) -->
 
 # GitHub Workflow — Collaborator Rule
 

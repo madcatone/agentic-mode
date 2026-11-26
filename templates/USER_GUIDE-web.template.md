@@ -12,7 +12,9 @@ column reads `none`.
 BILINGUAL: keep the second track ONLY IF config bilingual.enabled == true; else delete it.
 Harness-neutral: never name a specific agent product, model, or proprietary tool.
 Template-Source: agentic-bootstrap/USER_GUIDE-web@v2  (@v2: the title takes the component-name
-slot; no descriptive slot holds a second placeholder; the ID examples use three digits)
+slot; no descriptive slot holds a second placeholder; the ID examples use three digits; the
+header states the cuts for a service with no runtime placeholders and for one with no
+authentication)
 Rendered copies keep the Template-Source lines in a comment at the top of the file; the rest of this header is not rendered.
 -->
 

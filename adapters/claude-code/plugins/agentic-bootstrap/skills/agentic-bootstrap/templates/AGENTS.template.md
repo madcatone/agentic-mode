@@ -36,7 +36,7 @@ Resolve `{{IF ...}}` regions per BOOTSTRAP-CORE, "Conditional Text in Templates"
 Template-Source: agentic-bootstrap/AGENTS@v2  (@v2: Git Hygiene allows deleting a merged local
 branch, as the WORKFLOW doc does; the header states the light-profile note and the no-value rule
 for this template's optional slots; the Change-Flow Boundary heading drops its parenthetical;
-commands run `python3`)
+Change Flow step 6 exempts a command that failed before the change; commands run `python3`)
 Rendered copies keep the Template-Source lines in a comment at the top of the file; the rest of this header is not rendered.
 -->
 
@@ -81,7 +81,7 @@ A behavior change is **not done** until all of these hold. The ID is the join ke
 3. {{IF SURFACE_DOC_PATH}}`{{SURFACE_DOC_PATH}}` — the subsection for that behavior is updated and cites the `{{PREFIX}}-XXX` ID.{{ELSE}}The observable surface. The requirement row from step 2 records the command / call that exercises the behavior and what the user observes.{{END IF}}
 4. `{{README_PATH}}` — quick-start updated **iff** a user-visible command/entry changed.
 5. `{{VALIDATION_PATH}}` — a per-feature block is **appended**, citing the `{{PREFIX}}-XXX` ID and the issue/MR/PR number.
-6. Verification commands run clean (see Development Commands) and the docs gate exits clean.
+6. Verification commands run clean (see Development Commands) and the docs gate exits clean. A command that already failed before this change is reported, and does not fail this step.
 
 ## Sign-Off Points
 
