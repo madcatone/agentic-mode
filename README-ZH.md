@@ -42,6 +42,15 @@ agent 指向它（「讀這個檔案並執行」），或你自己照著做。
 分層文件且每個 gate 都通過（Phase B）、複製檢查器並佈線 CI（Phase C）、交接給自我運作
 （Phase D）。成果是一個任何協作者都能冷啟動操作的 repo。
 
+訪談的第 2 題同時選 **doc-set profile**：`Lite`、`Standard` 或 `Full`。profile 決定 Phase B
+產生幾層文件（見 doctrine 的 doc-set 表格）。`Lite` 產生 `README.md`、`AGENTS.md`、
+`docs/REQUIREMENTS.md` 與 `docs/VALIDATION.md`，每個 REQUIREMENTS 列自己寫出可觀察的表面
+（observable surface）與觸發它的指令。`Standard` 再加上 surface doc（`USER_GUIDE` 或
+`API_REFERENCE`）與 `docs/WORKFLOW.md`；`Full` 再加上 `docs/architecture.json`。每種 profile 也都
+會產生常駐的索引 `AGENTIC-MODE.md` 與 `agentic-mode/SELF-TEST.md`。模板以 guarded region
+帶著這些差異，所以每種 profile 產出的文件都不會指向自己沒有的 doc。下面的工作範例是
+`Standard` 形狀。
+
 ### Adopt 一個既有 repo
 
 若 repo 已經有 `AGENTS.md`、`README`、或零散的 `docs/`，用 **Adopt mode**（也在

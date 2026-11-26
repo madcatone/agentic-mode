@@ -7,12 +7,19 @@ DO put here: scope, key files, dev/verify commands, the change-flow, sign-off po
 the Stop-and-Ask list.
 DO NOT put here: generic agent discipline (how to dispatch, which model/tool to use, how to
 parallelize) — that is the executor's environment (How/Who), not this contract.
-DO NOT put here: platform-CLI rules or comment styles — those defer to docs/WORKFLOW.md.
+DO NOT put here: platform-CLI rules or comment styles — those belong in the WORKFLOW doc when one is seeded, and never here.
 
 HARD LIMIT: the generated file MUST stay <= checks.line_limits.agents (set the limit explicitly
 in agentic-mode/config.json — an absent key means the checker enforces no line limit).
-The checker enforces this mechanically. Keep it terse; push depth to REQUIREMENTS/WORKFLOW.
+The checker enforces this mechanically. Keep it terse; push depth to REQUIREMENTS and to the
+WORKFLOW doc when one is seeded.
 Harness-neutral: never name a specific agent product, model, or proprietary tool.
+Resolve `{{IF ...}}` regions per BOOTSTRAP-CORE, "Conditional Text in Templates".
+Template-Source: agentic-bootstrap/AGENTS@v1  (@v1: Template-Source marker added; references to
+the surface doc, WORKFLOW doc, and architecture doc sit inside regions; the boundary bullets
+and the MR / PR Governance closing sentence hold for a repo with no WORKFLOW doc; the
+Change-Flow Boundary bullet names MR / PR Governance)
+Rendered copies keep the Template-Source line in a comment at the top of the file; the rest of this header is not rendered.
 -->
 
 # AGENTS.md — {{PROJECT_NAME}}
@@ -30,12 +37,12 @@ Repo facts and the human/agent co-operation contract for this repository. It sta
 - `{{README_PATH}}`: onboarding, entry picker, quick start.
 - `{{PRIMARY_ENTRY}}`: {{ROLE — primary maintained path}}.
 - `{{SECONDARY_ENTRY_OR_NONE}}`: {{ROLE — legacy/optional, or delete this line}}.
-- `{{REQUIREMENTS_PATH}}`: behavior contract (IDs: `{{PREFIX}}-XXX`).
-- `{{SURFACE_DOC_PATH}}`: observable surface ({{SURFACE_DOC_ROLE}}).
+- `{{REQUIREMENTS_PATH}}`: behavior contract (IDs: `{{PREFIX}}-XXX`).{{IF SURFACE_DOC_PATH}}{{ELSE}} Also carries the observable surface, one exercising command per row.{{END IF}}
+{{IF SURFACE_DOC_PATH}}- `{{SURFACE_DOC_PATH}}`: observable surface ({{SURFACE_DOC_ROLE}}).{{END IF}}
 - `{{VALIDATION_PATH}}`: per-feature done evidence.
-- `{{WORKFLOW_PATH}}`: platform review loop (see Change Flow below).
+{{IF WORKFLOW_PATH}}- `{{WORKFLOW_PATH}}`: platform review loop (see Change Flow below).{{END IF}}
 - `{{TESTS_DIR}}`: {{WHAT_TESTS_COVER}}; fixtures in `{{FIXTURES_DIR}}`.
-<!-- Reconcile this list with docs/architecture.json components[] when that file exists. -->
+{{IF ARCHITECTURE_PATH}}<!-- Reconcile this list with `{{ARCHITECTURE_PATH}}` components[]. -->{{END IF}}
 
 ## Development Commands
 
@@ -53,7 +60,7 @@ A behavior change is **not done** until all of these hold. The ID is the join ke
 
 1. Code edited.
 2. `{{REQUIREMENTS_PATH}}` — the requirement `{{PREFIX}}-XXX` is added or updated, with a new **append-only** Iteration History entry (lead with the decision, then the evidence: numbers/fingerprint/issue-MR link). {{LIGHT_PROFILE_NOTE_OR_DELETE}}
-3. `{{SURFACE_DOC_PATH}}` — the subsection for that behavior is updated and cites the `{{PREFIX}}-XXX` ID.
+3. {{IF SURFACE_DOC_PATH}}`{{SURFACE_DOC_PATH}}` — the subsection for that behavior is updated and cites the `{{PREFIX}}-XXX` ID.{{ELSE}}The observable surface. The requirement row from step 2 records the command / call that exercises the behavior and what the user observes.{{END IF}}
 4. `{{README_PATH}}` — quick-start updated **iff** a user-visible command/entry changed.
 5. `{{VALIDATION_PATH}}` — a per-feature block is **appended**, citing the `{{PREFIX}}-XXX` ID and the issue/MR/PR number.
 6. Verification commands run clean (see Development Commands) and the docs gate exits clean.
@@ -75,7 +82,7 @@ Stop and ask a human before any of these, even if permissions technically allow 
 
 ## MR / PR Governance
 
-Landing a change on `main`, the default branch, or any protected branch happens **only** through a merge/pull request (MR/PR) — never a direct commit or push, even where permissions technically allow it. This section is the platform-neutral policy; the CLI and exact commands live in `{{WORKFLOW_PATH}}`.
+Landing a change on `main`, the default branch, or any protected branch happens **only** through a merge/pull request (MR/PR) — never a direct commit or push, even where permissions technically allow it. This section is the platform-neutral policy; {{IF WORKFLOW_PATH}}the CLI and exact commands live in `{{WORKFLOW_PATH}}`.{{ELSE}}no WORKFLOW doc is seeded, so this section is the whole review policy.{{END IF}}
 
 - **Route through review, positively.** Every completed change meant for a protected branch gets an MR/PR opened or updated for it. The obligation is to *land through review*, not merely to avoid pushing directly.
 - **Authorization inference.** When the user says "push the completed work," read it as *push the source branch and open or update its MR/PR* — unless they explicitly name a non-protected branch **and** say not to open one.
@@ -86,7 +93,7 @@ Landing a change on `main`, the default branch, or any protected branch happens 
 
 ## Change-Flow Boundary (defer to WORKFLOW)
 
-- Move changes through review per `{{WORKFLOW_PATH}}`. **Boundary test:** if a rule names the platform CLI or a platform-specific comment style, it belongs in `{{WORKFLOW_PATH}}`, not here.
+- Move changes through review per **MR / PR Governance** above{{IF WORKFLOW_PATH}} and per `{{WORKFLOW_PATH}}`{{END IF}}. **Boundary test:** if a rule names the platform CLI or a platform-specific comment style, it {{IF WORKFLOW_PATH}}belongs in `{{WORKFLOW_PATH}}`{{ELSE}}does not belong here{{END IF}}.
 
 ## Git Hygiene
 

@@ -6,6 +6,8 @@ Every endpoint/screen/state CITES its owning {{PREFIX}}-XXX from REQUIREMENTS. T
 tables must match the source router 1:1.
 BILINGUAL: keep the second track ONLY IF config bilingual.enabled == true; else delete it.
 Harness-neutral: never name a specific agent product, model, or proprietary tool.
+Template-Source: agentic-bootstrap/USER_GUIDE-web@v1  (@v1: Template-Source marker added)
+Rendered copies keep the Template-Source line in a comment at the top of the file; the rest of this header is not rendered.
 -->
 
 # {{COMPONENT}} — User Guide (Web Service)

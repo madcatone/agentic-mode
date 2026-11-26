@@ -7,6 +7,8 @@ Every documented symbol CITES its owning {{PREFIX}}-XXX from REQUIREMENTS. Signa
 source 1:1. Document only the PUBLIC surface — internal/private symbols are out of scope here.
 BILINGUAL: keep the second track ONLY IF config bilingual.enabled == true; else delete it.
 Harness-neutral: never name a specific agent product, model, or proprietary tool.
+Template-Source: agentic-bootstrap/API_REFERENCE-library@v1  (@v1: Template-Source marker added)
+Rendered copies keep the Template-Source line in a comment at the top of the file; the rest of this header is not rendered.
 -->
 
 # {{COMPONENT}} — API Reference
