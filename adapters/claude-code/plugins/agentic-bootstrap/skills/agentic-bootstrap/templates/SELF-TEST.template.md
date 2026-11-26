@@ -5,14 +5,17 @@ command; the manual section is intentionally minimal. This file MUST carry the f
 zero-context read-back probe unchanged in spirit. The canonical questions the probe asks live in the
 resident index's Canonical Questions section — this file points at them, it does not duplicate them.
 Under the `light` co-op profile the append-only rows relax; every other row still binds.
+
+The index template seeds the Canonical Questions. This file only points at them. The manual section
+stays short on purpose. A check that is review's job is named in §A and is not added as a §B row.
+
 Render body prose in the TARGET's chosen language; keep the section headings in canonical English.
 Harness-neutral: never name a specific agent product, model, or proprietary tool.
 Resolve `{{IF ...}}` regions per BOOTSTRAP-CORE, "Conditional Text in Templates".
-Template-Source: agentic-bootstrap/SELF-TEST@v3  (@v3: rows that name an optional doc moved inside
-regions; the ID-continuity and command-surface bullets are reworded and no longer quote the
-placeholder sweep's braces; §B names the VALIDATION backfill exception; §D makes the pre-release
-read-back optional; the process-doc boundary row names the declared substitution points and
-allows a declared local exception)
+Template-Source: agentic-bootstrap/SELF-TEST@v4  (@v4: §A names where each check that is not
+machine-checked lives and no longer cites a toolkit doc; §D carries no question count and no
+seeding instruction; a read-back record follows the VALIDATION record template, and a probe that
+could not run is recorded as not run; the §B read-back row accepts that record)
 Rendered copies keep the Template-Source lines in a comment at the top of the file; the rest of this header is not rendered.
 -->
 
@@ -27,13 +30,13 @@ Run this once all seeded docs exist. Every row is a gate: a failure blocks hand-
 The mechanizable checks run from a single repo-local command:
 
 ```bash
-python scripts/check_agentic_docs.py --config agentic-mode/config.json
+python3 scripts/check_agentic_docs.py --config agentic-mode/config.json
 ```
 
 It enforces, from `agentic-mode/config.json`:
 
-- **ID continuity** — every `{{PREFIX}}-NNN` cited in another governed prose doc resolves to a row in `{{REQUIREMENTS_PATH}}` (rows are duplicate-free and gap-free; bilingual regions carry identical ID sets). Not machine-checked: references in commit/MR/PR messages (a review discipline — the checker reads docs, not git history), the uniform format `^[A-Z]{2,6}-[0-9]{3,}$` itself, and "every observable behavior maps to ≥1 ID" (a Phase-B gate in the RUNBOOK).
-- **Command-surface consistency** — every `checks.commands` entry appears in the files its `must_appear_in` lists. README quick-start ↔ surface parity beyond the configured commands is a review matter; surviving `<command>` / `<placeholder>` markers and any unresolved region marker are swept by hand in Phase C (RUNBOOK).
+- **ID continuity** — every `{{PREFIX}}-NNN` cited in another governed prose doc resolves to a row in `{{REQUIREMENTS_PATH}}` (rows are duplicate-free and gap-free; bilingual regions carry identical ID sets). Not machine-checked: references in commit/MR/PR messages (a review discipline — the checker reads docs, not git history), the uniform format `^[A-Z]{2,6}-[0-9]{3,}$` itself, and "every observable behavior maps to ≥1 ID" (a gate the bootstrap runs).
+- **Command-surface consistency** — every `checks.commands` entry appears in the files its `must_appear_in` lists. README quick-start ↔ surface parity beyond the configured commands is a review matter. A leftover placeholder, in any generated file, is swept by hand whenever these docs are generated or upgraded.
 - **Line limit** — the generated `{{AGENTS_PATH}}` stays within `checks.line_limits`.
 - **Neutrality / harness-neutrality** — the configurable forbidden-token sweep (`checks.deny_words`, `checks.harness_neutrality`) over docs/examples, honoring `agentic-gate: allow` markers.
 - **Layer presence** — every doc path declared under `docs` in the config exists. (That README cross-links the layers is not machine-checked.)
@@ -51,7 +54,7 @@ Walk these by hand (kept deliberately short — the script owns everything mecha
 - [ ] **Append-only provenance holds.** REQUIREMENTS Iteration History and VALIDATION blocks were appended, not rewritten — verifiable via `git diff` across recent commits (only appends, plus the one post-merge backfill the VALIDATION header declares). *(Relaxed under the `light` co-op profile.)*
 {{IF WORKFLOW_PATH}}- [ ] **Process-doc boundary holds.** `{{AGENTS_PATH}}` defers change-flow to `{{WORKFLOW_PATH}}` and names no platform CLI. The WORKFLOW doc is the copied-as-is template with only its declared substitution points resolved, or a hand-written doc, with any local exception declared in its header.{{ELSE}}- [ ] **Process-doc boundary holds.** `{{AGENTS_PATH}}` names no platform CLI and carries the platform-neutral review policy in full. No WORKFLOW doc is seeded.{{END IF}}
 - [ ] **Bilingual lock-step** *(only if `bilingual.enabled`)* — both tracks share identical ID set/count/order and identical surface tables; cross-language citations are descriptive, not numeric.
-- [ ] **Read-back probe passes** (section D below).
+- [ ] **Read-back probe passes**, or the latest read-back record in `{{VALIDATION_PATH}}` says not run (section D below).
 
 ---
 
@@ -73,12 +76,12 @@ These are not style rules; they are stop conditions. A collaborator who violates
 
 The ultimate test of the contract is whether a **zero-context reviewer** (a human or agent who has never seen this repo or any chat history) can answer the repo's canonical questions using **only the committed docs**. This catches gaps the mechanical checker cannot: an ID that resolves but whose prose is incomprehensible cold, a workflow rule that reads fine to the author but not to a stranger.
 
-**Canonical questions.** The resident `{{INDEX_PATH}}` lists **N** canonical questions this repo's docs must answer cold, in its **Canonical Questions** section. Seed and maintain them **there** — one list, one home; this probe consumes that list and does not carry a second copy. Seed from the Layered Reading Order (see BOOTSTRAP-CORE), keep three to seven questions.
+**Canonical questions.** The resident `{{INDEX_PATH}}` lists the canonical questions this repo's docs must answer cold, in its **Canonical Questions** section. Maintain them **there**. One list, one home. This probe consumes that list and does not carry a second copy.
 
 **Protocol.**
 1. Hand a zero-context reviewer *only* the repo's committed docs — no chat history, no walkthrough.
 2. Ask them the canonical questions. They answer *solely* from the docs, citing the file:section (and `{{PREFIX}}-XXX` where relevant) that supplied each answer.
 3. Any question they cannot answer, or answer wrongly, marks a **doc gap** — the docs, not the reader, are at fault. Fix the offending layer.
-4. **Record the outcome in `{{VALIDATION_PATH}}`**: the date, who/what read back, each question's pass/fail, and the citation or the gap found. A clean read-back is part of the done evidence for a bootstrap or a major doc change; before a release tag it is an optional drift check{{IF WORKFLOW_PATH}} (WORKFLOW release checklist){{END IF}}.
+4. **Record the outcome in `{{VALIDATION_PATH}}`** with the read-back record template the file carries: the date, who/what read back, each question's pass/fail, and the citation or the gap found. A clean read-back is part of the done evidence for a bootstrap or a major doc change. When no zero-context reader is available, record the probe as not run. That record does not block hand-off. Before a release tag the probe is an optional drift check{{IF WORKFLOW_PATH}} (WORKFLOW release checklist){{END IF}}.
 
 A repo passes the read-back probe when every canonical question is answerable, cold, from the docs alone.

@@ -1,60 +1,77 @@
 <!--
 TEMPLATE: docs/VALIDATION.md — the done-evidence layer. SEED EMPTY at bootstrap.
-Filled from config.json (project.name). NO feature blocks at bootstrap — the first block is
-appended when the first behavior change lands. Verification commands in each block are COPIED
-from AGENTS Development Commands, not reinvented.
+Filled from config.json (project.name, id.prefix) and the Phase-A answers (BUILD_CMD, TEST_CMD,
+SMOKE_CMD), which resolve inside the block template. NO feature blocks at bootstrap — the first
+block is appended when the first behavior change lands. The read-back record (RUNBOOK Phase C,
+step 5) is the one other entry this file holds.
+The slots inside the two record templates are plain words with no marker around them. The Phase-C
+sweep leaves no double brace in a rendered file, so a slot that is filled only when a block or a
+record is appended cannot use the brace form. Leave every slot as it is.
+Verification commands in each block are COPIED from AGENTS Development Commands, not reinvented.
 Append-only: never rewrite a past block; a reversal APPENDS a new block referencing the old one.
 Block ordering: newest at the bottom (matches iteration-history order).
 Under the `light` co-op profile these blocks are encouraged, not required.
 Harness-neutral: never name a specific agent product, model, or proprietary tool.
-Template-Source: agentic-bootstrap/VALIDATION@v1  (@v1: Template-Source marker added; the surface
-checklist line names where the surface is documented; the block heading may cite an upgrade commit)
+Template-Source: agentic-bootstrap/VALIDATION@v2  (@v2: the block template's slots are plain words,
+so a rendered seed passes the Phase-C placeholder sweep; a read-back record template sits beside
+the block template; no angle-bracket token remains in the file)
 Rendered copies keep the Template-Source line in a comment at the top of the file; the rest of this header is not rendered.
 -->
 
 # {{COMPONENT_NAME}} — Implementation Validation
 
-Per-feature done evidence. One block per landed non-trivial change. A reviewer (human or agent) re-verifies any feature by running its Verification Commands. Each block cites the stable requirement IDs and the issue/MR/PR number so the ID trail stays followable.
+Per-feature done evidence. One block per landed non-trivial change. A reviewer (human or agent) re-verifies any feature by running its Verification Commands. Each block cites the stable requirement IDs and the issue/MR/PR number so the ID trail stays followable. A read-back record (`agentic-mode/SELF-TEST.md`, section D) is appended at the bottom with the record template.
 
 **Post-merge evidence clause.** Evidence that exists only after merge — deployments, live previews — may be backfilled into the same block's Status subsection via a small chore PR: limited to adding a post-merge entry or replacing that block's explicit "unverified / pending" wording, and it must cite the original PR/MR. Every other subsection stays append-only. This is the only declared exception to "never rewrite a past block."
 
 <!--
 ==== PER-FEATURE BLOCK TEMPLATE — copy below the line when a new feature lands ====
-The heading cites the issue/MR/PR number — use exactly one of (issue #N), (MR !N), or (PR #N); a doc-set upgrade that no issue or MR/PR covers uses (commit <sha>).
+The heading cites the issue/MR/PR number. Use exactly one of (issue #N), (MR !N), or (PR #N). A doc-set upgrade that no issue or MR/PR covers cites its commit instead.
+A slot in this template is a plain word or phrase with no marker around it. Replace each slot when you copy the block.
 
 ---
 
-## {{FEATURE_NAME}} (issue #{{ISSUE_NUMBER}})
+## FEATURE_NAME (issue #ISSUE_NUMBER)
 
 ### Code Implementation
-- [ ] {{concrete bullet: function/class/module added or changed, with `path` references}}
+- [ ] concrete bullet: function, class, or module added or changed, with `path` references
 
 ### Integration Points
-- [ ] {{which existing flows were touched; which invariants were preserved}}
+- [ ] which existing flows were touched; which invariants were preserved
 
 ### User Requirements Met
-- [ ] {{PREFIX}}-0NN {{one-line restatement copied verbatim from REQUIREMENTS}}
+- [ ] {{PREFIX}}-NNN one-line restatement copied verbatim from REQUIREMENTS
 
 ### Documentation Updates
-- [ ] REQUIREMENTS — {{iteration-history entry appended; which IDs added}}
-- [ ] Observable surface — {{command / flag / key / endpoint / API updated wherever the surface is documented, in its doc's subsection or in the requirement row while no surface doc is seeded}}
-- [ ] README — {{quick-start / components / verification updated, or "n/a — no user-visible surface change"}}
+- [ ] REQUIREMENTS — iteration-history entry appended; which IDs added
+- [ ] Observable surface — command / flag / key / endpoint / API updated wherever the surface is documented, in its doc's subsection or in the requirement row while no surface doc is seeded
+- [ ] README — quick-start / components / verification updated, or "n/a — no user-visible surface change"
 - [ ] VALIDATION — this block added
 
 ### Testing
-- [ ] {{test file}} — {{one-line case description per added test}}
-- [ ] {{fixture/example file}} — {{what scenario it captures}}
+- [ ] test file — one-line case description per added test
+- [ ] fixture or example file — what scenario it captures
 
 ### Verification Commands
 ```bash
-# Copied from AGENTS Development Commands — do NOT leave a <command> placeholder here.
+# Copied from AGENTS Development Commands. Paste the real commands. Never a stand-in.
 {{BUILD_CMD}}
 {{TEST_CMD}}
 {{SMOKE_CMD}}
 ```
 
 ### Status
-{{One paragraph: what is covered and any intentional exclusions. If a requirement is only partially met, say so here instead of checking the box. Post-merge evidence entries land here, per the post-merge clause in the header.}}
+One paragraph: what is covered and any intentional exclusions. If a requirement is only partially met, say so here instead of checking the box. Post-merge evidence entries land here, per the post-merge clause in the header.
 
 ==== END BLOCK TEMPLATE ====
+
+==== READ-BACK RECORD TEMPLATE — append at the bottom when a read-back runs (SELF-TEST §D) ====
+
+## Read-back — DATE (SCOPE)
+
+- Reader: who or what read back, with no chat history.
+- Question 1: pass, answered from file:section. One line per question. A failure names the gap.
+- Probe not run: the reason. Write only this line when no zero-context reader was available.
+
+==== END READ-BACK RECORD TEMPLATE ====
 -->

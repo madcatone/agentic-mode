@@ -17,9 +17,9 @@ agentic_docs_gate:
   stage: validate
   image: python:3.12-slim
   script:
-    - python --version
-    - python scripts/check_agentic_docs.py --config agentic-mode/config.json
+    - python3 --version
+    - python3 scripts/check_agentic_docs.py --config agentic-mode/config.json
     # ---------------------------------------------------------------------
     # add project test commands here
-    #   e.g. pip install -e . && python -m pytest
+    #   e.g. pip install -e . && python3 -m pytest
     # ---------------------------------------------------------------------

@@ -13,14 +13,15 @@ ID DISCIPLINE (highest-leverage rule):
 
 ITERATION HISTORY is APPEND-ONLY: never rewrite/renumber a past entry; a reversal APPENDS a new
 entry referencing the old one. Lead with the decision, then the evidence.
+The two Iteration History entries are samples. The history starts empty.
 
 BILINGUAL: keep the second-language track ONLY IF config bilingual.enabled == true. If enabled,
 both tracks share identical ID set / count / order. If disabled, DELETE the second track entirely.
 Harness-neutral: never name a specific agent product, model, or proprietary tool.
 Resolve `{{IF ...}}` regions per BOOTSTRAP-CORE, "Conditional Text in Templates".
-Template-Source: agentic-bootstrap/REQUIREMENTS@v1  (@v1: Template-Source marker added; rows
-carry the observable surface while no surface doc is seeded; a sentence under Functional
-Requirements states where the surface is documented)
+Template-Source: agentic-bootstrap/REQUIREMENTS@v2  (@v2: the Event Model heading is one
+descriptive slot; the two Iteration History entries are samples and the history starts empty;
+the superseded-row note shows a three-digit ID)
 Rendered copies keep the Template-Source line in a comment at the top of the file; the rest of this header is not rendered.
 -->
 
@@ -55,9 +56,9 @@ Rendered copies keep the Template-Source line in a comment at the top of the fil
 | {{PREFIX}}-002 | {{next behavior}}. |
 
 <!-- One row per observable behavior (each CLI flag / key / endpoint / public API / documented output).
-     Superseded rows stay, marked e.g. "(superseded by {{PREFIX}}-0NN)" — never deleted. -->
+     Superseded rows stay, marked e.g. "(superseded by {{PREFIX}}-NNN)" — never deleted. -->
 
-### {{Domain / Timeline}} Event Model
+### {{event model heading: the domain or timeline name}}
 {{If the component has an in-memory model or event ordering, describe the canonical flow here as a fenced text diagram. Otherwise delete this section.}}
 
 ### Iteration History

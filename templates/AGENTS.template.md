@@ -13,12 +13,21 @@ HARD LIMIT: the generated file MUST stay <= checks.line_limits.agents (set the l
 in agentic-mode/config.json — an absent key means the checker enforces no line limit).
 The checker enforces this mechanically. Keep it terse; push depth to REQUIREMENTS and to the
 WORKFLOW doc when one is seeded.
+`{{LIGHT_PROFILE_NOTE_OR_DELETE}}`: under the `light` co-op profile write
+``*(Under the `light` co-op profile this entry and the VALIDATION block in step 5 are encouraged, not required.)*``.
+Under every other profile delete it.
+`{{SURFACE_DOC_ROLE}}` is `commands, flags, and output` for a CLI, `endpoints and screens` for a web
+service, `the public API` for a library (RUNBOOK Phase B, step 4).
+A placeholder that describes something the target does not have follows the RUNBOOK's Phase-B rule
+for a placeholder with no value. `{{TESTS_DIR}}` and `{{FIXTURES_DIR}}` share one line and leave
+together. The parenthesized `{{RUNTIME_PLACEHOLDERS}}` goes with its parentheses.
+`{{SECONDARY_ENTRY_OR_NONE}}` takes its whole sentence with it. `{{TEST_CMD}}` and
+`{{TEST_FOCUSED_CMD_OR_NONE}}` each own a line.
 Harness-neutral: never name a specific agent product, model, or proprietary tool.
 Resolve `{{IF ...}}` regions per BOOTSTRAP-CORE, "Conditional Text in Templates".
-Template-Source: agentic-bootstrap/AGENTS@v1  (@v1: Template-Source marker added; references to
-the surface doc, WORKFLOW doc, and architecture doc sit inside regions; the boundary bullets
-and the MR / PR Governance closing sentence hold for a repo with no WORKFLOW doc; the
-Change-Flow Boundary bullet names MR / PR Governance)
+Template-Source: agentic-bootstrap/AGENTS@v2  (@v2: Git Hygiene allows deleting a merged local
+branch, as the WORKFLOW doc does; the header states the light-profile note and the no-value rule
+for this template's optional slots)
 Rendered copies keep the Template-Source line in a comment at the top of the file; the rest of this header is not rendered.
 -->
 
@@ -50,7 +59,7 @@ Repo facts and the human/agent co-operation contract for this repository. It sta
 - Full tests: `{{TEST_CMD}}`
 - Focused tests: `{{TEST_FOCUSED_CMD_OR_NONE}}`
 - Smoke / run: `{{SMOKE_CMD}}`
-- Docs coherence gate: `python scripts/check_agentic_docs.py --config agentic-mode/config.json`
+- Docs coherence gate: `python3 scripts/check_agentic_docs.py --config agentic-mode/config.json`
 
 Every command in `checks.commands` (config.json) that lists `"agents"` in `must_appear_in` MUST appear verbatim in this section — the checker verifies it.
 
@@ -99,4 +108,4 @@ Landing a change on `main`, the default branch, or any protected branch happens 
 
 - Keep transient output, generated assets, local virtual environments, and dependency folders out of commits — add them to the ignore file instead of staging them.
 - Stage files explicitly; never blanket-add. Keep secrets and `.env` values out of every commit — load them from the environment at runtime instead.
-- Do not push, force-push, tag, or delete branches unless the user explicitly asks. Never push directly to `main` / the default / protected branches — open a merge/pull request instead.
+- Do not push, force-push, tag, or delete branches unless the user explicitly asks. Never push directly to `main` / the default / protected branches — open a merge/pull request instead. You may delete one kind of branch unasked. A local branch whose commits are already merged goes with `git branch -d`, never `-D`.

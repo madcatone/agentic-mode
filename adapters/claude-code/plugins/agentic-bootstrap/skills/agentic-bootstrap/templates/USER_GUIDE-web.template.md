@@ -6,11 +6,12 @@ Every endpoint/screen/state CITES its owning {{PREFIX}}-XXX from REQUIREMENTS. T
 tables must match the source router 1:1.
 BILINGUAL: keep the second track ONLY IF config bilingual.enabled == true; else delete it.
 Harness-neutral: never name a specific agent product, model, or proprietary tool.
-Template-Source: agentic-bootstrap/USER_GUIDE-web@v1  (@v1: Template-Source marker added)
+Template-Source: agentic-bootstrap/USER_GUIDE-web@v2  (@v2: the title takes the component-name
+slot; no descriptive slot holds a second placeholder; the ID examples use three digits)
 Rendered copies keep the Template-Source line in a comment at the top of the file; the rest of this header is not rendered.
 -->
 
-# {{COMPONENT}} — User Guide (Web Service)
+# {{COMPONENT_NAME}} — User Guide (Web Service)
 
 ## English
 
@@ -28,10 +29,10 @@ The HTTP surface. Must match the router 1:1.
 
 | Method | Path | Purpose | Auth | Requirement |
 | --- | --- | --- | --- | --- |
-| `GET` | `{{/path}}` | {{what it returns}} | {{none/token/session}} | {{PREFIX}}-0NN |
-| `POST` | `{{/path}}` | {{what it does}} | {{...}} | {{PREFIX}}-0NN |
+| `GET` | `{{/path}}` | {{what it returns}} | {{none/token/session}} | {{PREFIX}}-NNN |
+| `POST` | `{{/path}}` | {{what it does}} | {{...}} | {{PREFIX}}-NNN |
 
-#### `{{METHOD}} {{/path}}`  ({{PREFIX}}-0NN)
+#### `{{METHOD}} {{/path}}`  ({{PREFIX}}-NNN)
 - **Request:** {{path/query params, body schema — with placeholder values}}.
 - **Response:** {{status codes + body schema}}.
 - **Errors:** {{status → condition}}.
@@ -46,9 +47,9 @@ The HTTP surface. Must match the router 1:1.
 <!-- Delete this section for a headless / API-only service. -->
 | Screen | Route | Purpose | Requirement |
 | --- | --- | --- | --- |
-| {{screen name}} | `{{/ui/route}}` | {{what the user does here}} | {{PREFIX}}-0NN |
+| {{screen name}} | `{{/ui/route}}` | {{what the user does here}} | {{PREFIX}}-NNN |
 
-For each screen: {{what triggers it, what the user sees, what actions it exposes, owning {{PREFIX}}-XXX.}}
+For each screen: {{what triggers it, what the user sees, what actions it exposes, and its owning requirement ID.}}
 
 ### State Flow
 {{Describe the primary state transitions as a fenced text diagram — e.g. request lifecycle, session/auth states, or a resource's status machine (created → active → closed). Cite the IDs that govern each transition.}}

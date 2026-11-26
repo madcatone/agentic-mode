@@ -3,16 +3,17 @@ TEMPLATE: docs/WORKFLOW.md for targets whose review platform is GitHub. PR-based
 using the `gh` CLI. Ported as-is: substitute only the H1, the Template-Source marker, and the
 {{PLACEHOLDER}} build/test commands (from AGENTS Development Commands). Do NOT re-author the review-loop body.
 CI-RUNNERS line: resolve `{{CI_RUNNERS}}` from config `ci.runners` (comma-separated runner names,
-e.g. when pipelines run on an external runner). When config declares no `ci.runners`, DELETE the
-whole line. The doc gate checks the `ci-runners:` marker against config.
+e.g. when pipelines run on an external runner). When config declares no `ci.runners`, DELETE two
+lines, the CI-runners line and the whole `Single source of truth` sentence under it. The doc gate
+checks the `ci-runners:` marker against config.
 NOTE: initially a structural mirror of the GitLab variant; since validated end-to-end in a real
 adoption (bootstrap through multiple tagged releases, including a CI-runner migration). Treat
 deviations found in your own use as bugs to report upstream.
 BILINGUAL dual-language external replies apply ONLY when config bilingual.enabled == true.
 `gh` appears here because this is the GitHub platform doc — it is the ONLY doc allowed to name it.
 Harness-neutral otherwise: never name a specific agent product or model.
-Template-Source: agentic-bootstrap/WORKFLOW-github@v3  (@v3: the two docs-sync lines name "the observable
-surface" instead of a surface doc, so a docs-only target ports them as-is)
+Template-Source: agentic-bootstrap/WORKFLOW-github@v4  (@v4: with no runners in config the sentence
+under the CI-runners line goes too; commands run `python3`; the ID example uses three digits)
 Rendered copies keep the Template-Source lines in a comment at the top of the file; the rest of this header is not rendered.
 -->
 
@@ -90,7 +91,7 @@ Conventional commit (team convention — the canonical rules live in your team's
 **Types:** `feat`, `fix`, `refactor`, `perf`, `test`, `docs`, `style`, `build`, `ci`, `ops`, `chore`, `revert` (dependency bumps are `build`, not `chore`; only CI-config changes are `ci`).
 **Ticket (as-needed):** when the change maps to a tracked ticket, put its ID between the type and the colon, space-separated, no parentheses (`fix PROJ-123: Correct session teardown`); omit it when there is no ticket.
 **Subject:** ≤ 50 chars, type lowercase, subject first letter capitalized, imperative, no trailing period.
-**Body:** 1–4 tight lines; explain motivation/trade-offs/pitfalls; include measured evidence; reference the requirement ID ("implements {{PREFIX}}-0NN") and `Closes #N`. Omit the body entirely when the diff already shows the why.
+**Body:** 1–4 tight lines; explain motivation/trade-offs/pitfalls; include measured evidence; reference the requirement ID ("implements {{PREFIX}}-NNN") and `Closes #N`. Omit the body entirely when the diff already shows the why.
 **Precedence:** if this repo has a commit-msg hook or its own documented convention, that takes precedence over these defaults.
 
 ### HEREDOC example
@@ -129,7 +130,7 @@ Run the repo's real commands from AGENTS Development Commands, e.g.:
 {{TEST_CMD}}
 {{SMOKE_CMD}}
 # Docs coherence gate:
-python scripts/check_agentic_docs.py --config agentic-mode/config.json
+python3 scripts/check_agentic_docs.py --config agentic-mode/config.json
 ```
 **All green is the only "done."**
 
@@ -138,7 +139,7 @@ python scripts/check_agentic_docs.py --config agentic-mode/config.json
 - [ ] Add a new `{{PREFIX}}-XXX` requirement row if a new behavior surfaced.
 - [ ] VALIDATION — append a per-feature block.
 - [ ] README / observable surface — update if a command, key, endpoint, or visible behavior changed.
-- [ ] `python scripts/check_agentic_docs.py --config agentic-mode/config.json` passes.
+- [ ] `python3 scripts/check_agentic_docs.py --config agentic-mode/config.json` passes.
 
 ## 5. Push and PR
 
