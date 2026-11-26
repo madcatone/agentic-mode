@@ -10,12 +10,13 @@ record is appended cannot use the brace form. Leave every slot as it is.
 Verification commands in each block are COPIED from AGENTS Development Commands, not reinvented.
 Append-only: never rewrite a past block; a reversal APPENDS a new block referencing the old one.
 Block ordering: newest at the bottom (matches iteration-history order).
+Blocks and read-back records share that order.
 Under the `light` co-op profile these blocks are encouraged, not required.
 Harness-neutral: never name a specific agent product, model, or proprietary tool.
 Template-Source: agentic-bootstrap/VALIDATION@v2  (@v2: the block template's slots are plain words,
 so a rendered seed passes the Phase-C placeholder sweep; a read-back record template sits beside
 the block template; no angle-bracket token remains in the file)
-Rendered copies keep the Template-Source line in a comment at the top of the file; the rest of this header is not rendered.
+Rendered copies keep the Template-Source lines in a comment at the top of the file; the rest of this header is not rendered.
 -->
 
 # {{COMPONENT_NAME}} — Implementation Validation
@@ -26,8 +27,8 @@ Per-feature done evidence. One block per landed non-trivial change. A reviewer (
 
 <!--
 ==== PER-FEATURE BLOCK TEMPLATE — copy below the line when a new feature lands ====
-The heading cites the issue/MR/PR number. Use exactly one of (issue #N), (MR !N), or (PR #N). A doc-set upgrade that no issue or MR/PR covers cites its commit instead.
-A slot in this template is a plain word or phrase with no marker around it. Replace each slot when you copy the block.
+The heading cites the issue/MR/PR number. Use exactly one of (issue #N), (MR !N), or (PR #N). A doc-set upgrade that no issue or MR/PR covers cites its commit instead, as (commit 1a2b3c4).
+A slot in this template is a plain word or phrase with no marker around it. Replace each slot when you copy the block, and check a box that holds.
 
 ---
 
@@ -54,7 +55,7 @@ A slot in this template is a plain word or phrase with no marker around it. Repl
 
 ### Verification Commands
 ```bash
-# Copied from AGENTS Development Commands. Paste the real commands. Never a stand-in.
+# Copied from AGENTS Development Commands.
 {{BUILD_CMD}}
 {{TEST_CMD}}
 {{SMOKE_CMD}}
@@ -67,6 +68,7 @@ One paragraph: what is covered and any intentional exclusions. If a requirement 
 
 ==== READ-BACK RECORD TEMPLATE — append at the bottom when a read-back runs (SELF-TEST §D) ====
 
+DATE is the ISO date. SCOPE is `bootstrap`, `adoption`, `doc-set upgrade`, or the name of the change that was read back.
 ## Read-back — DATE (SCOPE)
 
 - Reader: who or what read back, with no chat history.

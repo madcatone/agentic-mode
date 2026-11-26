@@ -4,11 +4,16 @@ screens/views, and state flows. Filled from config.json (id.prefix, bilingual.*)
 (the HTTP surface mined from the router / route definitions, and the UI screens if any).
 Every endpoint/screen/state CITES its owning {{PREFIX}}-XXX from REQUIREMENTS. The endpoint and route
 tables must match the source router 1:1.
+`{{RUNTIME_PLACEHOLDERS}}`: when the target needs none, delete the sentence that starts with `Provide`.
+`{{BASE_URL_PLACEHOLDER — e.g. http://localhost:<port>}}`: the address a developer uses locally. Write
+the target's real local address when it has one.
+A service with no authentication loses the Authentication section, headings included, and its Auth
+column reads `none`.
 BILINGUAL: keep the second track ONLY IF config bilingual.enabled == true; else delete it.
 Harness-neutral: never name a specific agent product, model, or proprietary tool.
 Template-Source: agentic-bootstrap/USER_GUIDE-web@v2  (@v2: the title takes the component-name
 slot; no descriptive slot holds a second placeholder; the ID examples use three digits)
-Rendered copies keep the Template-Source line in a comment at the top of the file; the rest of this header is not rendered.
+Rendered copies keep the Template-Source lines in a comment at the top of the file; the rest of this header is not rendered.
 -->
 
 # {{COMPONENT_NAME}} — User Guide (Web Service)

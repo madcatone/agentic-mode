@@ -1,11 +1,11 @@
 <!--
 TEMPLATE: docs/WORKFLOW.md for targets whose review platform is GitLab. This doc is ported as-is into the target repo:
-substitute only the H1 platform name, the Template-Source marker, and the {{PLACEHOLDER}} test/build
-commands (from AGENTS Development Commands). Do NOT re-author the review-loop body — the issue→branch→
-commit→MR→review conventions and red lines are platform constants.
+substitute only the {{PLACEHOLDER}} build/test/smoke commands (from AGENTS Development Commands), the prefix,
+and the bilingual conditionals. The Template-Source marker lines stay as they are. Do NOT re-author the
+review-loop body — the issue→branch→commit→MR→review conventions and red lines are platform constants.
 CI-RUNNERS line: resolve `{{CI_RUNNERS}}` from config `ci.runners` (comma-separated runner names,
 e.g. when pipelines run on an external runner). When config declares no `ci.runners`, DELETE two
-lines, the CI-runners line and the whole `Single source of truth` sentence under it. The doc gate
+lines, the CI-runners line and the whole `Single source of truth` sentence under it, and leave one blank line where they stood. The doc gate
 checks the `ci-runners:` marker against config.
 BILINGUAL comment rule (dual-language external replies + EOF-terminated multi-line format) applies ONLY
 when config bilingual.enabled == true; if monolingual, replies are single-language (still self-contained,

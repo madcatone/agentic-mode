@@ -1,6 +1,6 @@
 # Agentic-mode documentation gate (GitHub Actions).
-# Copy to .github/workflows/agentic-docs.yml and add your project's own
-# build / test commands in the marked step below.
+# Copy to .github/workflows/agentic-docs.yml. The commented block below shows
+# where the project's own build / test steps can go.
 #
 # Runs on pull requests and on pushes to the default branch, sets up a plain
 # Python 3, and runs the config-driven documentation-consistency gate.
@@ -28,7 +28,7 @@ jobs:
       - name: Run agentic-mode documentation gate
         run: python3 scripts/check_agentic_docs.py --config agentic-mode/config.json
       # -----------------------------------------------------------------
-      # add project test commands here
+      # project test commands can go here
       #   e.g.
       # - name: Tests
       #   run: |

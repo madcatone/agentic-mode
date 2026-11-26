@@ -2,7 +2,7 @@
 TEMPLATE: docs/REQUIREMENTS.md — the behavior contract (source of truth for What).
 Filled from config.json (project.name, id.prefix, bilingual.*) and Phase-A answers
 (problem/goals/non-goals, one requirement per observable behavior mined from entry points/tests,
-verification commands from AGENTS Development Commands).
+the verification commands, the same ones AGENTS Development Commands lists in Phase B, step 6).
 
 ID DISCIPLINE (highest-leverage rule):
 - Every functional requirement gets {{PREFIX}}-001, {{PREFIX}}-002, ... NEVER renumber.
@@ -22,7 +22,7 @@ Resolve `{{IF ...}}` regions per BOOTSTRAP-CORE, "Conditional Text in Templates"
 Template-Source: agentic-bootstrap/REQUIREMENTS@v2  (@v2: the Event Model heading is one
 descriptive slot; the two Iteration History entries are samples and the history starts empty;
 the superseded-row note shows a three-digit ID)
-Rendered copies keep the Template-Source line in a comment at the top of the file; the rest of this header is not rendered.
+Rendered copies keep the Template-Source lines in a comment at the top of the file; the rest of this header is not rendered.
 -->
 
 # {{COMPONENT_NAME}} — Requirements and Evolution

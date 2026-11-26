@@ -8,9 +8,14 @@ Workflow authority is the WORKFLOW doc when one is seeded and the AGENTS co-op c
 The entry table's second row is a sample. Write one row per entry point and delete the samples. The
 no-value rule does not apply to a sample.
 A placeholder that describes something the target does not have follows the RUNBOOK's Phase-B rule
-for a placeholder with no value. `{{SUPPORT_MODULE_1}}` and `{{TESTS_DIR}}` each own a line. When the
-target needs no runtime placeholders, delete the sentence that says to provide them and the
-checklist bullet that lists them.
+for a placeholder with no value. `{{SUPPORT_MODULE_1}}` and `{{TESTS_DIR}}` each own a line.
+`{{TESTS_DIR}}` is the path of the tests, a directory or a single file. When the target needs no
+runtime placeholders, delete the sentence that says to provide them and the checklist bullet that
+lists them.
+Main Components: `{{SYMBOL_n}}` is one bullet per public function, class, or module of that entry
+point. Leave out a name that starts with an underscore unless a requirement row cites it.
+`{{SECONDARY_USE_CASE_TITLE_OR_DELETE}}`: a second quick start the target has. When there is none,
+delete the heading and its code block. It is not the secondary entry point of Phase A question 6.
 Data Flow: one numbered step per stage, from what enters to what leaves. The two lines are samples.
 Harness-neutral: never name a specific agent product, model, or proprietary tool.
 Resolve `{{IF ...}}` regions per BOOTSTRAP-CORE, "Conditional Text in Templates".
@@ -20,8 +25,8 @@ declares no runners, DELETE that whole line. The doc gate checks the `ci-runners
 against config.
 Template-Source: agentic-bootstrap/README@v2  (@v2: Data Flow is two sample lines, the two component
 bullets name their own job slot, and the header states the no-value rule and the sample rule for
-this template's slots)
-Rendered copies keep the Template-Source line in a comment at the top of the file; the rest of this header is not rendered.
+this template's slots; the verification sentence no longer says "above")
+Rendered copies keep the Template-Source lines in a comment at the top of the file; the rest of this header is not rendered.
 -->
 
 # {{PROJECT_NAME}}
@@ -106,7 +111,7 @@ Safe-change pattern:
 python3 scripts/check_agentic_docs.py --config agentic-mode/config.json
 ```
 
-Every command in `checks.commands` (config.json) that lists `"readme"` in `must_appear_in` MUST appear verbatim above.
+Every command in `checks.commands` (config.json) that lists `"readme"` in `must_appear_in` MUST appear verbatim in this file.
 
 {{IF WORKFLOW_PATH}}{{ELSE}}CI runners executing this repo's pipelines: {{CI_RUNNERS}} <!-- ci-runners: {{CI_RUNNERS}} -->{{END IF}}
 

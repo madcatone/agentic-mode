@@ -139,7 +139,7 @@ Two collaborator-facing docs, with different jobs:
 
 Keeping them separate avoids one giant rules file that no one re-reads.
 
-**The `WORKFLOW.md` doc is ported as-is** — verbatim except its declared substitution points. When adopting this mode in a new repo, copy the canonical platform workflow doc, then resolve only those points: the H1 platform name, the `Template-Source:` marker, and every `{{PLACEHOLDER}}` the template header lists (build/test/smoke commands, prefix, bilingual conditionals). Do not re-author its prose: the review loop, comment style, and red lines are platform constants and out of scope for regeneration.
+**The `WORKFLOW.md` doc is ported as-is** — verbatim except its declared substitution points. When adopting this mode in a new repo, copy the canonical platform workflow doc, then resolve only those points: every `{{PLACEHOLDER}}` the template header lists (build/test/smoke commands, prefix, bilingual conditionals). The `Template-Source:` marker lines stay as the template carries them. Do not re-author its prose: the review loop, comment style, and red lines are platform constants and out of scope for regeneration.
 
 **Boundary test:** if a candidate AGENTS.md rule names the platform CLI or a platform-specific comment style, it belongs in WORKFLOW, not AGENTS.md.
 
@@ -192,7 +192,7 @@ A template never names a doc-set profile. A template names an optional doc throu
 - **A region can sit inside a line or span several lines.** A table cell, a list item, or a clause can hold a region, and so can a block of lines. Regions do not nest, and none sits inside a heading line: a heading's text is a cross-repo reference anchor and reads the same at every profile. A region may still drop a whole section together with its heading, when the section belongs to a doc that is not seeded.
 - **Select a branch. Do not write new text.** Keep one branch verbatim and drop the other branch together with its markers. Renumber a numbered list only when a whole item disappeared. A dropped region leaves no line behind: drop a line that held only the dropped branch and its markers, and collapse the blank lines that a dropped block leaves into one blank line.
 - **Rules for template authors.** An optional path placeholder may appear only inside its own region. Prefer a sentence that is true whether or not the doc is seeded, and use a region only when the wording itself must differ. Every marker is spelled with `{{`, so an unresolved region fails the RUNBOOK's Phase-C placeholder sweep. For the same reason, rendered prose never quotes that sweep's brace pattern.
-- **Instructions to the renderer do not render.** An instruction to whoever renders the template lives in a template comment or inside the slot it explains. Every sentence outside them renders, so the body carries only rules for the target's collaborators.
+- **Instructions to the renderer do not render.** An instruction to whoever renders the template lives in a template comment or inside the slot it explains. Every sentence outside them renders, so the body carries only rules for the target's collaborators. A body comment stays in the rendered copy, with its placeholders resolved, unless it tells the renderer to repeat or delete.
 - `{{IF_BILINGUAL: <text>}}` in the WORKFLOW templates is the older one-line form of a keep-or-delete region for `bilingual.enabled`. It is unchanged.
 
 ---

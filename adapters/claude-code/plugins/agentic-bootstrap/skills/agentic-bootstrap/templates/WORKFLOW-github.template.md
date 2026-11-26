@@ -1,10 +1,11 @@
 <!--
 TEMPLATE: docs/WORKFLOW.md for targets whose review platform is GitHub. PR-based equivalent of the GitLab workflow,
-using the `gh` CLI. Ported as-is: substitute only the H1, the Template-Source marker, and the
-{{PLACEHOLDER}} build/test commands (from AGENTS Development Commands). Do NOT re-author the review-loop body.
+using the `gh` CLI. Ported as-is: substitute only the {{PLACEHOLDER}} build/test/smoke commands (from
+AGENTS Development Commands), the prefix, and the bilingual conditionals. The Template-Source marker
+lines stay as they are. Do NOT re-author the review-loop body.
 CI-RUNNERS line: resolve `{{CI_RUNNERS}}` from config `ci.runners` (comma-separated runner names,
 e.g. when pipelines run on an external runner). When config declares no `ci.runners`, DELETE two
-lines, the CI-runners line and the whole `Single source of truth` sentence under it. The doc gate
+lines, the CI-runners line and the whole `Single source of truth` sentence under it, and leave one blank line where they stood. The doc gate
 checks the `ci-runners:` marker against config.
 NOTE: initially a structural mirror of the GitLab variant; since validated end-to-end in a real
 adoption (bootstrap through multiple tagged releases, including a CI-runner migration). Treat

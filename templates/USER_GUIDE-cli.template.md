@@ -14,7 +14,9 @@ slot; no descriptive slot holds a second placeholder; a command sketch marks its
 value, not a placeholder; the ID examples use three digits; the header names the sections that
 belong to an interactive tool; the instruction above the feature subsections is a comment, not a
 heading)
-Rendered copies keep the Template-Source line in a comment at the top of the file; the rest of this header is not rendered.
+`{{FLAG_1}}` and `{{FLAG_2}}`: one bullet per flag that takes a value. A target
+with no such flag loses the Project-Neutral Usage section, headings included.
+Rendered copies keep the Template-Source lines in a comment at the top of the file; the rest of this header is not rendered.
 -->
 
 # {{COMPONENT_NAME}} — User Guide
@@ -30,7 +32,7 @@ Rendered copies keep the Template-Source line in a comment at the top of the fil
 - {{Other runtime placeholders + supported enum values, or delete.}}
 
 ### Common Commands
-{{One fenced bash block per primary flow, using placeholders (e.g. open a saved input, live read, live+save, replay).}}
+{{One fenced bash block per primary flow, each introduced by a one-line sentence. Use runtime placeholders where the target has them.}}
 ```bash
 {{command_example_1}}
 {{command_example_2}}
@@ -56,7 +58,7 @@ Rendered copies keep the Template-Source line in a comment at the top of the fil
 ### Highlighting and Error Semantics
 {{Prefix/marker rules, threshold-based coloring, missing/alert conditions, timeout pairing — cite IDs. Delete if not applicable.}}
 
-<!-- One subsection per surfaced behavior family, each under its own ### heading. -->
+<!-- Repeat one subsection per behavior family, the commands that serve one task. Each has its own heading and cites its owning requirement ID. -->
 {{For each: what triggers it, what the user sees, which filter/flag surfaces it, and its owning requirement ID.}}
 
 ### Troubleshooting

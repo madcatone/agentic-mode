@@ -14,21 +14,29 @@ in agentic-mode/config.json — an absent key means the checker enforces no line
 The checker enforces this mechanically. Keep it terse; push depth to REQUIREMENTS and to the
 WORKFLOW doc when one is seeded.
 `{{LIGHT_PROFILE_NOTE_OR_DELETE}}`: under the `light` co-op profile write
-``*(Under the `light` co-op profile this entry and the VALIDATION block in step 5 are encouraged, not required.)*``.
+``*(Under the `light` co-op profile this entry and the VALIDATION block in item 5 of this list are encouraged, not required.)*``.
 Under every other profile delete it.
-`{{SURFACE_DOC_ROLE}}` is `commands, flags, and output` for a CLI, `endpoints and screens` for a web
-service, `the public API` for a library (RUNBOOK Phase B, step 4).
+`{{SURFACE_DOC_ROLE}}` is `commands, flags, and output` for a CLI, `endpoints and screens` for a
+web service, or `endpoints` for one with no screens, `the public API` for a library (RUNBOOK Phase
+B, step 4).
 A placeholder that describes something the target does not have follows the RUNBOOK's Phase-B rule
-for a placeholder with no value. `{{TESTS_DIR}}` and `{{FIXTURES_DIR}}` share one line and leave
-together. The parenthesized `{{RUNTIME_PLACEHOLDERS}}` goes with its parentheses.
-`{{SECONDARY_ENTRY_OR_NONE}}` takes its whole sentence with it. `{{TEST_CMD}}` and
-`{{TEST_FOCUSED_CMD_OR_NONE}}` each own a line.
+for a placeholder with no value. `{{TESTS_DIR}}` is the path of the tests, a directory or a single
+file. `{{TESTS_DIR}}` and `{{FIXTURES_DIR}}` sit on one line. Delete the line when the target has
+no tests. Delete only the clause that starts with `; fixtures in` when the target has tests but no
+fixtures directory. When the target needs no runtime placeholders, delete the sentence that starts
+with `Use runtime placeholders`. When it has no fixtures directory, delete the sentence that starts
+with `Raw fixture lines`. `{{SECONDARY_ENTRY_OR_NONE}}` takes its whole sentence with it.
+`{{TEST_CMD}}` and `{{TEST_FOCUSED_CMD_OR_NONE}}` each own a line.
+`{{TEST_FOCUSED_CMD_OR_NONE}}` is filled only when TARGET already declares a focused test command.
+Otherwise the line goes.
+`{{INDEPENDENCE_INVARIANT_OR_NONE}}` is the one rule every entry point keeps, whatever the
+others do, for example a shared store format. It has no value when the target has one entry point.
 Harness-neutral: never name a specific agent product, model, or proprietary tool.
 Resolve `{{IF ...}}` regions per BOOTSTRAP-CORE, "Conditional Text in Templates".
 Template-Source: agentic-bootstrap/AGENTS@v2  (@v2: Git Hygiene allows deleting a merged local
 branch, as the WORKFLOW doc does; the header states the light-profile note and the no-value rule
-for this template's optional slots)
-Rendered copies keep the Template-Source line in a comment at the top of the file; the rest of this header is not rendered.
+for this template's optional slots; the Change-Flow Boundary heading drops its parenthetical)
+Rendered copies keep the Template-Source lines in a comment at the top of the file; the rest of this header is not rendered.
 -->
 
 # AGENTS.md — {{PROJECT_NAME}}
@@ -100,7 +108,7 @@ Landing a change on `main`, the default branch, or any protected branch happens 
 - **Report back** the MR/PR URL and its key metadata to the user.
 - **Recovery.** If a change reaches a protected branch directly by mistake, restore review flow with a revert branch and a revert MR/PR — never force-push or rewrite protected history. Run parallel MRs/PRs in separate worktrees so they do not collide.
 
-## Change-Flow Boundary (defer to WORKFLOW)
+## Change-Flow Boundary
 
 - Move changes through review per **MR / PR Governance** above{{IF WORKFLOW_PATH}} and per `{{WORKFLOW_PATH}}`{{END IF}}. **Boundary test:** if a rule names the platform CLI or a platform-specific comment style, it {{IF WORKFLOW_PATH}}belongs in `{{WORKFLOW_PATH}}`{{ELSE}}does not belong here{{END IF}}.
 

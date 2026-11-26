@@ -9,7 +9,7 @@ BILINGUAL: keep the second track ONLY IF config bilingual.enabled == true; else 
 Harness-neutral: never name a specific agent product, model, or proprietary tool.
 Template-Source: agentic-bootstrap/API_REFERENCE-library@v2  (@v2: the title takes the
 component-name slot; the ID examples use three digits)
-Rendered copies keep the Template-Source line in a comment at the top of the file; the rest of this header is not rendered.
+Rendered copies keep the Template-Source lines in a comment at the top of the file; the rest of this header is not rendered.
 -->
 
 # {{COMPONENT_NAME}} — API Reference

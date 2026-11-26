@@ -2,8 +2,8 @@
 TEMPLATE: AGENTIC-MODE.md — resident root index for the target repo.
 Filled from config.json: project.name, project.type, id.prefix, docs.*, ci.platform,
 bilingual.enabled, and the surface row's `{{SURFACE_DOC_ROLE}}`. `{{SURFACE_DOC_ROLE}}` is
-`commands, flags, and output` for a CLI, `endpoints and screens` for a web service,
-`the public API` for a library (RUNBOOK Phase B, step 4).
+`commands, flags, and output` for a CLI, `endpoints and screens` for a web service, or
+`endpoints` for one with no screens, `the public API` for a library (RUNBOOK Phase B, step 4).
 Rows and cells that name an optional doc sit inside `{{IF ...}}` regions,
 resolved per BOOTSTRAP-CORE, "Conditional Text in Templates". This file is META and RESIDENT:
 it is meant to be read every session. Keep it short — it routes; it is not the content.
@@ -18,7 +18,7 @@ Harness-neutral: never name a specific agent product, model, or proprietary tool
 Template-Source: agentic-bootstrap/AGENTIC-MODE@v4  (@v4: the inventory lists the layers in reading
 order, architecture third; the Enforcement paragraph routes each non-mechanized check to where it
 lives instead of to SELF-TEST §B; the Canonical Questions carry no seeding instruction; the
-doctrine pointers say this repo keeps no copy)
+doctrine pointers say this repo keeps no copy; the requirements row allows for no event model; the process-rules row no longer names the H1 as a substitution point)
 Rendered copies keep the Template-Source lines in a comment at the top of the file; the rest of this header is not rendered.
 -->
 
@@ -37,10 +37,10 @@ Project: **{{PROJECT_NAME}}** ({{PROJECT_TYPE}}). ID prefix: `{{PREFIX}}`. It is
 | Onboarding | `{{README_PATH}}` | What is this, which entry point to pick, quick start, neutrality/contracts. |
 | Repo facts + co-op contract | `{{AGENTS_PATH}}` | Scope, key files, dev commands, change-flow, the platform-neutral MR / PR policy, sign-off points, Stop-and-Ask list — *What/Done* only. |
 {{IF ARCHITECTURE_PATH}}| Architecture inventory | `{{ARCHITECTURE_PATH}}` | Component graph as committed, diffable JSON. |{{END IF}}
-| Behavior contract | `{{REQUIREMENTS_PATH}}` | Problem/Goals/Non-Goals, enumerated functional requirements with stable IDs{{IF SURFACE_DOC_PATH}} (each row names the observable surface it governs){{ELSE}}, each row carrying the observable surface and the command that exercises it{{END IF}}, event/domain model, append-only iteration history, acceptance criteria, verification commands. |
+| Behavior contract | `{{REQUIREMENTS_PATH}}` | Problem/Goals/Non-Goals, enumerated functional requirements with stable IDs{{IF SURFACE_DOC_PATH}} (each row names the observable surface it governs){{ELSE}}, each row carrying the observable surface and the command that exercises it{{END IF}}, event/domain model when there is one, append-only iteration history, acceptance criteria, verification commands. |
 {{IF SURFACE_DOC_PATH}}| Observable surface | `{{SURFACE_DOC_PATH}}` | {{SURFACE_DOC_ROLE}} — what users see, press, or call. |{{END IF}}
 | Done evidence | `{{VALIDATION_PATH}}` | Per-feature checklist: Code Implementation / Integration Points / User Requirements Met / Documentation Updates / Testing / Verification Commands / Status. |
-{{IF WORKFLOW_PATH}}| Process rules | `{{WORKFLOW_PATH}}` | Issue → branch → commit → MR/PR → review loop, red lines, platform CLI conventions — copied as-is except the H1 and `Template-Source` line. |{{END IF}}
+{{IF WORKFLOW_PATH}}| Process rules | `{{WORKFLOW_PATH}}` | Issue → branch → commit → MR/PR → review loop, red lines, platform CLI conventions — copied as-is except its declared substitution points. |{{END IF}}
 
 The table lists the layers in the order a newcomer reads them. The index itself comes first. It is the map.
 
