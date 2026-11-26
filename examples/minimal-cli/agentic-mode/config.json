@@ -48,7 +48,19 @@
       },
       {
         "run": "python3 todo.py list",
-        "must_appear_in": ["agents", "readme"]
+        "must_appear_in": ["agents", "readme", "user_guide"]
+      },
+      {
+        "run": "python3 todo.py add",
+        "must_appear_in": ["readme", "user_guide"]
+      },
+      {
+        "run": "python3 todo.py done",
+        "must_appear_in": ["readme", "user_guide"]
+      },
+      {
+        "run": "python3 todo.py remove",
+        "must_appear_in": ["readme", "user_guide"]
       }
     ],
     "entrypoints": ["todo.py"]

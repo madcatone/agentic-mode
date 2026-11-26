@@ -1,12 +1,11 @@
 <!-- Copied from templates/WORKFLOW-github.template.md (agentic-mode).
-     Only the H1, the Template-Source marker, and the template's placeholders
-     (build/test/smoke commands, prefix, bilingual) were substituted; the
-     review-loop body is unchanged. One local exception is kept across template
-     refreshes. The docs gate runs through the parent repo's checker, because
-     this example ships no copy of it.
-     Template-Source: agentic-bootstrap/WORKFLOW-github@v3  (@v3: the two docs-sync lines name "the observable
-     surface" instead of a surface doc, so a docs-only target ports them as-is) -->
-
+     Only the template's placeholders (build/test/smoke commands, prefix,
+     bilingual) were substituted, and the Template-Source marker lines stay as
+     the template carries them; the review-loop body is unchanged. One local
+     exception is kept across template refreshes. The docs gate runs through
+     the parent repo's checker, because this example ships no copy of it.
+Template-Source: agentic-bootstrap/WORKFLOW-github@v4  (@v4: with no runners in config the sentence
+under the CI-runners line goes too; commands run `python3`; the ID example uses three digits) -->
 
 # GitHub Workflow — Collaborator Rule
 
@@ -79,7 +78,7 @@ Conventional commit (team convention — the canonical rules live in your team's
 **Types:** `feat`, `fix`, `refactor`, `perf`, `test`, `docs`, `style`, `build`, `ci`, `ops`, `chore`, `revert` (dependency bumps are `build`, not `chore`; only CI-config changes are `ci`).
 **Ticket (as-needed):** when the change maps to a tracked ticket, put its ID between the type and the colon, space-separated, no parentheses (`fix PROJ-123: Correct session teardown`); omit it when there is no ticket.
 **Subject:** ≤ 50 chars, type lowercase, subject first letter capitalized, imperative, no trailing period.
-**Body:** 1–4 tight lines; explain motivation/trade-offs/pitfalls; include measured evidence; reference the requirement ID ("implements TODO-0NN") and `Closes #N`. Omit the body entirely when the diff already shows the why.
+**Body:** 1–4 tight lines; explain motivation/trade-offs/pitfalls; include measured evidence; reference the requirement ID ("implements TODO-NNN") and `Closes #N`. Omit the body entirely when the diff already shows the why.
 **Precedence:** if this repo has a commit-msg hook or its own documented convention, that takes precedence over these defaults.
 
 ### HEREDOC example

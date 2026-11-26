@@ -1,5 +1,9 @@
 <!--
-Template-Source: agentic-bootstrap/USER_GUIDE-cli@v1  (@v1: Template-Source marker added)
+Template-Source: agentic-bootstrap/USER_GUIDE-cli@v2  (@v2: the title takes the component-name
+slot; no descriptive slot holds a second placeholder; a command sketch marks its argument as a
+value, not a placeholder; the ID examples use three digits; the header names the sections that
+belong to an interactive tool; the instruction above the feature subsections is a comment, not a
+heading)
 -->
 
 # todo — User Guide

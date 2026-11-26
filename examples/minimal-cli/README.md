@@ -1,7 +1,7 @@
 <!--
-Template-Source: agentic-bootstrap/README@v1  (@v1: Template-Source marker added; regions for
-the surface doc, WORKFLOW doc, and architecture doc, plus the CI-runners line kept while no
-WORKFLOW doc is seeded)
+Template-Source: agentic-bootstrap/README@v2  (@v2: Data Flow is two sample lines, the two component
+bullets name their own job slot, and the header states the no-value rule and the sample rule for
+this template's slots; the verification sentence no longer says "above")
 -->
 
 # todo
@@ -81,6 +81,8 @@ docs gate.
 python3 -m py_compile todo.py
 python3 todo.py list
 ```
+
+Every command in `checks.commands` (config.json) that lists `"readme"` in `must_appear_in` MUST appear verbatim in this file.
 
 Docs coherence gate (ID continuity, command-surface consistency, neutrality).
 Same check; run the invocation that matches your cwd.

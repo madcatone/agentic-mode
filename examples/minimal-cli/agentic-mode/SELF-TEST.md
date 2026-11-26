@@ -1,9 +1,8 @@
 <!--
-Template-Source: agentic-bootstrap/SELF-TEST@v3  (@v3: rows that name an optional doc moved inside
-regions; the ID-continuity and command-surface bullets are reworded and no longer quote the
-placeholder sweep's braces; §B names the VALIDATION backfill exception; §D makes the pre-release
-read-back optional; the process-doc boundary row names the declared substitution points and
-allows a declared local exception)
+Template-Source: agentic-bootstrap/SELF-TEST@v4  (@v4: §A names where each check that is not
+machine-checked lives and no longer cites a toolkit doc; §D carries no question count and no
+seeding instruction; a read-back record follows the VALIDATION record template, and a probe that
+could not run is recorded as not run; the §B read-back row accepts that record)
 -->
 
 # SELF-TEST.md — Cross-Layer Self-Test
@@ -22,9 +21,9 @@ python3 ../../checker/check_agentic_docs.py --config agentic-mode/config.json
 
 It enforces, from `agentic-mode/config.json`:
 
-- **ID continuity** — every `TODO-NNN` cited in another governed prose doc resolves to a row in `docs/REQUIREMENTS.md` (rows are duplicate-free and gap-free; bilingual regions carry identical ID sets). Not machine-checked: references in commit/MR/PR messages (a review discipline — the checker reads docs, not git history), the uniform format `^[A-Z]{2,6}-[0-9]{3,}$` itself, and "every observable behavior maps to ≥1 ID" (a Phase-B gate in the RUNBOOK).
+- **ID continuity** — every `TODO-NNN` cited in another governed prose doc resolves to a row in `docs/REQUIREMENTS.md` (rows are duplicate-free and gap-free; bilingual regions carry identical ID sets). Not machine-checked: references in commit/MR/PR messages (a review discipline — the checker reads docs, not git history), the uniform format `^[A-Z]{2,6}-[0-9]{3,}$` itself, and "every observable behavior maps to ≥1 ID" (a gate the bootstrap runs).
 - **Iteration continuity** — the Iteration History entries are numbered gap-free (enabled in this example).
-- **Command-surface consistency** — every `checks.commands` entry appears in the files its `must_appear_in` lists. README quick-start ↔ surface parity beyond the configured commands is a review matter; surviving `<command>` / `<placeholder>` markers and any unresolved region marker are swept by hand in Phase C (RUNBOOK).
+- **Command-surface consistency** — every `checks.commands` entry appears in the files its `must_appear_in` lists. README quick-start ↔ surface parity beyond the configured commands is a review matter. A leftover placeholder, in any generated file, is swept by hand whenever these docs are generated or upgraded.
 - **Line limit** — the generated `AGENTS.md` stays within `checks.line_limits`.
 - **Neutrality / harness-neutrality** — the configurable forbidden-token sweep (`checks.deny_words`, `checks.harness_neutrality`) over docs/examples, honoring `agentic-gate: allow` markers, plus — enabled in this example — the IPv4 and machine-path leak sweeps.
 - **Layer presence** — every doc path declared under `docs` in the config exists. (That README cross-links the layers is not machine-checked.)
@@ -41,7 +40,7 @@ Walk these by hand (kept deliberately short — the script owns everything mecha
 - [ ] **Dev commands actually run clean.** From a fresh checkout, the AGENTS Development Commands build/compile and smoke all exit 0 with the expected output. This example carries no test command. The script checks that they are *cited*; only a human/agent run proves they *work*.
 - [ ] **Append-only provenance holds.** REQUIREMENTS Iteration History and VALIDATION blocks were appended, not rewritten — verifiable via `git diff` across recent commits (only appends, plus the one post-merge backfill the VALIDATION header declares). *(Relaxed under the `light` co-op profile.)*
 - [ ] **Process-doc boundary holds.** `AGENTS.md` defers change-flow to `docs/WORKFLOW.md` and names no platform CLI. The WORKFLOW doc is the copied-as-is template with only its declared substitution points resolved, or a hand-written doc, with any local exception declared in its header.
-- [ ] **Read-back probe passes** (section D below).
+- [ ] **Read-back probe passes**, or the latest read-back record in `docs/VALIDATION.md` says not run (section D below).
 
 ---
 
@@ -63,12 +62,12 @@ These are not style rules; they are stop conditions. A collaborator who violates
 
 The ultimate test of the contract is whether a **zero-context reviewer** (a human or agent who has never seen this repo or any chat history) can answer the repo's canonical questions using **only the committed docs**. This catches gaps the mechanical checker cannot: an ID that resolves but whose prose is incomprehensible cold, a workflow rule that reads fine to the author but not to a stranger.
 
-**Canonical questions.** The resident `AGENTIC-MODE.md` lists **five** canonical questions this repo's docs must answer cold, in its **Canonical Questions** section. Seed and maintain them **there** — one list, one home; this probe consumes that list and does not carry a second copy. Seed from the Layered Reading Order (see BOOTSTRAP-CORE), keep three to seven questions.
+**Canonical questions.** The resident `AGENTIC-MODE.md` lists the canonical questions this repo's docs must answer cold, in its **Canonical Questions** section. Maintain them **there**. One list, one home. This probe consumes that list and does not carry a second copy.
 
 **Protocol.**
 1. Hand a zero-context reviewer *only* the repo's committed docs — no chat history, no walkthrough.
 2. Ask them the canonical questions. They answer *solely* from the docs, citing the file:section (and `TODO-XXX` where relevant) that supplied each answer.
 3. Any question they cannot answer, or answer wrongly, marks a **doc gap** — the docs, not the reader, are at fault. Fix the offending layer.
-4. **Record the outcome in `docs/VALIDATION.md`**: the date, who/what read back, each question's pass/fail, and the citation or the gap found. A clean read-back is part of the done evidence for a bootstrap or a major doc change; before a release tag it is an optional drift check (WORKFLOW release checklist).
+4. **Record the outcome in `docs/VALIDATION.md`** with the read-back record template the file carries: the date, who/what read back, each question's pass/fail, and the citation or the gap found. A clean read-back is part of the done evidence for a bootstrap or a major doc change. When no zero-context reader is available, record the probe as not run. That record does not block hand-off. Before a release tag the probe is an optional drift check (WORKFLOW release checklist).
 
 A repo passes the read-back probe when every canonical question is answerable, cold, from the docs alone.
