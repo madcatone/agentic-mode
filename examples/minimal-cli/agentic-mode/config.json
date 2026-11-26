@@ -36,6 +36,7 @@
     "forbid_ipv4": true,
     "ipv4_allowlist": ["127.0.0.1", "0.0.0.0"],
     "forbid_local_paths": true,
+    "require_resident_docs": true,
     "iteration_history": {
       "enabled": true,
       "heading": "Iteration History"

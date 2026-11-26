@@ -71,6 +71,7 @@ region (BOOTSTRAP-CORE, "Conditional Text in Templates").
     "forbid_ipv4": false,
     "ipv4_allowlist": ["127.0.0.1", "0.0.0.0"],
     "forbid_local_paths": false,
+    "require_resident_docs": false,
     "iteration_history": {"enabled": false, "heading": "Iteration History"},
     "commands": [{"run": "str", "must_appear_in": ["agents", "readme"]}],
     "entrypoints": []
@@ -90,6 +91,11 @@ that a rule under `checks.commands` names in `must_appear_in` is skipped there
 only when it is declared `null`. Left out of `docs` entirely, it raises a
 `command-consistency` finding. `agents` left `null` while
 `checks.line_limits.agents` is set is a `line-limit` finding.
+`checks.require_resident_docs` guards the files every doc-set profile needs.
+When it is `true`, `index`, `readme`, and `agents` must be declared as
+non-empty paths, like `requirements` and `validation`, and a `SELF-TEST.md`
+must sit next to the config file. Phase A and Adopt write `true`. The default
+stays `false`, so a config written before the switch existed still passes.
 
 The checker is invoked exactly one way:
 `python scripts/check_agentic_docs.py --config agentic-mode/config.json`.
@@ -219,7 +225,10 @@ Record the answers as the **bootstrap input bundle** and write them into
 it reaches config only as the `null`s under `docs`. Write the whole `docs` block
 here, every layer the profile defers already `null`, before any doc is rendered:
 templates read that block, and nothing else, to learn which layers exist
-(BOOTSTRAP-CORE, "Conditional Text in Templates").
+(BOOTSTRAP-CORE, "Conditional Text in Templates"). Write
+`checks.require_resident_docs: true`. The resident index and
+`agentic-mode/SELF-TEST.md` belong to every profile, and this switch is what
+the checker enforces of that.
 
 ---
 
@@ -359,7 +368,8 @@ profile.
    the target already has, even a layer that the profile does not include.
    Declare a path for each of those layers, and for the resident index
    (`AGENTIC-MODE.md`). The resident index and `agentic-mode/SELF-TEST.md`
-   belong to every doc-set profile: never declare `docs.index` `null`. Declare
+   belong to every doc-set profile: never declare `docs.index` `null`. Write
+   `checks.require_resident_docs: true` here as well. Declare
    `null` only for a layer that neither exists nor belongs to the profile.
    `null` means that no such doc exists. Templates read this block to learn
    which layers exist, so write all of it before step 4.
@@ -421,7 +431,9 @@ silently — upgrade on purpose, and record it like any change.
    until your config declares them.
 2. **Swap the checker verbatim from the tag**, byte-compile it, run the gate.
    A new check firing on your current docs is the upgrade working as designed —
-   fix the docs (add the missing declaration), not the checker.
+   fix the docs (add the missing declaration), not the checker. A config
+   written before `checks.require_resident_docs` existed lacks the switch. Add
+   it as `true` once the resident index and `agentic-mode/SELF-TEST.md` exist.
 3. **Re-port each marked doc only at its declared substitution points** when
    its `Template-Source` bumps (@v1 → @v2): the marker lists what moved
    (new lines, new sections). Check every doc that carries a marker, not only

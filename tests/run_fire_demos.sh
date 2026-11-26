@@ -29,6 +29,9 @@
 #   a*  surface-doc dependency by project type (type-mapped surface doc):
 #       the explicit-null Lite exemption and the absent-key error (#49)
 #   g*  coverage gaps found in read-back (one firing case per check family)
+#   d*  resident docs switch (opt-in via checks.require_resident_docs): on and
+#       complete, docs.index null, SELF-TEST.md missing, switch absent, and
+#       the switch typed as a string
 #   t*  tilde fences + fence-engine edge cases (indent leniency, fake
 #       closers) (#5)
 #   m*  ci-runners marker consistency (opt-in via config ci.runners):
@@ -206,6 +209,19 @@ expect 1 g2-entrypoint-missing \
 expect 1 g3-declared-doc-missing \
     "declared user_guide file missing while config is valid -> flagged" \
     doc-presence
+
+# ---- resident docs switch (opt-in via checks.require_resident_docs) ----------
+expect 0 d1-resident-docs-clean \
+    "control: switch on, index/readme/agents declared, SELF-TEST.md beside the config -> clean"
+expect 2 d2-resident-index-null \
+    "require_resident_docs=true (the switch) and docs.index null -> config error: docs.index is not declared"
+expect 1 d3-resident-self-test-missing \
+    "switch on, resident docs declared, no SELF-TEST.md beside the config -> flagged" \
+    doc-presence:checks.require_resident_docs
+expect 0 d4-resident-switch-absent-clean \
+    "switch absent: docs.index null and no SELF-TEST.md run clean (default off)"
+expect 2 d5-resident-switch-string \
+    "require_resident_docs: \"false\" string -> config error"
 
 # ---- tilde fences + fence-engine edge cases (#5) -------------------------------
 expect 0 t1-tilde-fence-exempt-clean \
