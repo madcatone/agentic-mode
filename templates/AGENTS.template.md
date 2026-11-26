@@ -31,12 +31,23 @@ with `Raw fixture lines`. `{{SECONDARY_ENTRY_OR_NONE}}` takes its whole sentence
 Otherwise the line goes.
 `{{INDEPENDENCE_INVARIANT_OR_NONE}}` is the one rule every entry point keeps, whatever the
 others do, for example a shared store format. It has no value when the target has one entry point.
+`{{PRIMARY_ENTRY}}` is the path Q6 names as primary. A target with no entry point has none, so its
+sentence goes, and its Key Files line for it becomes one line per directory that holds pages,
+`` `<directory>`: the pages in it, each named by a requirement row. `` Its change flow then reads
+`The pages are edited.` in place of `Code edited.` and `iff a reading line changed` in place of
+`iff a user-visible command/entry changed`. With no tests, its sign-off line reads
+`(static sanity check/gate)` in place of `(build/test/gate)`.
+Its Stop-and-Ask list reads `Changing a **commitment a page makes** or the config **schema**` in
+place of `Changing a **public API surface** or a serialized **schema**`.
 Harness-neutral: never name a specific agent product, model, or proprietary tool.
 Resolve `{{IF ...}}` regions per BOOTSTRAP-CORE, "Conditional Text in Templates".
-Template-Source: agentic-bootstrap/AGENTS@v2  (@v2: Git Hygiene allows deleting a merged local
+Template-Source: agentic-bootstrap/AGENTS@v3  (@v2: Git Hygiene allows deleting a merged local
 branch, as the WORKFLOW doc does; the header states the light-profile note and the no-value rule
 for this template's optional slots; the Change-Flow Boundary heading drops its parenthetical;
-Change Flow step 6 exempts a command that failed before the change; commands run `python3`)
+Change Flow step 6 exempts a command that failed before the change; commands run `python3`.
+@v3: the two no-surface stand-ins also allow a page in place of a command, and the header states
+the substitutions a target with no entry point makes; the IF branches are unchanged, so a copy
+rendered with a surface doc needs no port)
 Rendered copies keep the Template-Source lines in a comment at the top of the file; the rest of this header is not rendered.
 -->
 
@@ -55,7 +66,7 @@ Repo facts and the human/agent co-operation contract for this repository. It sta
 - `{{README_PATH}}`: onboarding, entry picker, quick start.
 - `{{PRIMARY_ENTRY}}`: {{ROLE — primary maintained path}}.
 - `{{SECONDARY_ENTRY_OR_NONE}}`: {{ROLE — legacy/optional, or delete this line}}.
-- `{{REQUIREMENTS_PATH}}`: behavior contract (IDs: `{{PREFIX}}-XXX`).{{IF SURFACE_DOC_PATH}}{{ELSE}} Also carries the observable surface, one exercising command per row.{{END IF}}
+- `{{REQUIREMENTS_PATH}}`: behavior contract (IDs: `{{PREFIX}}-XXX`).{{IF SURFACE_DOC_PATH}}{{ELSE}} Also carries the observable surface, one exercising command or page per row.{{END IF}}
 {{IF SURFACE_DOC_PATH}}- `{{SURFACE_DOC_PATH}}`: observable surface ({{SURFACE_DOC_ROLE}}).{{END IF}}
 - `{{VALIDATION_PATH}}`: per-feature done evidence.
 {{IF WORKFLOW_PATH}}- `{{WORKFLOW_PATH}}`: platform review loop (see Change Flow below).{{END IF}}
@@ -78,7 +89,7 @@ A behavior change is **not done** until all of these hold. The ID is the join ke
 
 1. Code edited.
 2. `{{REQUIREMENTS_PATH}}` — the requirement `{{PREFIX}}-XXX` is added or updated, with a new **append-only** Iteration History entry (lead with the decision, then the evidence: numbers/fingerprint/issue-MR link). {{LIGHT_PROFILE_NOTE_OR_DELETE}}
-3. {{IF SURFACE_DOC_PATH}}`{{SURFACE_DOC_PATH}}` — the subsection for that behavior is updated and cites the `{{PREFIX}}-XXX` ID.{{ELSE}}The observable surface. The requirement row from step 2 records the command / call that exercises the behavior and what the user observes.{{END IF}}
+3. {{IF SURFACE_DOC_PATH}}`{{SURFACE_DOC_PATH}}` — the subsection for that behavior is updated and cites the `{{PREFIX}}-XXX` ID.{{ELSE}}The observable surface. The requirement row from step 2 records the command or call that exercises the behavior, or the page that carries it, and what the user observes.{{END IF}}
 4. `{{README_PATH}}` — quick-start updated **iff** a user-visible command/entry changed.
 5. `{{VALIDATION_PATH}}` — a per-feature block is **appended**, citing the `{{PREFIX}}-XXX` ID and the issue/MR/PR number.
 6. Verification commands run clean (see Development Commands) and the docs gate exits clean. A command that already failed before this change is reported, and does not fail this step.

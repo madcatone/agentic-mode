@@ -19,16 +19,29 @@ delete the heading and its code block. It is not the secondary entry point of Ph
 `{{REGION_LIST_FROM_JSON}}`: with no regions in the architecture doc,
 write `none`.
 Data Flow: one numbered step per stage, from what enters to what leaves. The two lines are samples.
+A target with no entry point (RUNBOOK Phase A, question 6) lists pages. `{{ENTRY_n}}` is a page a
+reader enters by, `{{WANT_n}}` is what a reader finds there, and each `{{INSTALL_n_OR_NONE}}` is
+`none`. `{{SYMBOL_n}}` is a heading of that page. `{{SUPPORT_MODULE_1}}` is one more such page.
+Write one line, and one `###` section under Main Components, per page a reader enters by.
+The `## Pick a Tool / Entry Point` heading stays as written, because a heading is a cross-repo
+reference anchor. Its rows list the pages.
+In Quick Start each command and its fence become one line,
+``Read `<page>#<heading>` for <what the reader needs>.``
+The use-case headings stay as the sample and no-value rules leave them.
+`Data Flow` lists the reading path, one step per line. `Before editing core logic` reads
+`Before editing a page`, and `Edit the code.` reads `Edit the page.`
 Harness-neutral: never name a specific agent product, model, or proprietary tool.
 Resolve `{{IF ...}}` regions per BOOTSTRAP-CORE, "Conditional Text in Templates".
 The CI-runners stand-in under Verification is kept only while no WORKFLOW doc is seeded.
 `{{CI_RUNNERS}}`: resolve from config `ci.runners` (comma-separated runner names); when config
 declares no runners, DELETE that whole line. The doc gate checks the `ci-runners:` marker
 against config.
-Template-Source: agentic-bootstrap/README@v2  (@v2: Data Flow is two sample lines, the two component
+Template-Source: agentic-bootstrap/README@v3  (@v2: Data Flow is two sample lines, the two component
 bullets name their own job slot, and the header states the no-value rule and the sample rule for
 this template's slots; the verification sentence no longer says "above";
-commands run `python3`)
+commands run `python3`.
+@v3: a target with no entry point lists pages in place of entry points and reading lines in place of
+Quick Start commands, as the header says; every other target renders no change)
 Rendered copies keep the Template-Source lines in a comment at the top of the file; the rest of this header is not rendered.
 -->
 

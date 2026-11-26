@@ -12,12 +12,23 @@ Append-only: never rewrite a past block; a reversal APPENDS a new block referenc
 Block ordering: newest at the bottom (matches iteration-history order).
 Blocks and read-back records share that order.
 Under the `light` co-op profile these blocks are encouraged, not required.
+A target with no entry point makes these substitutions in the block template, and no
+others. Under `Code Implementation` the slot line reads
+`page or section added or changed, with path references`. Under `Integration Points` it reads
+`which linked pages were touched; which invariants were preserved`. When the target has no
+tests, both lines under `Testing` give way to one line, `The target has no tests.` Under
+`Documentation Updates`, `command / flag / key / endpoint / API` reads `page`. Under
+`Verification Commands`, a block copied from the template adds one heading lookup per cited row
+after the commands. In the seed the lookup is a comment line inside the fence,
+`# One lookup per cited row: a grep for the row's heading in its page, or for the title line of a page a row names whole.`
 Harness-neutral: never name a specific agent product, model, or proprietary tool.
-Template-Source: agentic-bootstrap/VALIDATION@v2  (@v2: the block template's slots are plain words,
+Template-Source: agentic-bootstrap/VALIDATION@v3  (@v2: the block template's slots are plain words,
 so a rendered seed passes the Phase-C placeholder sweep; a read-back record template sits beside
 the block template, and the opening paragraph gains a sentence about the record; no angle-bracket
 token remains in the file; the ID example uses three digits; the record template's instructions
-sit above its fill-in lines)
+sit above its fill-in lines.
+@v3: a target with no entry point makes the substitutions the header lists in the block template;
+every other target renders no change)
 Rendered copies keep the Template-Source lines in a comment at the top of the file; the rest of this header is not rendered.
 -->
 

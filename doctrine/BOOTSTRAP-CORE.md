@@ -65,6 +65,8 @@ A layer deferred by the doc-set profile is a different case: it is absent on pur
 | `web-service` | `docs/USER_GUIDE.md` | `USER_GUIDE-web.template.md` |
 | `docs-only` | (none; REQUIREMENTS carries the surface) | — |
 
+**A target with no entry point.** Some `docs-only` targets hold pages and nothing that is run, imported, or called. Such a target has no command for a row to carry, so the row names, in one code span, the page's path, then `#` and the heading, as the page writes it, when the page carries several rows, where the reader meets the commitment. Every page has at least one row. A row states one commitment a reader can check on its own. A commitment above a page's title heading names the page alone. A `docs-only` target that does have an entry point writes its rows like any other.
+
 ---
 
 ## The ID Discipline
@@ -106,7 +108,7 @@ Three rules the block enforces:
 
 1. **Each `User Requirements Met` bullet MUST cite a stable ID** drawn from the REQUIREMENTS table — not prose.
 2. **Each feature block header MUST cite its issue or MR/PR number**, matching a `Closes #N` / `MR !N` / `PR #N` marker in Iteration History. A doc-set upgrade that no issue or MR/PR covers cites the upgrade commit instead. A read-back record is not a feature block. Its heading cites the date and the scope, and it follows the record template in `docs/VALIDATION.md`.
-3. **Verification Commands MUST include** (a) a build/compile of touched entry points, (b) a test step, when the project has tests, (c) ≥1 smoke run against a fixture or example — sourced from AGENTS.md Development Commands, not reinvented.
+3. **Verification Commands MUST include** (a) a build/compile of touched entry points, (b) a test step, when the project has tests, (c) ≥1 smoke run against a fixture or example — sourced from AGENTS.md Development Commands, not reinvented. A target without one of the three runs what it has. With no build step, (a) is the static sanity command agreed at bootstrap. With no entry point, (c) is the docs gate command, and a block adds one heading lookup per cited row. A lookup is written for its block. It is not a copy of a Development Command.
 
 **Verification procedures live in scripts, not prose.** A checker can verify that a command *exists* in a doc; it cannot verify that the procedure the doc describes still matches reality — prose steps drift as platforms change, while an in-repo script either runs or fails. Record *where the procedure lives* (the script), not the procedure itself. And record the **verification action** (a fresh version timestamp, a live smoke test), not a status name ("green," "deployed") — platforms silently redefine status semantics (a job can skip by design and stay green), while an action's truth re-generates on every run.
 
@@ -229,7 +231,7 @@ The rule is not "never repeat words." The rule is "never let duplicated facts be
 | Fact type | Canonical owner | Allowed mirrors | Owner not seeded: the stand-in | Update rule |
 |---|---|---|---|---|
 | Development / verification commands | `AGENTS.md` Development Commands | README Verification, REQUIREMENTS Verification Commands, per-feature VALIDATION blocks | Not applicable. Every profile seeds the owner. | Mirrors copy the current command or explicitly say they are a focused subset. |
-| User-visible commands, flags, keys, endpoints, API signatures | `docs/USER_GUIDE.md` or `docs/API_REFERENCE.md` | README Quick Start, REQUIREMENTS requirement rows | **REQUIREMENTS requirement rows.** Each row states the behavior and the exact command or call that exercises it, with what the user observes. | The checker verifies every command that `checks.commands` lists (SELF-TEST §A). Parity beyond those commands is a review matter. |
+| User-visible commands, flags, keys, endpoints, API signatures | `docs/USER_GUIDE.md` or `docs/API_REFERENCE.md` | README Quick Start, REQUIREMENTS requirement rows | **REQUIREMENTS requirement rows.** Each row states the behavior and the exact command or call that exercises it, with what the user observes. A target with no entry point has no command to carry, so its row names the page that carries the commitment. | The checker verifies every command that `checks.commands` lists (SELF-TEST §A). Parity beyond those commands is a review matter. |
 | Behavior contract and stable IDs | `docs/REQUIREMENTS.md` | USER_GUIDE/API_REFERENCE citations, VALIDATION `Requirements Met`, commits/MRs | Not applicable. Every profile seeds the owner. | Mirrors cite IDs; they do not redefine the requirement. |
 | Per-feature completion evidence | `docs/VALIDATION.md` | MR/PR description, issue closure comment | Not applicable. Every profile seeds the owner. | Mirrors may summarize, but the validation block is the re-verification home. |
 | Workflow / review commands | `docs/WORKFLOW.md` | AGENTS one-line deferral | **AGENTS.md "MR / PR Governance" and "Git Hygiene"**, the platform-neutral policy that every profile keeps. While `ci.runners` is declared, the CI-runners line sits in README Verification. | Do not duplicate platform-specific steps in AGENTS. |

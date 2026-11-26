@@ -20,15 +20,22 @@ Keep between three and seven questions.
 Render body prose in the TARGET's primary language; keep the section headings in
 canonical English (they are cross-repo reference anchors — doctrine and upgrades
 cite them by name).
+A target with no entry point makes three substitutions. In the Doc Inventory, the README row's
+`which entry point to pick` reads `which page to pick`. In the Canonical Questions, question 1's
+`which entry point do I pick` reads `which page do I pick`, and question 4's
+`(the command / key / endpoint / API)` reads `(the page and heading)`.
 Harness-neutral: never name a specific agent product, model, or proprietary tool.
-Template-Source: agentic-bootstrap/AGENTIC-MODE@v4  (@v4: the inventory lists the layers in reading
+Template-Source: agentic-bootstrap/AGENTIC-MODE@v5  (@v4: the inventory lists the layers in reading
 order, architecture third, and a short paragraph under it says so; the Enforcement paragraph
 routes each non-mechanized check to where it lives instead of to SELF-TEST §B, and ends with two
 sentences on the placeholder sweep; the Canonical Questions carry no seeding instruction and no
 question count; the doctrine pointers say this repo keeps no copy and take the toolkit's
 location; the requirements row allows for no event model; the process-rules row no longer names
 the H1 as a substitution point; commands run `python3`; the header says which words a target
-without runtime placeholders drops)
+without runtime placeholders drops.
+@v5: the behavior-contract stand-in also allows a page in place of a command, and the header names
+the three substitutions a target with no entry point makes; the IF branches are unchanged, so a
+copy rendered with a surface doc needs no port)
 Rendered copies keep the Template-Source lines in a comment at the top of the file; the rest of this header is not rendered.
 -->
 
@@ -47,7 +54,7 @@ Project: **{{PROJECT_NAME}}** ({{PROJECT_TYPE}}). ID prefix: `{{PREFIX}}`. It is
 | Onboarding | `{{README_PATH}}` | What is this, which entry point to pick, quick start, neutrality/contracts. |
 | Repo facts + co-op contract | `{{AGENTS_PATH}}` | Scope, key files, dev commands, change-flow, the platform-neutral MR / PR policy, sign-off points, Stop-and-Ask list — *What/Done* only. |
 {{IF ARCHITECTURE_PATH}}| Architecture inventory | `{{ARCHITECTURE_PATH}}` | Component graph as committed, diffable JSON. |{{END IF}}
-| Behavior contract | `{{REQUIREMENTS_PATH}}` | Problem/Goals/Non-Goals, enumerated functional requirements with stable IDs{{IF SURFACE_DOC_PATH}} (each row names the observable surface it governs){{ELSE}}, each row carrying the observable surface and the command that exercises it{{END IF}}, event/domain model when there is one, append-only iteration history, acceptance criteria, verification commands. |
+| Behavior contract | `{{REQUIREMENTS_PATH}}` | Problem/Goals/Non-Goals, enumerated functional requirements with stable IDs{{IF SURFACE_DOC_PATH}} (each row names the observable surface it governs){{ELSE}}, each row carrying the observable surface and the command or page that carries it{{END IF}}, event/domain model when there is one, append-only iteration history, acceptance criteria, verification commands. |
 {{IF SURFACE_DOC_PATH}}| Observable surface | `{{SURFACE_DOC_PATH}}` | {{SURFACE_DOC_ROLE}} — what users see, press, or call. |{{END IF}}
 | Done evidence | `{{VALIDATION_PATH}}` | Per-feature checklist: Code Implementation / Integration Points / User Requirements Met / Documentation Updates / Testing / Verification Commands / Status. |
 {{IF WORKFLOW_PATH}}| Process rules | `{{WORKFLOW_PATH}}` | Issue → branch → commit → MR/PR → review loop, red lines, platform CLI conventions — copied as-is except its declared substitution points. |{{END IF}}

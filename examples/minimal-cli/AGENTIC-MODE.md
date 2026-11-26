@@ -1,12 +1,15 @@
 <!--
-Template-Source: agentic-bootstrap/AGENTIC-MODE@v4  (@v4: the inventory lists the layers in reading
+Template-Source: agentic-bootstrap/AGENTIC-MODE@v5  (@v4: the inventory lists the layers in reading
 order, architecture third, and a short paragraph under it says so; the Enforcement paragraph
 routes each non-mechanized check to where it lives instead of to SELF-TEST §B, and ends with two
 sentences on the placeholder sweep; the Canonical Questions carry no seeding instruction and no
 question count; the doctrine pointers say this repo keeps no copy and take the toolkit's
 location; the requirements row allows for no event model; the process-rules row no longer names
 the H1 as a substitution point; commands run `python3`; the header says which words a target
-without runtime placeholders drops)
+without runtime placeholders drops.
+@v5: the behavior-contract stand-in also allows a page in place of a command, and the header names
+the three substitutions a target with no entry point makes; the IF branches are unchanged, so a
+copy rendered with a surface doc needs no port)
 -->
 
 # AGENTIC-MODE.md — Doc Contract for Agent + Human Co-Development
