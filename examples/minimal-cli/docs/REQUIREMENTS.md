@@ -55,8 +55,6 @@ Each row states one behavior. Its observable surface is documented in
 
 Rows are never deleted. A superseded row stays, marked for example as "(superseded by TODO-NNN)".
 
-<!-- Repeat one row per observable behavior: each CLI flag, key, endpoint, public API, or documented output. -->
-
 ## Task Store Model
 
 ```text
