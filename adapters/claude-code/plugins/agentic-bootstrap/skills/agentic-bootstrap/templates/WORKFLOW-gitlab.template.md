@@ -7,9 +7,9 @@ CI-RUNNERS line: resolve `{{CI_RUNNERS}}` from config `ci.runners` (comma-separa
 e.g. when pipelines run on an external runner). When config declares no `ci.runners`, DELETE two
 lines, the CI-runners line and the whole `Single source of truth` sentence under it, and leave one blank line where they stood. The doc gate
 checks the `ci-runners:` marker against config.
-`{{TEST_CMD}}`: a target with no tests deletes the words
-`; tests {{TEST_CMD}}` from the Iron Rules bullet that lists the commands,
-and keeps the rest of the bullet.
+`{{TEST_CMD}}`: a target with no tests deletes the words `; tests` together
+with the backtick-wrapped `{{TEST_CMD}}` that follows them, from the Iron Rules
+bullet that lists the commands, and keeps the rest of the bullet.
 `{{IF_BILINGUAL: <text>}}`: delete it together with the space before it.
 BILINGUAL comment rule (dual-language external replies + EOF-terminated multi-line format) applies ONLY
 when config bilingual.enabled == true; if monolingual, replies are single-language (still self-contained,
