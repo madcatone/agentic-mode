@@ -1,3 +1,9 @@
+<!--
+Template-Source: agentic-bootstrap/README@v1  (@v1: Template-Source marker added; regions for
+the surface doc, WORKFLOW doc, and architecture doc, plus the CI-runners line kept while no
+WORKFLOW doc is seeded)
+-->
+
 # todo
 
 A tiny standard-library task tracker. It is the worked example for the
@@ -36,6 +42,27 @@ python3 todo.py list
 python3 todo.py done 1
 python3 todo.py remove 1
 ```
+
+## Data Flow
+
+1. The caller runs one subcommand; the store path comes from `--store`, else
+   the `TODO_STORE` environment variable, else `tasks.json` (TODO-001).
+2. `_load` reads the JSON array, or starts from an empty list when the file
+   does not exist.
+3. The subcommand transforms the list: `add` appends, `done` marks, `remove`
+   drops, `list` keeps the unfinished tasks unless `--all` is given.
+4. Mutating commands write the list back with `_save` and print one line;
+   `list` prints the kept tasks without writing.
+
+## Main Components
+
+### `todo.py`
+
+- `_store_path` / `_load` / `_save`: store-path resolution and JSON read / write.
+- `cmd_add` / `cmd_list` / `cmd_done` / `cmd_remove`: the four verbs; each
+  returns the text to print, and the mutating ones edit the task list in place.
+- `build_parser` / `main`: the argument surface (`--store`, `add`, `list --all`,
+  `done`, `remove`) and dispatch to the verbs.
 
 ## Agent Onboarding Guide
 

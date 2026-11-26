@@ -1,3 +1,9 @@
+<!--
+Template-Source: agentic-bootstrap/REQUIREMENTS@v1  (@v1: Template-Source marker added; rows
+carry the observable surface while no surface doc is seeded; a sentence under Functional
+Requirements states where the surface is documented)
+-->
+
 # todo — Requirements and Evolution
 
 The behavior contract for the `todo` example CLI. Every functional requirement
@@ -34,6 +40,9 @@ python3 todo.py remove 1
 ```
 
 ## Functional Requirements
+
+Each row states one behavior. Its observable surface is documented in
+`docs/USER_GUIDE.md`, which cites the row's ID.
 
 | ID | Requirement |
 | --- | --- |

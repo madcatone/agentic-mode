@@ -1,3 +1,7 @@
+<!--
+Template-Source: agentic-bootstrap/USER_GUIDE-cli@v1  (@v1: Template-Source marker added)
+-->
+
 # todo — User Guide
 
 The observable surface of the `todo` CLI: its commands, flags, output, and

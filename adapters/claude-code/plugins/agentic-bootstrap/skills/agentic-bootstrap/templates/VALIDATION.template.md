@@ -7,6 +7,9 @@ Append-only: never rewrite a past block; a reversal APPENDS a new block referenc
 Block ordering: newest at the bottom (matches iteration-history order).
 Under the `light` co-op profile these blocks are encouraged, not required.
 Harness-neutral: never name a specific agent product, model, or proprietary tool.
+Template-Source: agentic-bootstrap/VALIDATION@v1  (@v1: Template-Source marker added; the surface
+checklist line names where the surface is documented; the block heading may cite an upgrade commit)
+Rendered copies keep the Template-Source line in a comment at the top of the file; the rest of this header is not rendered.
 -->
 
 # {{COMPONENT_NAME}} — Implementation Validation
@@ -17,7 +20,7 @@ Per-feature done evidence. One block per landed non-trivial change. A reviewer (
 
 <!--
 ==== PER-FEATURE BLOCK TEMPLATE — copy below the line when a new feature lands ====
-The heading cites the issue/MR/PR number — use exactly one of (issue #N), (MR !N), or (PR #N).
+The heading cites the issue/MR/PR number — use exactly one of (issue #N), (MR !N), or (PR #N); a doc-set upgrade that no issue or MR/PR covers uses (commit <sha>).
 
 ---
 
@@ -34,7 +37,7 @@ The heading cites the issue/MR/PR number — use exactly one of (issue #N), (MR 
 
 ### Documentation Updates
 - [ ] REQUIREMENTS — {{iteration-history entry appended; which IDs added}}
-- [ ] observable-surface doc (USER_GUIDE / API_REFERENCE) — {{command/flag/key/endpoint/API updated}}
+- [ ] Observable surface — {{command / flag / key / endpoint / API updated wherever the surface is documented, in its doc's subsection or in the requirement row while no surface doc is seeded}}
 - [ ] README — {{quick-start / components / verification updated, or "n/a — no user-visible surface change"}}
 - [ ] VALIDATION — this block added
 

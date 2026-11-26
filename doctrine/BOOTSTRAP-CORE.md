@@ -54,6 +54,8 @@ A cold-start collaborator reads in this order; each layer answers a different qu
 
 If any layer is missing, the reader fills the gap with assumptions or chat history — both of which decay. The layers exist so chat history is never load-bearing.
 
+A layer deferred by the doc-set profile is a different case: it is absent on purpose, and its question goes to the stand-in named in the Controlled-Duplication table, so the reader still gets an answer from the committed docs.
+
 **Observable-surface selection by project type.** The observable-surface doc is chosen from `project.type` in `agentic-mode/config.json`:
 
 | `project.type` | Observable-surface doc | Template |
@@ -103,7 +105,7 @@ Every non-trivial landed change gets a block in `docs/VALIDATION.md`. The block 
 Three rules the block enforces:
 
 1. **Each `User Requirements Met` bullet MUST cite a stable ID** drawn from the REQUIREMENTS table — not prose.
-2. **Each feature block header MUST cite its issue or MR/PR number**, matching a `Closes #N` / `MR !N` / `PR #N` marker in Iteration History.
+2. **Each feature block header MUST cite its issue or MR/PR number**, matching a `Closes #N` / `MR !N` / `PR #N` marker in Iteration History. A doc-set upgrade that no issue or MR/PR covers cites the upgrade commit instead.
 3. **Verification Commands MUST include** (a) a build/compile of touched entry points, (b) a test step, (c) ≥1 smoke run against a fixture or example — sourced from AGENTS.md Development Commands, not reinvented.
 
 **Verification procedures live in scripts, not prose.** A checker can verify that a command *exists* in a doc; it cannot verify that the procedure the doc describes still matches reality — prose steps drift as platforms change, while an in-repo script either runs or fails. Record *where the procedure lives* (the script), not the procedure itself. And record the **verification action** (a fresh version timestamp, a live smoke test), not a status name ("green," "deployed") — platforms silently redefine status semantics (a job can skip by design and stay green), while an action's truth re-generates on every run.
@@ -122,7 +124,7 @@ When present, `docs/architecture.json` is the source of truth; any rendered `.sv
 - Derive the component list by mining entry points + AGENTS Key Files + README Main Components — do not hand-author.
 - **Stability rule.** Append components/connections; do not rename existing ids or reflow position/size unless intentionally restructuring — diffability is the point.
 
-The architecture doc is **optional** and gated on `project.type` and the team's need. A single-entry `cli` or a `docs-only` repo may skip it; a multi-component `web-service` benefits most. When skipped, set `docs.architecture` to `null` in config.
+The architecture doc is **optional** and gated on `project.type` and the team's need. A single-entry `cli` or a `docs-only` repo may skip it; a multi-component `web-service` benefits most. When skipped, set `docs.architecture` to `null` in config. The shape of the file is stated once, in RUNBOOK Phase B step 1.
 
 Anti-pattern: a `.png` or `.drawio` committed directly, with no source. It rots the first time someone is too lazy to open the editor. <!-- agentic-gate: allow -->
 
@@ -151,6 +153,8 @@ Because the platform WORKFLOW doc is ported as-is, every imported copy must reco
 
 This preserves the "ported as-is" rule while still making long-term template drift visible.
 
+Every Markdown template carries the same marker, not only the WORKFLOW one, and a rendered copy keeps it. **Bump the version whenever a change alters what a rendered copy contains** — a new or removed sentence, row, section, or region — and list what moved in the marker itself. A change confined to template instructions that never reach a rendered copy needs no bump.
+
 ---
 
 ## Bilingual Discipline (Config-Gated — Optional Section)
@@ -171,6 +175,24 @@ When the team works in two languages:
 ## Rendering Language and Canonical Headings
 
 Unlike bilingual tracks (config-gated), this rule always applies. **Body prose renders in the repo's chosen language; section headings in `AGENTIC-MODE.md` and `agentic-mode/SELF-TEST.md` stay in the canonical English the templates carry.** Never translate the headings — they are reference anchors: the doctrine, the RUNBOOK, upgrade notes, and cross-repo tooling cite sections by name ("Doc Inventory", "Canonical Questions", the SELF-TEST §A–D rows). A translated heading silently severs every one of those citations. The field evidence: three adopters translated headings three different ways in one week, and no cross-repo instruction could resolve.
+
+---
+
+## Conditional Text in Templates
+
+A template never names a doc-set profile. A template names an optional doc through one path placeholder, and every sentence that depends on that doc sits inside a region guarded by the same placeholder. This section is the only definition of the construct.
+
+| Marker | Meaning |
+|---|---|
+| `{{IF <PLACEHOLDER>}}` | Opens a region. The region is kept when the placeholder has a value from `agentic-mode/config.json` and dropped when the placeholder has no value. |
+| `{{ELSE}}` | Splits the region. The text after `{{ELSE}}` is the **stand-in**. The stand-in is kept only when the placeholder has no value. `{{ELSE}}` is optional. |
+| `{{END IF}}` | Closes the region. |
+
+- **A region tests config, not the profile name.** Exactly three placeholders are optional. `SURFACE_DOC_PATH` is `docs.api_reference` for a `library` and `docs.user_guide` for every other type. `WORKFLOW_PATH` is `docs.workflow`. `ARCHITECTURE_PATH` is `docs.architecture`. A placeholder has a value when its key is a path and has no value when the key is `null` or absent.
+- **A region can sit inside a line or span several lines.** A table cell, a list item, or a clause can hold a region, and so can a block of lines. Regions do not nest, and none sits inside a heading line: a heading's text is a cross-repo reference anchor and reads the same at every profile. A region may still drop a whole section together with its heading, when the section belongs to a doc that is not seeded.
+- **Select a branch. Do not write new text.** Keep one branch verbatim and drop the other branch together with its markers. Renumber a numbered list only when a whole item disappeared. A dropped region leaves no line behind: drop a line that held only the dropped branch and its markers, and collapse the blank lines that a dropped block leaves into one blank line.
+- **Rules for template authors.** An optional path placeholder may appear only inside its own region. Prefer a sentence that is true whether or not the doc is seeded, and use a region only when the wording itself must differ. Every marker is spelled with `{{`, so an unresolved region fails the RUNBOOK's Phase-C placeholder sweep. For the same reason, rendered prose never quotes that sweep's brace pattern.
+- `{{IF_BILINGUAL: <text>}}` in the WORKFLOW templates is the older one-line form of a keep-or-delete region for `bilingual.enabled`. It is unchanged.
 
 ---
 
@@ -201,14 +223,14 @@ Project-neutrality is necessary but not sufficient. A repo can be project-neutra
 
 The rule is not "never repeat words." The rule is "never let duplicated facts become independent authorities." Some facts must appear in more than one layer because each audience enters through a different door.
 
-| Fact type | Canonical owner | Allowed mirrors | Update rule |
-|---|---|---|---|
-| Development / verification commands | `AGENTS.md` Development Commands | README Verification, REQUIREMENTS Verification Commands, per-feature VALIDATION blocks | Mirrors copy the current command or explicitly say they are a focused subset. |
-| User-visible commands, flags, keys, endpoints, API signatures | `docs/USER_GUIDE.md` or `docs/API_REFERENCE.md` | README Quick Start, REQUIREMENTS requirement rows | Mirrors must be checked by the command-surface parity tests (SELF-TEST §A). |
-| Behavior contract and stable IDs | `docs/REQUIREMENTS.md` | USER_GUIDE/API_REFERENCE citations, VALIDATION `Requirements Met`, commits/MRs | Mirrors cite IDs; they do not redefine the requirement. |
-| Per-feature completion evidence | `docs/VALIDATION.md` | MR/PR description, issue closure comment | Mirrors may summarize, but the validation block is the re-verification home. |
-| Workflow / review commands | `docs/WORKFLOW.md` | AGENTS one-line deferral | Do not duplicate platform-specific steps in AGENTS. |
-| Architecture inventory | `docs/architecture.json` | README Main Components, AGENTS Key Files | Prose derives from JSON; JSON remains the diffable source. |
+| Fact type | Canonical owner | Allowed mirrors | Owner not seeded: the stand-in | Update rule |
+|---|---|---|---|---|
+| Development / verification commands | `AGENTS.md` Development Commands | README Verification, REQUIREMENTS Verification Commands, per-feature VALIDATION blocks | Not applicable. Every profile seeds the owner. | Mirrors copy the current command or explicitly say they are a focused subset. |
+| User-visible commands, flags, keys, endpoints, API signatures | `docs/USER_GUIDE.md` or `docs/API_REFERENCE.md` | README Quick Start, REQUIREMENTS requirement rows | **REQUIREMENTS requirement rows.** Each row states the behavior and the exact command or call that exercises it, with what the user observes. | Mirrors must be checked by the command-surface parity tests (SELF-TEST §A). |
+| Behavior contract and stable IDs | `docs/REQUIREMENTS.md` | USER_GUIDE/API_REFERENCE citations, VALIDATION `Requirements Met`, commits/MRs | Not applicable. Every profile seeds the owner. | Mirrors cite IDs; they do not redefine the requirement. |
+| Per-feature completion evidence | `docs/VALIDATION.md` | MR/PR description, issue closure comment | Not applicable. Every profile seeds the owner. | Mirrors may summarize, but the validation block is the re-verification home. |
+| Workflow / review commands | `docs/WORKFLOW.md` | AGENTS one-line deferral | **AGENTS.md "MR / PR Governance" and "Git Hygiene"**, the platform-neutral policy that every profile keeps. While `ci.runners` is declared, the CI-runners line sits in README Verification. | Do not duplicate platform-specific steps in AGENTS. |
+| Architecture inventory | `docs/architecture.json` | README Main Components, README Data Flow, AGENTS Key Files | **The mirrors.** README Main Components, README Data Flow, and AGENTS Key Files are the inventory. | Prose derives from JSON; JSON remains the diffable source. |
 
 If a mirror disagrees with its canonical owner, update the mirror unless the canonical owner is wrong. If the canonical owner is wrong, fix it first, then refresh every mirror in the same change.
 
@@ -228,7 +250,7 @@ When two layers disagree, resolve by responsibility, not by recency:
 | What components exist and how do they connect? | `docs/architecture.json` |
 | What should a newcomer read first? | `README.md` |
 
-README is the onboarding map, not the final authority for behavior or workflow. VALIDATION records done evidence, not new requirements. Iteration history explains why a decision changed, but the current functional requirement table states the live contract.
+README is the onboarding map, not the final authority for behavior or workflow. VALIDATION records done evidence, not new requirements. Iteration history explains why a decision changed, but the current functional requirement table states the live contract. When the winning layer is not seeded, the question goes to the stand-in that the Controlled-Duplication table names for that fact.
 
 ---
 
@@ -278,10 +300,14 @@ The co-op profile signals to collaborators how strictly the append-only rules bi
 |---|---|---|---|
 | Lite | `README.md`, `AGENTS.md`, `docs/REQUIREMENTS.md`, seeded `docs/VALIDATION.md` | Small single-entry tool, low surface, no established MR workflow yet | First visible behavior change or second collaborator. |
 | Standard | Lite + observable-surface doc (`USER_GUIDE`/`API_REFERENCE`) + `docs/WORKFLOW.md` | Active feature work with issue/MR review | Repeated architecture questions or cross-component changes. |
-| Full | Standard + `docs/architecture.json` + full SELF-TEST automation in CI | Multi-component repo, multiple collaborators, protected branches | Default for repos expected to live beyond one feature cycle. |
+| Full | Standard + `docs/architecture.json` | Multi-component repo, multiple collaborators, protected branches | Default for repos expected to live beyond one feature cycle. |
+
+Every profile also seeds the resident index (`AGENTIC-MODE.md`) and `agentic-mode/SELF-TEST.md`.
 
 A profile is a starting point, not a fork of the rules. The target architecture remains the Full model; Lite and Standard simply defer lower-risk layers until the repo needs them.
 
 A Lite repo starts with the type-selected surface doc declared as an explicit `null` (`docs.user_guide: null` for `cli` / `web-service`, `docs.api_reference: null` for `library`) — REQUIREMENTS carries the surface until the upgrade — and the gate's checks that depend on that doc (its presence, cross-doc references, command-consistency targets) withdraw with it; an undeclared key remains a config error.
+
+A deferred layer's stand-in is pre-written in the templates (Conditional Text in Templates, above). RUNBOOK.md, "Upgrading the doc-set profile", moves a target up to the row its request names.
 
 When the seeded layers exist AND SELF-TEST passes, any new collaborator (human or agent) can read top-down per the Layered Reading Order and reach productive context in minutes, with no chat history required.

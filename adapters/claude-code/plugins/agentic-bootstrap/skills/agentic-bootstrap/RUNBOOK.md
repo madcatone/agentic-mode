@@ -42,7 +42,9 @@ scripts/check_agentic_docs.py  # the checker, copied verbatim from TOOLKIT/check
 
 The doc-set profile (Phase A, question 2) decides how much of this layout
 exists: a Lite target has neither the surface doc nor `docs/WORKFLOW.md`, and
-only a Full target has `docs/architecture.json` (Phase B).
+only a Full target has `docs/architecture.json` (Phase B). Where a template
+sentence depends on one of those three docs, it sits inside a `{{IF ...}}`
+region (BOOTSTRAP-CORE, "Conditional Text in Templates").
 
 ## config.json — schema v1 (the single source of machine truth)
 
@@ -165,7 +167,10 @@ Prefer simple shell tools first: `echo`, `jq`, `sed`, `head`, `grep`, `sort`,
   full four-phase protocol.
 - **Adopt** — TARGET already has some of these docs (a hand-written `AGENTS.md`,
   a `README`, ad-hoc `docs/`). Do **not** overwrite. Jump to **Adopt mode**,
-  inventory what exists, and fill only the gaps.
+  inventory what exists, and fill only the gaps. If TARGET was rendered from
+  these templates before (its docs carry `Template-Source:` markers) and this
+  run changes its doc-set profile, go to **Upgrading the doc-set profile**
+  instead.
 
 If unsure, list the target paths. A hit on any **contract doc** (AGENTS,
 REQUIREMENTS, VALIDATION, WORKFLOW, AGENTIC-MODE, a surface guide) → adopt. A
@@ -211,7 +216,10 @@ it sets the rigor for everything after:
 
 Record the answers as the **bootstrap input bundle** and write them into
 `TARGET/agentic-mode/config.json`. The doc-set profile has no key of its own:
-it reaches config only as the `null`s under `docs` that Phase B has you declare.
+it reaches config only as the `null`s under `docs`. Write the whole `docs` block
+here, every layer the profile defers already `null`, before any doc is rendered:
+templates read that block, and nothing else, to learn which layers exist
+(BOOTSTRAP-CORE, "Conditional Text in Templates").
 
 ---
 
@@ -223,21 +231,51 @@ doc-set table: every target runs steps 3, 5, 6, and 7 (Lite), Standard adds
 steps 2 and 4, and Full adds step 1 as well. For each doc: open the
 matching `TOOLKIT/templates/*.template.md`, resolve every `{{PLACEHOLDER}}`
 from the bundle, write the file into TARGET, then run its inline gate. **Do not
-advance on a failed gate.** A skipped step leaves no file behind: declare that
-doc `null` under `docs` in config, and delete every template row, bullet, or
-clause that names it, so no `{{PLACEHOLDER}}` survives. Production order:
+advance on a failed gate.** A step whose doc is `null` under `docs` in config
+is skipped and leaves no file behind. The other templates name that doc only
+inside `{{IF ...}}` regions: resolve them per BOOTSTRAP-CORE, "Conditional Text
+in Templates", keeping the stand-in where one is written, so no
+`{{PLACEHOLDER}}` survives. Production order:
 
-1. **`docs/architecture.json`** *(Full profile — Lite and Standard skip this step; under Full the doctrine still gates the doc on `project.type` and need. Any skip sets `docs.architecture: null`.)* Gate: every `connection.from`/`.to` resolves; every component label naming a real symbol exists in source; JSON parses.
-2. **`docs/WORKFLOW.md`** *(Standard and Full — Lite skips this step and sets `docs.workflow: null`)* — **ported as-is** (verbatim except its declared substitution points) from `WORKFLOW-<platform>.template.md`. Substitute the H1 platform name, the `Template-Source:` marker, and every `{{PLACEHOLDER}}` in the body (build/test/smoke commands, prefix, bilingual conditionals). Resolve the CI-runners line from config `ci.runners` (comma-separated runner names), or **delete the whole line** when config declares no runners — the doc gate checks its `ci-runners:` marker against config. A Lite target has no WORKFLOW doc, so when its config declares runners it carries that line in README instead; the checker reads the marker in any governed doc. Do **not** re-author its prose — the review loop, comment style, and red lines are platform constants.
-3. **`docs/REQUIREMENTS.md`** — Problem/Goals/Non-Goals, enumerated `{{PREFIX}}-001..N` requirements (one per observable behavior), domain/event model, **empty** Iteration History (append-only from here), acceptance criteria, verification commands. Gate: every entry-point behavior maps to ≥1 ID; if bilingual, both tracks share identical ID set/count/order.
-4. **`docs/USER_GUIDE.md` or `docs/API_REFERENCE.md`** *(Standard and Full)* — the observable surface, template chosen by `project.type`. Under Lite, do not write it: declare the type-selected key as an explicit `null` (`docs.user_guide: null` for `cli` / `web-service`, `docs.api_reference: null` for `library`) — the Lite opt-out, with REQUIREMENTS carrying the surface until the upgrade. `docs-only` has no surface doc at any profile. Each behavior subsection cites its owning `{{PREFIX}}-XXX`. A doc you write must also be declared: keep its key at the real path, because a written doc left `null` gets no scans. Gate: every cited ID exists in REQUIREMENTS; surface tables match source 1:1.
-5. **`README.md`** — onboarding: entry table, quick start, architecture overview *derived from the JSON when present*, agent-onboarding pointer, verification commands, neutrality checklist, doc cross-links. Gate: every quick-start command appears in the surface doc (under Lite or `docs-only`, in the REQUIREMENTS row that carries that surface); neutrality sweep clean.
+1. **`docs/architecture.json`** *(Full profile — Lite and Standard skip this step; under Full the doctrine still gates the doc on `project.type` and need. Any skip sets `docs.architecture: null` before any template is rendered.)* No template file exists for it; the shape below is its only statement. Start from the skeleton. The doctrine derives the component list from the entry points, AGENTS Key Files, and README Main Components; AGENTS and README are written in steps 5 and 6, so mine the list from the source's entry points now and keep the three in step when you write them:
+
+   ```json
+   {
+     "components": [
+       { "id": "<entry-point path>", "label": "<symbol>", "region": "<region id>",
+         "position": { "x": 0, "y": 0 }, "size": { "w": 4, "h": 2 } }
+     ],
+     "connections": [
+       { "from": "<component id>", "to": "<component id>", "label": "<what flows>" }
+     ],
+     "regions": [
+       { "id": "<region id>", "label": "<boundary name>" }
+     ]
+   }
+   ```
+
+   | Field | Rule |
+   |---|---|
+   | `components[].id` | Stable; never renamed. An entry point uses its repo-relative path — the one the README entry table prints. Any other component (a store, a client, a module) uses a stable name of the same kind: its path for a file, its symbol for a module. |
+   | `components[].label` | What a reader looks for in source. When it names a symbol, the symbol exists. |
+   | `components[].region` | Optional; an `id` from `regions`. |
+   | `components[].position`, `.size` | Renderer coordinates in any consistent unit; they change only in an intentional restructure. |
+   | `connections[].from`, `.to` | Each is a `components[].id`. That is what "resolves" means. |
+   | `connections[].label` | What flows. When it names a flag, the flag exists. |
+   | `regions[]` | Optional boundaries; README's Architecture Overview lists their labels. |
+
+   Gate: JSON parses; every `connections[].from` and `.to` is a `components[].id`; every component or connection label that names a symbol or a flag exists in source.
+2. **`docs/WORKFLOW.md`** *(Standard and Full — Lite skips this step and `docs.workflow` stays `null`)* — **ported as-is** (verbatim except its declared substitution points) from `WORKFLOW-<platform>.template.md`. The platform is the team's review platform, not `ci.platform`: when neither Q3 nor the remote settles it, ask which one before porting. Substitute the H1 platform name, the `Template-Source:` marker, and every `{{PLACEHOLDER}}` in the body (build/test/smoke commands, prefix, bilingual conditionals). Resolve the CI-runners line from config `ci.runners` (comma-separated runner names), or **delete the whole line** when config declares no runners — the doc gate checks its `ci-runners:` marker against config. While no WORKFLOW doc is seeded and config declares runners, that line sits in README instead: the README template's stand-in for this doc carries it. The checker reads the marker in any governed doc. Do **not** re-author its prose — the review loop, comment style, and red lines are platform constants. Gate: no `{{` remains in the doc, and it differs from its template only at its declared substitution points.
+3. **`docs/REQUIREMENTS.md`** — Problem/Goals/Non-Goals, enumerated `{{PREFIX}}-001..N` requirements (one per observable behavior), domain/event model, **empty** Iteration History (append-only from here), acceptance criteria, verification commands. Gate: every entry-point behavior maps to ≥1 ID; while no surface doc is seeded, every row carries, in a code span, the command / call that exercises it; if bilingual, both tracks share identical ID set/count/order.
+4. **`docs/USER_GUIDE.md` or `docs/API_REFERENCE.md`** *(Standard and Full)* — the observable surface, template chosen by `project.type`. Under Lite, do not write it: the type-selected key stays the explicit `null` Phase A declared (`docs.user_guide: null` for `cli` / `web-service`, `docs.api_reference: null` for `library`) — the Lite opt-out, with REQUIREMENTS carrying the surface until the upgrade. `docs-only` has no surface doc at any profile. `{{SURFACE_DOC_ROLE}}` is the kind of surface: `commands, flags, and output` for a CLI, `endpoints and screens` for a web service, `the public API` for a library. Each behavior subsection cites its owning `{{PREFIX}}-XXX`. A doc you write must also be declared: keep its key at the real path, because a written doc left `null` gets no scans. Gate: every cited ID exists in REQUIREMENTS; surface tables match source 1:1.
+5. **`README.md`** — onboarding: entry table, quick start, architecture overview *derived from the JSON when present*, agent-onboarding pointer, verification commands, neutrality checklist, doc cross-links. Gate: every quick-start command appears in the surface doc (under Lite or `docs-only`, in the REQUIREMENTS row that carries that surface); neutrality sweep clean. While no surface doc is seeded, a quick-start command's `must_appear_in` names `readme` and `requirements` instead of the surface key: a rule that targets only the unseeded surface key withdraws.
 6. **`AGENTS.md`** — **lean**: repo facts + the co-op contract (change-flow, sign-off, Stop-and-Ask). *What/Done* only — **no** generic agent discipline, **no** platform-CLI rules. Gate: every Key-Files path exists; every dev command runs clean; **≤ `checks.line_limits.agents` lines**; no platform-CLI rule leaked in.
 7. **`docs/VALIDATION.md`** — seed **empty** with the file H1 and the per-feature block template in a comment, placeholders resolved to TARGET's real prefix and commands. Gate: file exists; seed parses; no `<command>`/`{{PLACEHOLDER}}` left.
 
 Also write **`AGENTIC-MODE.md`** (root index) and **`agentic-mode/SELF-TEST.md`**
 (from their templates), under every doc-set profile. These are resident meta
-files, not part of the chain.
+files, not part of the chain. Gate: every path in the index's Doc Inventory
+and precedence tables exists, and every section a precedence cell names exists.
 Render their body prose in the TARGET's chosen language, but keep the canonical
 English section headings and the `Template-Source:` markers exactly as the
 templates carry them — headings are cross-repo reference anchors (see
@@ -260,19 +298,25 @@ sensitive area — for the code owner to fill in.
    - gitlab → `templates/ci-gitlab.template.yml` → `.gitlab-ci.yml`
    - github → `templates/ci-github.template.yml` → `.github/workflows/agentic-docs.yml`
 
-   The doctrine's Full row also names "full SELF-TEST automation in CI". The
-   toolkit ships nothing beyond this gate for it: the gate runs the SELF-TEST
-   §A command for every profile, and §B stays manual.
+   This gate is the toolkit's whole CI automation at every profile: it runs the
+   SELF-TEST §A command, and §B stays manual.
 3. **Run** `python scripts/check_agentic_docs.py --config agentic-mode/config.json`.
    Fix the offending **doc**, not the checker, and re-run until it exits clean.
    A failed row blocks hand-off. (`checks.entrypoints` byte-compiles `.py`
-   entries; non-Python entrypoints get an existence check only.)
+   entries; non-Python entrypoints get an existence check only.) Then check by
+   hand that every path that README, AGENTS, and the index name as part of
+   TARGET exists, and that every section their pointers name exists (the index's
+   precedence table, README's cross-links); the checker checks neither. A path
+   outside TARGET is not checked: the toolkit's own docs, or a file the program
+   writes at run time.
 4. **Placeholder sweep.** No check in the checker looks for a leftover
    placeholder, in any file: it scans a declared index for IDs and deny words
    but never for `{{`, and it does not scan `agentic-mode/SELF-TEST.md` or the
    CI file at all. Sweep every generated file yourself: `grep -rn '{{'` over
-   the index, AGENTS, README, `docs/`, `agentic-mode/`, and the CI file must
-   return **nothing**.
+   the index, AGENTS, README, `docs/`, `agentic-mode/`, and the CI file, when
+   one was placed, must return **nothing**. In Adopt mode, sweep the files you
+   generated or added pieces to; a hand-written doc you did not touch is not
+   swept. That sweep also catches an unresolved region.
 
 ---
 
@@ -298,37 +342,77 @@ Summarize for the user:
 
 ## Adopt mode — merging into a repo that already has docs
 
-TARGET already carries some layers. **Merge, never clobber.**
+TARGET already carries some layers. **Merge, never clobber.** If TARGET was
+rendered from these templates (its docs carry `Template-Source:` markers) and
+the run changes its doc-set profile, use **Upgrading the doc-set profile**
+below: this mode never overwrites, so it cannot move a rendered doc to a new
+profile.
 
 1. **Inventory.** Map what exists to the target layout. Record path + which
-   contract role it fills.
+   contract role it fills. Run the Phase A scan and interview first if they have
+   not run: steps 3 and 4 need their answers.
 2. **Do not overwrite.** Treat every existing file as authoritative for its own
    content. Never replace a hand-written doc wholesale with a template.
-3. **Fill gaps only.** For each **missing** layer, generate it from its template
-   (Phase B rules and gates apply per file). For each **partial** layer, add only
-   the missing contract pieces — e.g. an existing REQUIREMENTS without stable IDs
-   gets an ID column and an (empty, append-only) Iteration History appended; an
-   existing AGENTS gains the co-op-contract / Stop-and-Ask section if absent, and
-   is trimmed toward the line limit only with the user's ok.
-4. **Reconcile the config.** Point `docs.*` at wherever the real files live
-   (names may differ from defaults — the config is the indirection layer).
+3. **Reconcile the config.** Point `docs.*` at wherever the real files live
+   (names may differ from defaults — the config is the indirection layer). Seed
+   every layer that the doc-set profile includes, and keep every layer that
+   the target already has, even a layer that the profile does not include.
+   Declare a path for each of those layers, and for the resident index
+   (`AGENTIC-MODE.md`). The resident index and `agentic-mode/SELF-TEST.md`
+   belong to every doc-set profile: never declare `docs.index` `null`. Declare
+   `null` only for a layer that neither exists nor belongs to the profile.
+   `null` means that no such doc exists. Templates read this block to learn
+   which layers exist, so write all of it before step 4.
+4. **Fill gaps only.** For each layer that the profile includes and that the
+   target still lacks, and for each of the two resident files (`AGENTIC-MODE.md`,
+   `agentic-mode/SELF-TEST.md`) when it is missing, generate it from its template
+   (Phase B rules and gates apply per file). For each **partial** layer, add
+   only the missing contract pieces, under the template's headings and without
+   moving any hand-written text — e.g. an existing REQUIREMENTS without stable
+   IDs gets an ID column and an (empty, append-only) Iteration History appended;
+   an existing README gains the template's missing sections after its own text,
+   and its hand-written quick start gets the `Quick Start` heading above it; an
+   existing AGENTS gains the template's missing sections by their headings, from
+   Project Scope and Key Files through MR / PR Governance and Git Hygiene, and
+   is trimmed toward the line limit only with the user's ok. A doc you added
+   pieces to carries that template's `Template-Source:` marker from then on, so
+   a later upgrade finds its regions.
 5. **Wire enforcement + converge.** Copy the checker, add the CI gate whenever
-   `ci.platform` is `gitlab` or `github` (Phase C step 2), run the checker, and
-   close the reported gaps until clean. Report every gap you filled and every
-   existing file you left untouched.
+   `ci.platform` is `gitlab` or `github` (Phase C step 2), run the checker and
+   close the reported gaps until clean, then run the Phase-C hand check of paths
+   and section names and the placeholder sweep. Report every gap you filled and
+   every existing file you left untouched, and summarize as Phase D does.
 
 Adopt is deliberately conservative: the win is coherence and enforceability, not
 a rewrite.
 
 ---
 
+## Upgrading the doc-set profile
+
+When a trigger in the doctrine's doc-set table fires, move up to the row the request names. The repo's row is the highest row of that table whose every layer that `project.type` does not rule out is upgraded. When the repo's row is the requested row or above it, only the first two cases below can apply. A layer is upgraded when its proof in step 4 holds: it is declared, every region for it is ported, and no stand-in text or stale fill-in sentence for it remains. The docs must first be at the toolkit's current template versions: when a `Template-Source:` marker names an older version, follow "Upgrading an adopted repo to a newer toolkit version" first. Then start with the proof in step 4, which changes nothing, for each layer of the requested row that `project.type` does not rule out:
+
+- The proof holds, and an Iteration History entry and a VALIDATION block already record the upgrade: there is nothing to do.
+- The proof holds, and either record is missing: do step 5 only.
+- The layer's path is already declared but the proof fails: an earlier run stopped mid-way. Run all five steps again; their guards skip what is already done.
+- Otherwise: run all five steps once, covering every layer that the requested row adds and that `project.type` does not rule out.
+
+1. **Write the layer** with its Phase B step and gate, in Phase B order, and declare the layer's path under `docs` in the same step. There is no interview bundle here: resolve placeholders from the target's own config and AGENTS Development Commands. A written doc that is left `null` gets no scans. A layer whose file already exists keeps that file, declared or not; a hand-written doc is never rewritten. Everything else in this step still applies to it: the declaration, the `must_appear_in` move, and the gate. For a surface doc, also move each quick-start command's `must_appear_in` target from `requirements` to the surface key, so the new doc becomes the one the checker reads. The quick-start commands are the ones README's Quick Start lists; other command rules stay as they are. The surface key is `docs.user_guide`, or `docs.api_reference` for a library. For the WORKFLOW doc, port the platform template that matches the team's review platform, and ask which one if the interview did not settle it.
+2. **Move what the stand-in held for the layer.** The content a stand-in kept for the layer now has its home in the new doc: the CI-runners line leaves README for the WORKFLOW doc, and the surface doc carries the exercising commands it took from the requirement rows when step 1 wrote it. Remove every stand-in whose region has an empty first branch: search the templates for the layer's opener followed directly by `{{ELSE}}`. What a stand-in wrote for itself stays where it is as an allowed mirror. For a surface doc that is the exercising commands in the requirement rows. For the architecture doc those are README Main Components, README Data Flow, and AGENTS Key Files. `AGENTS.md` keeps its MR / PR Governance and Git Hygiene sections at every profile. The Controlled-Duplication table in BOOTSTRAP-CORE lists these mirrors.
+3. **Port the regions.** Search the templates for `{{IF <PLACEHOLDER>}}` with the new layer's placeholder: `SURFACE_DOC_PATH` for a surface doc, `WORKFLOW_PATH` for the WORKFLOW doc, `ARCHITECTURE_PATH` for the architecture doc. Each region is one item to port into the doc that was rendered from that template, and one line can hold several regions. Where the doc carries the stand-in, replace it with the first branch. Where the region left nothing behind, add its first branch where the region sits in the template. A region whose first branch is empty was handled in step 2. If the doc already carries the first branch where the region sits, leave it as it is, so a re-run after an interruption adds nothing twice. Then re-read the fill-in text you wrote at bootstrap that describes the doc set: it sits in no region, and it is found where a placeholder asked for it, in README's sentence listing what `docs/` contains, its onboarding text, AGENTS Project Scope and Key Files, and the index's inventory prose. Name the new layer where it belongs, and rewrite any sentence that still describes the doc set as it was. Re-run the Phase B gate of every doc you changed.
+4. **Prove the upgrade.** Run the checker, the Phase-C hand check of paths and section names, and the Phase-C placeholder sweep. Then check the regions themselves, because the checker does not. For each region of each new layer's placeholder: the first branch, when it has text, must be in the doc that was rendered from its template, and its stand-in must be gone from that doc. Search that doc only, and skip its `Template-Source` note, which quotes a stand-in on purpose. Once a WORKFLOW doc exists, README must no longer carry the CI-runners line. Once a surface doc exists, each quick-start command's `must_appear_in` names the surface key. Then read the fill-in text from step 3: no search finds a stale sentence for you, and it must describe the doc set as it is now. A failed check points back to its step: a failed gate to step 1 (repair a file this upgrade wrote; a hand-written doc that fails its gate is reported to the user, not rewritten), a remaining stand-in whose region has an empty first branch (the CI-runners line is one) to step 2, a missing first branch or any other remaining stand-in to step 3, and a stale fill-in sentence to step 3 as well. Redo that step, then prove again.
+5. **Record the upgrade once.** The record cites the change that carries the upgrade: its issue or MR/PR, or else the commit that completes steps 1 to 4. When you commit, commit on the branch the target's WORKFLOW doc prescribes, and commit steps 1 to 4 first. When the repo's rules forbid committing without consent, ask first, as its Stop-and-Ask list requires. Add an Iteration History entry and a VALIDATION block with that citation; the block follows the block template in the target's `docs/VALIDATION.md`. The upgrade is a major doc change, so also run the read-back probe (SELF-TEST §D) and record its outcome; when no zero-context reader is available, record the probe as not run. Then run the checker once more. On a re-run, an entry and a block that already record this upgrade stay as they are: add nothing.
+
+A target that was rendered from these templates goes through these steps when it changes its doc-set profile. Adopt mode does not do this for it.
+
+---
+
 ## Upgrading an adopted repo to a newer toolkit version
 
 Adopted repos carry two kinds of artifact that age: the checker (copied
-verbatim in Phase C) and every doc rendered from a template that carries a
-`Template-Source:` marker — the ported WORKFLOW, the resident index
-(`AGENTIC-MODE.md`), and `agentic-mode/SELF-TEST.md`. A toolkit release changes
-none of them silently — upgrade on purpose, and record it like any change.
+verbatim in Phase C) and every doc rendered from a Markdown template — each
+carries a `Template-Source:` marker. A toolkit release changes none of them
+silently — upgrade on purpose, and record it like any change.
 
 1. **Read the delta before swapping.** Diff your checker against the new tag
    before replacing it (`git -C <toolkit-repo> show <tag>:checker/check_agentic_docs.py`
@@ -339,12 +423,14 @@ none of them silently — upgrade on purpose, and record it like any change.
    A new check firing on your current docs is the upgrade working as designed —
    fix the docs (add the missing declaration), not the checker.
 3. **Re-port each marked doc only at its declared substitution points** when
-   its `Template-Source` bumps (@v1 → @v2): the template header lists what moved
+   its `Template-Source` bumps (@v1 → @v2): the marker lists what moved
    (new lines, new sections). Check every doc that carries a marker, not only
-   WORKFLOW, because a release can move the index or SELF-TEST template too. Port
-   the changes into your copy; local sections you authored yourself (recipes,
-   checklists) are yours to keep — `Template-Source` records the base you ported
-   from, not a lockstep contract.
+   WORKFLOW, because a release can move the index or SELF-TEST template too. A
+   doc rendered from a template that gained its marker in a later release
+   carries none yet: port what that first marked version's note lists, then add
+   the marker. Port the changes into your copy; local sections you authored
+   yourself (recipes, checklists) are yours to keep — `Template-Source` records
+   the base you ported from, not a lockstep contract.
 4. **Record it like any change**: REQUIREMENTS iteration-history entry +
    VALIDATION block citing the PR, with the diff-against-tag as evidence.
 

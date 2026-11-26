@@ -1,5 +1,5 @@
 <!--
-TEMPLATE: docs/WORKFLOW.md for ci.platform == "gitlab". This doc is ported as-is into the target repo:
+TEMPLATE: docs/WORKFLOW.md for targets whose review platform is GitLab. This doc is ported as-is into the target repo:
 substitute only the H1 platform name, the Template-Source marker, and the {{PLACEHOLDER}} test/build
 commands (from AGENTS Development Commands). Do NOT re-author the review-loop body — the issue→branch→
 commit→MR→review conventions and red lines are platform constants.
@@ -11,7 +11,9 @@ when config bilingual.enabled == true; if monolingual, replies are single-langua
 still EOF-terminated multi-line). Chat replies are never bound by the external-reply format.
 `glab` appears here because this is the GitLab platform doc — it is the ONLY doc allowed to name it.
 Harness-neutral otherwise: never name a specific agent product or model.
-Template-Source: agentic-bootstrap/WORKFLOW-gitlab@v2
+Template-Source: agentic-bootstrap/WORKFLOW-gitlab@v3  (@v3: the two docs-sync lines name "the observable
+surface" instead of a surface doc, so a docs-only target ports them as-is)
+Rendered copies keep the Template-Source lines in a comment at the top of the file; the rest of this header is not rendered.
 -->
 
 # GitLab Workflow — Collaborator Rule
@@ -26,7 +28,7 @@ Single source of truth: `agentic-mode/config.json` (`ci.runners`). To change run
 - **Without explicit user consent, do not commit, push, amend, rebase, force-push, or `--no-verify`.** "The user agreed once" is not standing consent; ask every time.
 - **No blanket staging** (`git add -A` / `git add .`). Stage files explicitly: `git add <file1> <file2>`. Ignored directories can still let stray untracked files slip into the stage.
 - **Never claim tests pass without actually running them.** Run the repo's real commands (from AGENTS Development Commands): build/compile `{{BUILD_CMD}}`; tests `{{TEST_CMD}}`. Green means you saw the passing summary, not "should pass." (see §10 Red lines)
-- **A behavior change must sync docs in the same change** (REQUIREMENTS iteration history + observable-surface doc + VALIDATION). Otherwise it is not done.
+- **A behavior change must sync docs in the same change** (REQUIREMENTS iteration history + the observable surface + VALIDATION). Otherwise it is not done.
 - **MR and issue comments must be self-contained.** The reader has not seen your chat history; write so a cold read is enough.
 - External replies posted to GitLab issues/MRs use an EOF-terminated multi-line format (HEREDOC). {{IF_BILINGUAL: post both languages.}} Chat replies are exempt.
 
@@ -150,7 +152,7 @@ python scripts/check_agentic_docs.py --config agentic-mode/config.json
 - [ ] REQUIREMENTS — append an iteration-history entry {{IF_BILINGUAL: one per language track, kept in lock-step}}.
 - [ ] Add a new `{{PREFIX}}-XXX` requirement row if a new behavior surfaced.
 - [ ] VALIDATION — append a per-feature block (Code / Testing / Verification Commands / Status).
-- [ ] README / observable-surface doc — update if a command, key, endpoint, or visible behavior changed.
+- [ ] README / observable surface — update if a command, key, endpoint, or visible behavior changed.
 - [ ] `python scripts/check_agentic_docs.py --config agentic-mode/config.json` passes.
 
 ## 5. Push and MR
