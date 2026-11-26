@@ -71,4 +71,4 @@ Rendered copies keep the Template-Source lines in a comment at the top of the fi
 
 <!-- ==== SECOND LANGUAGE TRACK — keep ONLY if config bilingual.enabled == true; else delete from here down ==== -->
 ## {{SECONDARY_LANGUAGE_HEADER}}
-{{Mirror every section above in lock-step: same headings, same keyboard table, same flag list, same command count.}}
+{{Mirror every section above in lock-step: the same sections, same keyboard table, same flag list, same command count.}}
