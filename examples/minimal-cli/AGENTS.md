@@ -15,7 +15,7 @@ tool, model, or dispatch to use — that is your own environment's business. Rea
 
 - A tiny standard-library CLI task tracker, and the worked example for the
   agentic-mode documentation contract.
-- Primary maintained entry point: `todo.py`. There is no secondary entry point.
+- Primary maintained entry point: `todo.py`.
 - **Project-neutral.** Do not add brand names, hardcoded hosts, IP literals, or
   absolute machine paths to code, docs, tests, or examples. The store path is a
   runtime input (`--store` / `TODO_STORE`).

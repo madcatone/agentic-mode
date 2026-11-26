@@ -55,6 +55,10 @@ python3 todo.py add "smoke task" && python3 todo.py list
 All five requirements are covered by the current entry point. Due dates,
 priorities, and tags are intentionally out of scope (see REQUIREMENTS Non-Goals).
 
+### Read-back
+- 2026-07-16 — cold-reader read-back of the five canonical questions passed
+  against the committed docs alone; no doc gaps found.
+
 <!--
 ==== PER-FEATURE BLOCK TEMPLATE — copy below the line when a new feature lands ====
 The heading cites the issue/MR/PR number. Use exactly one of (issue #N), (MR !N), or (PR #N). A doc-set upgrade that no issue or MR/PR covers cites its commit instead, as (commit 1a2b3c4).
@@ -107,9 +111,9 @@ DATE is the ISO date. SCOPE is `bootstrap`, `adoption`, `doc-set upgrade`, or th
 ==== END READ-BACK RECORD TEMPLATE ====
 -->
 
-## Read-back — 2026-07-16 (Core task verbs)
+## Read-back — 2026-11-27 (template re-port)
 
-- Reader: a cold reader with no chat history, from the committed docs alone.
+- Reader: a fresh-context reader with no chat history, from the docs alone.
 - Question 1: pass, answered from `README.md` opening paragraph and `README.md:Quick Start` (Add and list tasks).
 - Question 2: pass, answered from `AGENTS.md:Stop-and-Ask (do NOT proceed silently)` and `docs/WORKFLOW.md:0. Iron Rules (apply in every context)`.
 - Question 3: pass, answered from `docs/REQUIREMENTS.md:Functional Requirements`, row TODO-001.

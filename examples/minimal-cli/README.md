@@ -58,7 +58,6 @@ python3 todo.py remove 1
 
 ### `todo.py`
 
-- `_store_path` / `_load` / `_save`: store-path resolution and JSON read / write.
 - `cmd_add` / `cmd_list` / `cmd_done` / `cmd_remove`: the four verbs; each
   returns the text to print, and the mutating ones edit the task list in place.
 - `build_parser` / `main`: the argument surface (`--store`, `add`, `list --all`,
