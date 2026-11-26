@@ -22,12 +22,12 @@ canonical English (they are cross-repo reference anchors — doctrine and upgrad
 cite them by name).
 Harness-neutral: never name a specific agent product, model, or proprietary tool.
 Template-Source: agentic-bootstrap/AGENTIC-MODE@v4  (@v4: the inventory lists the layers in reading
-order, architecture third, and a sentence under it says so; the Enforcement paragraph routes each
-non-mechanized check to where it lives instead of to SELF-TEST §B, and ends with two sentences on
-the placeholder sweep; the Canonical Questions carry no seeding instruction; the doctrine pointers
-say this repo keeps no copy and take the toolkit's location; the requirements row allows for no
-event model; the process-rules row no longer names the H1 as a substitution point; commands run
-`python3`)
+order, architecture third, and a short paragraph under it says so; the Enforcement paragraph
+routes each non-mechanized check to where it lives instead of to SELF-TEST §B, and ends with two
+sentences on the placeholder sweep; the Canonical Questions carry no seeding instruction and no
+question count; the doctrine pointers say this repo keeps no copy and take the toolkit's
+location; the requirements row allows for no event model; the process-rules row no longer names
+the H1 as a substitution point; commands run `python3`)
 Rendered copies keep the Template-Source lines in a comment at the top of the file; the rest of this header is not rendered.
 -->
 
