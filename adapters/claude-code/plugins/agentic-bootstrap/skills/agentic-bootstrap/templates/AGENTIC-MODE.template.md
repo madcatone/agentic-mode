@@ -20,10 +20,12 @@ Keep between three and seven questions.
 Render body prose in the TARGET's primary language; keep the section headings in
 canonical English (they are cross-repo reference anchors — doctrine and upgrades
 cite them by name).
-A target with no entry point makes three substitutions. In the Doc Inventory, the README row's
+A target with no entry point makes four substitutions. In the Doc Inventory, the README row's
 `which entry point to pick` reads `which page to pick`. In the Canonical Questions, question 1's
 `which entry point do I pick` reads `which page do I pick`, and question 4's
-`(the command / key / endpoint / API)` reads `(the page and heading)`.
+`(the command / key / endpoint / API)` reads `(the page and heading)`. In the Source-of-Truth
+Precedence table, `What should users type, press, see, or call?` reads `Which page answers a
+reader's question?`.
 Harness-neutral: never name a specific agent product, model, or proprietary tool.
 Template-Source: agentic-bootstrap/AGENTIC-MODE@v5  (@v4: the inventory lists the layers in reading
 order, architecture third, and a short paragraph under it says so; the Enforcement paragraph
@@ -34,7 +36,7 @@ location; the requirements row allows for no event model; the process-rules row 
 the H1 as a substitution point; commands run `python3`; the header says which words a target
 without runtime placeholders drops.
 @v5: the behavior-contract stand-in also allows a page in place of a command, and the header names
-the three substitutions a target with no entry point makes; the IF branches are unchanged, so a
+the four substitutions a target with no entry point makes; the IF branches are unchanged, so a
 copy rendered with a surface doc needs no port)
 Rendered copies keep the Template-Source lines in a comment at the top of the file; the rest of this header is not rendered.
 -->

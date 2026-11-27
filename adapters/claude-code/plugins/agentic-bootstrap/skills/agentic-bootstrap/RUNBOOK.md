@@ -227,7 +227,7 @@ it sets the rigor for everything after:
 4. **Primary language + build, test, and smoke commands** — the one command that compiles/builds, the one that runs tests, and the one that runs the primary entry point on a fixture or an example, each verbatim from TARGET. The third is the smoke command. No build step? Agree on a cheap static sanity command (syntax check, lint, byte-compile) to fill `{{BUILD_CMD}}`. No declared test command? Compose one from the test framework the test files import, run it, and use it. No smoke command to mine? Compose the shortest one-line shell command that runs the primary entry point on its primary flow, leaves the repo as it found it, and exits 0. A file the program writes at run time is not a change. When several commands qualify, take the one that exercises the primary flow over one that only prints help or an empty list. For a service that runs until stopped, the command starts it, calls one endpoint, and stops it. It exits with the call's status, and it stops the service whether the call succeeded or failed. When no one line can do that, add one small script to TARGET and make its path the smoke command. Use only what TARGET already depends on. Run it, and use it. For a target with no entry point the smoke command is the docs gate command, and when the scan found no command of its own, the static sanity command byte-compiles the checker's own copy, `python3 -m py_compile scripts/check_agentic_docs.py`. Neither exists before Phase C, step 1 copies the checker. Run them there. TARGET has no tests? Say so in the bundle. The templates then lose their test lines (Phase B, "A placeholder with no value"). A placeholder must never survive unresolved.
 5. **One-line purpose + audience** — internal tool vs external product; who reads/uses it.
 6. **Entry points** — which is primary maintained vs secondary/legacy. A target with no entry point has nothing that is run, imported, or called. Answer `none` for it. Its `checks.entrypoints` stays empty and `{{PRIMARY_ENTRY}}` then has no value (Phase B, "A placeholder with no value").
-7. **Component name + ID prefix** for REQUIREMENTS (`^[A-Z]{2,6}$`, one prefix per component).
+7. **Component name + ID prefix** for REQUIREMENTS (`^[A-Z]{2,6}$`, one prefix per component). Choose a prefix that no file path or heading of TARGET contains. The checker reads `PREFIX-NNN` on any line of any doc other than REQUIREMENTS as a requirement ID, so a page path that contains the prefix fails the gate.
 8. **Problem statement + Goals / Non-Goals** — not derivable from code.
 9. **Bilingual?** — one clean language, or two full tracks? If two, name the secondary-language header.
 10. **Runtime placeholders + neutrality** — which placeholders TARGET needs (e.g. `<package.name>`, `<device-serial>`), and whether the harness-neutrality sweep (and optional IPv4 / machine-path leak sweeps) should run. Default: the harness-neutrality sweep runs and the IPv4 and machine-path sweeps do not.
@@ -470,8 +470,10 @@ sensitive area — for the code owner to fill in.
    one was placed, must return **nothing**. In Adopt mode, sweep the files you
    generated or added pieces to; a hand-written doc you did not touch is not
    swept. That sweep also catches an unresolved region. A target with no entry
-   point greps the same files for `Code edited.`, `Edit the code.`, and
-   `Primary maintained entry point:`, and, when it has no tests, for
+   point greps each doc this protocol rendered from a template, never a
+   hand-written one, for `Code edited.`, `Edit the code.`, and
+   `Primary maintained entry point:`, and `What should users type, press,
+   see, or call?`, and, when it has no tests, for
    `Full tests:`. A hit is a substitution a template header asked for that
    the doc did not make.
 5. **Read-back.** Run the read-back probe (`agentic-mode/SELF-TEST.md`, section D) on the docs as they stand. A bootstrap is a major doc change, so its outcome is done evidence. Record it at the bottom of `docs/VALIDATION.md`, below the comment that holds the templates, with the read-back record template the file carries. When no zero-context reader is available, record the probe as not run. That record does not block hand-off. A gap the probe finds is fixed in the offending doc. Once the record is in place, run steps 3 and 4 again.

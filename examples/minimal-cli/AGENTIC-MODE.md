@@ -8,7 +8,7 @@ location; the requirements row allows for no event model; the process-rules row 
 the H1 as a substitution point; commands run `python3`; the header says which words a target
 without runtime placeholders drops.
 @v5: the behavior-contract stand-in also allows a page in place of a command, and the header names
-the three substitutions a target with no entry point makes; the IF branches are unchanged, so a
+the four substitutions a target with no entry point makes; the IF branches are unchanged, so a
 copy rendered with a surface doc needs no port)
 -->
 
