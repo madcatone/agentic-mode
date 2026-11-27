@@ -23,7 +23,8 @@ skills/agentic-bootstrap/
 ├── reference/BOOTSTRAP-CORE.md     # the doctrine behind every rule (vendored)
 ├── checker/check_agentic_docs.py   # the config-driven gate (vendored)
 ├── checker/config.example.json     # annotated config with every knob (vendored)
-└── templates/                      # fill-in skeletons for every doc + CI files (vendored)
+├── templates/                      # fill-in skeletons for every doc + CI files (vendored)
+└── scripts/check_template_renders.py # proves a rendered target's regions (vendored)
 ```
 
 All resources live **inside this directory** — resolve them relative to this
@@ -50,6 +51,9 @@ path. A skill can only read what it vendors.
    mapping is:
    - RUNBOOK's `doctrine/BOOTSTRAP-CORE.md`  →  `reference/BOOTSTRAP-CORE.md` here.
    - RUNBOOK's `checker/…` and `templates/…`  →  same names, in this directory.
+   - RUNBOOK's `tests/check_template_renders.py`  →  `scripts/check_template_renders.py` here.
+     Run it with `--target <TARGET>` only. Its selftest and its no-argument form read
+     the toolkit's worked example, which this skill does not vendor.
    - `doctrine/FIELD-NOTES.md` (war stories) is **not** vendored; read it in the
      canonical agentic-mode repo if you want the origin lessons.
    Generated files always resolve against the working repo (TARGET); nothing is

@@ -141,7 +141,7 @@ marketplace 即可安裝十二個 plugin 中的任意子集——每個都獨立
 
 | Plugin | 安裝什麼 | 正典來源 |
 | --- | --- | --- |
-| `agentic-bootstrap` | 文件契約 bootstrapper skill（跑 RUNBOOK）。 | `RUNBOOK.md` + `doctrine/BOOTSTRAP-CORE.md` + `templates/` + `checker/`（vendored） |
+| `agentic-bootstrap` | 文件契約 bootstrapper skill（跑 RUNBOOK）。 | `RUNBOOK.md` + `doctrine/BOOTSTRAP-CORE.md` + `templates/` + `checker/` + `tests/check_template_renders.py`（vendored） |
 | `gcm` | commit message 慣例 skill。 | [`playbooks/COMMIT-MESSAGES.md`](playbooks/COMMIT-MESSAGES.md) |
 | `two-axis-review` | 雙軸 review skill。 | [`playbooks/TWO-AXIS-REVIEW.md`](playbooks/TWO-AXIS-REVIEW.md) |
 | `review-response` | review-response 紀律 skill。 | [`playbooks/REVIEW-RESPONSE.md`](playbooks/REVIEW-RESPONSE.md) |

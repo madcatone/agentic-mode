@@ -14,6 +14,11 @@ T2  a rendered target proves its regions (RUNBOOK.md, "Upgrading the doc-set pro
                                                           bootstrap, an adoption or an upgrade),
                                                           held against this checkout's templates/
 
+The first two forms need this checkout's `examples/minimal-cli`; the selftest
+also needs its doctrine. A copy vendored without them serves `--target` only.
+Such a copy sits one directory below the directory that carries its own
+`templates/`, and it exits 2 on the other two forms.
+
 Output: one `<file>:<line>: [<category>] <message>` line per finding or notice, then a summary
 line per part. Exit 0 clean, 1 a finding or a failed selftest check, 2 a usage or I/O error (a
 directory that cannot be listed, an unusable config, a selftest anchor that no longer occurs
@@ -88,7 +93,7 @@ from typing import Dict, Iterator, List, NamedTuple, Optional, Sequence, Set, Tu
 
 __all__ = ["main"]   # a script, not a library: the command line is its only interface
 
-REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # the parent of tests/
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # the directory that carries templates/
 TEMPLATES_DIR = os.path.join(REPO, "templates")
 EXAMPLE_DIR = os.path.join(REPO, "examples", "minimal-cli")
 DOCTRINE = os.path.join(REPO, "doctrine", "BOOTSTRAP-CORE.md")
