@@ -33,26 +33,26 @@ Name a skill directly. Read the skill before you recommend it, and give one exam
 
 | The user wants to | Skill |
 |---|---|
-| Check that the agent understood their goal and the problem before it starts | [`/in-your-own-words`](../in-your-own-words/SKILL.md) |
-| Get a prompt rewritten deeper, not bigger, before sending it | [`/sharpen`](../sharpen/SKILL.md) |
-| Learn the expert words for what they're building, then get the description rewritten with those words | [`/reframe`](../reframe/SKILL.md) |
-| Catch up on what changed in this chat since their last message | [`/ketchup`](../ketchup/SKILL.md) |
-| Catch up like `/ketchup`, as a short subtitled video, with a text fallback when no video tool is available | [`/ketchup-video`](../ketchup-video/SKILL.md) |
-| Know what a small diff could break outside itself | [`/blast-radius`](../blast-radius/SKILL.md) |
-| Settle types and module shape before code that crosses a function boundary | [`/architect`](../architect/SKILL.md) |
-| Get several attempts at one brief, merged into the best one | [`/arena`](../arena/SKILL.md) |
-| Have adversaries try to break a diff, and keep only findings a run proves | [`/interrogate`](../interrogate/SKILL.md) |
-| Fix a bug test-first when a cheap local test exists | [`/tdd`](../tdd/SKILL.md) |
-| Apply TypeScript rules to `.ts` or `.tsx` work | [`/typescript-best-practices`](../typescript-best-practices/SKILL.md) |
-| Clean AI tells out of prose | [`/unslop`](../unslop/SKILL.md) |
-| Write docs, an RFC, a README, a PR description, or a commit message to a standard | [`/technical-writing`](../technical-writing/SKILL.md) |
-| Give agents a scripted way to drive the app and prove behavior | [`/create-verification-skill`](../create-verification-skill/SKILL.md) |
-| Bring a verification skill and its feature map back in line with the app | [`/maintain-verification-skill`](../maintain-verification-skill/SKILL.md) |
-| Formally verify a race, invariant, or other property that tests rarely reach | [`/create-formal-verification-skill`](../create-formal-verification-skill/SKILL.md) |
-| Bring a formal verification back in line after the code it covers changed | [`/maintain-formal-verification-skill`](../maintain-formal-verification-skill/SKILL.md) |
-| Draw a TLA+ model as a Mermaid statechart and report the shortest path to each broken rule | [`/statechart`](../statechart/SKILL.md) |
-| Vet a performance number before reporting or acting on it | [`/benchmark-checklist`](../benchmark-checklist/SKILL.md) |
-| Run a large or cross-cutting change, or one to review after stepping away | [`/figure-it-out`](../figure-it-out/SKILL.md) |
+| Check that the agent understood their goal and the problem before it starts | `/in-your-own-words` |
+| Get a deeper prompt than the one you would send | `/sharpen` |
+| Learn the expert words for what they're building, then get the description rewritten with those words | `/reframe` |
+| Catch up on what changed in this chat since their last message | `/ketchup` |
+| Catch up like `/ketchup`, as a short subtitled video. The text reply is the fallback when the machine lacks a slide-to-video tool | `/ketchup-video` |
+| Know what a small diff could break outside itself | `/blast-radius` |
+| Settle types and module shape before code that crosses a function boundary | `/architect` |
+| Get several attempts at one brief, merged into the best one | `/arena` |
+| Have adversaries try to break a diff, and keep only findings a run proves | `/interrogate` |
+| Fix a bug test-first when a cheap local test exists | `/tdd` |
+| Apply TypeScript rules to `.ts` or `.tsx` work | `/typescript-best-practices` |
+| Clean AI tells out of prose | `/unslop` |
+| Write docs, an RFC, a README, a PR description, or a commit message to a standard | `/technical-writing` |
+| Give agents a scripted way to drive the app and prove behavior | `/create-verification-skill` |
+| Bring a verification skill and its feature map back in line with the app | `/maintain-verification-skill` |
+| Formally verify a race, invariant, or other property that tests rarely reach | `/create-formal-verification-skill` |
+| Bring a formal verification back in line after the code it covers changed | `/maintain-formal-verification-skill` |
+| Draw a TLA+ model as a Mermaid statechart and report the shortest path to each broken rule | `/statechart` |
+| Vet a performance number before reporting or acting on it | `/benchmark-checklist` |
+| Run a large or cross-cutting change, or one to review after stepping away | `/figure-it-out` |
 | Find their way around this pack | `/poteto-help` |
 
 If a skill directory next to this one is missing from the table, read its frontmatter and route by its description. The `principle-*` directories are covered under principles below.
