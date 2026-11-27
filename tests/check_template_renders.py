@@ -1153,7 +1153,7 @@ T2 = (
     Mutation("F4", "stand-in put back beside the ported region", "example", "AGENTS.md",
              "- `docs/REQUIREMENTS.md`: behavior contract (IDs: `TODO-XXX`).",
              "- `docs/REQUIREMENTS.md`: behavior contract (IDs: `TODO-XXX`). Also carries the observable "
-             "surface, one exercising command per row.", "target-stand-in-remains"),
+             "surface, one exercising command or page per row.", "target-stand-in-remains"),
     Mutation("F4", "CI-runners stand-in line put back", "example", "README.md", "## Project-Neutrality Checklist",
              "CI runners executing this repo's pipelines: linux-small <!-- ci-runners: linux-small -->\n\n"
              "## Project-Neutrality Checklist", "target-stand-in-remains"),

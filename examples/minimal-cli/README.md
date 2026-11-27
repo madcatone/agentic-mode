@@ -1,8 +1,10 @@
 <!--
-Template-Source: agentic-bootstrap/README@v2  (@v2: Data Flow is two sample lines, the two component
+Template-Source: agentic-bootstrap/README@v3  (@v2: Data Flow is two sample lines, the two component
 bullets name their own job slot, and the header states the no-value rule and the sample rule for
 this template's slots; the verification sentence no longer says "above";
-commands run `python3`)
+commands run `python3`.
+@v3: a target with no entry point lists pages in place of entry points and reading lines in place of
+Quick Start commands, as the header says; every other target renders no change)
 -->
 
 # todo

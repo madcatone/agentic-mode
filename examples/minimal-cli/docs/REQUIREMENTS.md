@@ -1,8 +1,11 @@
 <!--
-Template-Source: agentic-bootstrap/REQUIREMENTS@v2  (@v2: the Event Model heading is one
+Template-Source: agentic-bootstrap/REQUIREMENTS@v3  (@v2: the Event Model heading is one
 descriptive slot; the two Iteration History entries are samples and the history starts empty;
-the superseded-row note shows a three-digit ID;
-the rule that superseded rows stay is a rendered sentence)
+the superseded-row note shows a three-digit ID; the rule that superseded rows stay is a
+rendered sentence.
+@v3: the no-surface stand-in also allows a page in place of a command, and the header states
+what a target with no entry point does; the IF branches are unchanged, so a copy rendered
+with a surface doc needs no port)
 -->
 
 # todo — Requirements and Evolution

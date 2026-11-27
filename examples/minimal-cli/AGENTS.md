@@ -1,8 +1,11 @@
 <!--
-Template-Source: agentic-bootstrap/AGENTS@v2  (@v2: Git Hygiene allows deleting a merged local
+Template-Source: agentic-bootstrap/AGENTS@v3  (@v2: Git Hygiene allows deleting a merged local
 branch, as the WORKFLOW doc does; the header states the light-profile note and the no-value rule
 for this template's optional slots; the Change-Flow Boundary heading drops its parenthetical;
-Change Flow step 6 exempts a command that failed before the change; commands run `python3`)
+Change Flow step 6 exempts a command that failed before the change; commands run `python3`.
+@v3: the two no-surface stand-ins also allow a page in place of a command, and the header states
+the substitutions a target with no entry point makes; the IF branches are unchanged, so a copy
+rendered with a surface doc needs no port)
 -->
 
 # AGENTS.md — todo

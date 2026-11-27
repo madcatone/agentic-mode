@@ -190,7 +190,8 @@ If unsure, list the target paths. A hit on any **contract doc** (AGENTS,
 REQUIREMENTS, VALIDATION, WORKFLOW, AGENTIC-MODE, a surface guide) → adopt. A
 `README.md` alone does not force adopt: a trivial stub (≤15 non-blank lines and
 no `##` headings) folds into the bootstrap-generated README; anything longer, or
-containing any heading, → adopt.
+containing any heading, → adopt. A `docs-only` target's own pages under `docs/`
+are its content, not contract docs. They do not force adopt.
 
 ---
 
@@ -208,6 +209,9 @@ Scan TARGET first; only ask what the scan cannot derive. The scan is
   three commands has a remedy for when TARGET declares none.
 - **Test surface.** Locate tests/fixtures/examples — each encodes a behavior that
   will need a requirement ID.
+- **Pages.** A target with no entry point usually has no tests to list either.
+  List its pages instead, the documents a reader opens wherever they sit. Each
+  page will need a requirement ID.
 - **Platform.** Inspect the remote to tell GitLab vs GitHub; this decides which
   WORKFLOW template to copy.
 - **Existing docs.** Check the target paths so you know bootstrap vs adopt.
@@ -221,10 +225,10 @@ it sets the rigor for everything after:
    - `light`: **no append-only ritual** — iteration history + per-feature VALIDATION encouraged, not required.
 2. **Project type + doc-set profile** — `cli` / `library` / `web-service` / `docs-only`, and `Lite` / `Standard` / `Full`? (The type selects the observable-surface doc: `cli`→USER_GUIDE-cli, `library`→API_REFERENCE, `web-service`→USER_GUIDE-web, `docs-only`→none. The doc-set profile selects how many layers Phase B seeds, per the doctrine's doc-set table — Lite, Standard, or Full — and is independent of the co-op profile in Q1. Default `Full` for a repo expected to outlive one feature cycle, as the doctrine's table says. Under `Full`, also settle the architecture doc. Write it unless TARGET has one entry point and no other component, or is `docs-only`. Ask the user in those two cases. A skip sets `docs.architecture: null` and leaves the profile at `Full`.)
 3. **CI platform** — `gitlab` / `github` / `none`? `none` governs only the CI **gate**; the WORKFLOW doc, when the doc-set profile seeds one, still follows the team's **actual review platform**.
-4. **Primary language + build, test, and smoke commands** — the one command that compiles/builds, the one that runs tests, and the one that runs the primary entry point on a fixture or an example, each verbatim from TARGET. The third is the smoke command. No build step? Agree on a cheap static sanity command (syntax check, lint, byte-compile) to fill `{{BUILD_CMD}}`. No declared test command? Compose one from the test framework the test files import, run it, and use it. No smoke command to mine? Compose the shortest one-line shell command that runs the primary entry point on its primary flow, leaves the repo as it found it, and exits 0. A file the program writes at run time is not a change. When several commands qualify, take the one that exercises the primary flow over one that only prints help or an empty list. For a service that runs until stopped, the command starts it, calls one endpoint, and stops it. It exits with the call's status, and it stops the service whether the call succeeded or failed. When no one line can do that, add one small script to TARGET and make its path the smoke command. Use only what TARGET already depends on. Run it, and use it. For a `docs-only` target the smoke command is the docs gate command. TARGET has no tests? Say so in the bundle. The templates then lose their test lines (Phase B, "A placeholder with no value"). A placeholder must never survive unresolved.
+4. **Primary language + build, test, and smoke commands** — the one command that compiles/builds, the one that runs tests, and the one that runs the primary entry point on a fixture or an example, each verbatim from TARGET. The third is the smoke command. No build step? Agree on a cheap static sanity command (syntax check, lint, byte-compile) to fill `{{BUILD_CMD}}`. No declared test command? Compose one from the test framework the test files import, run it, and use it. No smoke command to mine? Compose the shortest one-line shell command that runs the primary entry point on its primary flow, leaves the repo as it found it, and exits 0. A file the program writes at run time is not a change. When several commands qualify, take the one that exercises the primary flow over one that only prints help or an empty list. For a service that runs until stopped, the command starts it, calls one endpoint, and stops it. It exits with the call's status, and it stops the service whether the call succeeded or failed. When no one line can do that, add one small script to TARGET and make its path the smoke command. Use only what TARGET already depends on. Run it, and use it. For a target with no entry point the smoke command is the docs gate command, and when the scan found no command of its own, the static sanity command byte-compiles the checker's own copy, `python3 -m py_compile scripts/check_agentic_docs.py`. Neither exists before Phase C, step 1 copies the checker. Run them there. TARGET has no tests? Say so in the bundle. The templates then lose their test lines (Phase B, "A placeholder with no value"). A placeholder must never survive unresolved.
 5. **One-line purpose + audience** — internal tool vs external product; who reads/uses it.
-6. **Entry points** — which is primary maintained vs secondary/legacy.
-7. **Component name + ID prefix** for REQUIREMENTS (`^[A-Z]{2,6}$`, one prefix per component).
+6. **Entry points** — which is primary maintained vs secondary/legacy. A target with no entry point has nothing that is run, imported, or called. Answer `none` for it. Its `checks.entrypoints` stays empty and `{{PRIMARY_ENTRY}}` then has no value (Phase B, "A placeholder with no value").
+7. **Component name + ID prefix** for REQUIREMENTS (`^[A-Z]{2,6}$`, one prefix per component). Choose a prefix that no file path or heading of TARGET contains. The checker reads `PREFIX-NNN` on any line of any doc other than REQUIREMENTS as a requirement ID, so a page path that contains the prefix fails the gate.
 8. **Problem statement + Goals / Non-Goals** — not derivable from code.
 9. **Bilingual?** — one clean language, or two full tracks? If two, name the secondary-language header.
 10. **Runtime placeholders + neutrality** — which placeholders TARGET needs (e.g. `<package.name>`, `<device-serial>`), and whether the harness-neutrality sweep (and optional IPv4 / machine-path leak sweeps) should run. Default: the harness-neutrality sweep runs and the IPv4 and machine-path sweeps do not.
@@ -272,7 +276,8 @@ Fill the two lists under `checks` from the scan and the answers:
   quick-start rule's `run` is the command without its sample argument
   values. Subcommands, flags, methods, and paths stay. A flag goes when the
   value it takes goes. While no surface doc is seeded, the quick-start rules
-  name `requirements` instead of the surface key.
+  name `requirements` instead of the surface key. A target with no entry point
+  carries no command in Quick Start (step 5), so it writes no quick-start rule.
 - `must_appear_in` takes only these keys under `docs`: `index`, `readme`,
   `agents`, `requirements`, `user_guide`, `api_reference`, `validation`,
   `workflow`. A rule that names a doc declared `null` is skipped. A rule
@@ -304,6 +309,19 @@ only for it, and keep what remains true. In a fenced code block, delete the
 line, and the fence too when nothing remains in it. Never write `N/A` or
 leave empty brackets. A placeholder named `..._OR_NONE` or `..._OR_DELETE`
 follows the same rule.
+
+**A target with no entry point.** Q6 answered `none`, so `{{PRIMARY_ENTRY}}` has
+no value and `checks.entrypoints` is empty. It has no command for a row to
+carry, so a row's code span is the page's path, then `#` and the heading, as the
+page writes it, when the page carries several rows, where the reader meets the
+commitment. A row states one commitment a reader can check on its own. A
+commitment above a page's title heading names the page alone. It has no tests to
+run unless the scan found some. With none, the test lines go (Q4).
+`{{BUILD_CMD}}` is the static sanity command and `{{SMOKE_CMD}}` is the docs
+gate command (Q4). The gate command then sits on more than one line. Each one
+stays. A template sentence that can hold only of code or tests names the pages
+instead, or goes. Each template's header lists its own, and step 4 of Phase C
+greps for the ones such a target most often leaves.
 
 **Sample lines.** A numbered or repeated line whose placeholder names end
 in a number or a sequence letter (`{{goal_1}}`, `{{goal_n}}`, `{{SYMBOL_1}}`,
@@ -386,11 +404,11 @@ Production order:
    A target with no tests deletes the words `; tests` together with the
    backtick-wrapped `{{TEST_CMD}}` that follows them, and keeps the rest of the rule.
    Resolve the CI-runners line from config `ci.runners` (comma-separated runner names), or **delete the CI-runners line and the sentence under it** when config declares no runners, leaving one blank line — the doc gate checks its `ci-runners:` marker against config. While no WORKFLOW doc is seeded and config declares runners, that line sits in README instead: the README template's stand-in for this doc carries it. The checker reads the marker in any governed doc. Do **not** re-author its prose — the review loop, comment style, and red lines are platform constants. Gate: no `{{` remains in the doc, and it differs from its template only at its declared substitution points.
-3. **`docs/REQUIREMENTS.md`** — Problem/Goals/Non-Goals, enumerated `{{PREFIX}}-001..N` requirements (one per observable behavior), domain/event model when the component has one, **empty** Iteration History (append-only from here), acceptance criteria, verification commands. Gate: every entry-point behavior maps to ≥1 ID; while no surface doc is seeded, every row carries, in a code span, the command / call that exercises it; if bilingual, both tracks share identical ID set/count/order.
+3. **`docs/REQUIREMENTS.md`** — Problem/Goals/Non-Goals, enumerated `{{PREFIX}}-001..N` requirements (one per observable behavior), domain/event model when the component has one, **empty** Iteration History (append-only from here), acceptance criteria, verification commands. Gate: every entry-point behavior maps to ≥1 ID, and for a target with no entry point every page does; while no surface doc is seeded, every row carries, in a code span, the command / call that exercises it, or for such a target the page's path, and the heading when the page carries several rows, that carry it, except that a row for a commitment above a page's title heading names the page alone; if bilingual, both tracks share identical ID set/count/order.
 4. **`docs/USER_GUIDE.md` or `docs/API_REFERENCE.md`** *(Standard and Full)* — the observable surface, template chosen by `project.type`. Under Lite, do not write it: the type-selected key stays the explicit `null` Phase A declared (`docs.user_guide: null` for `cli` / `web-service`, `docs.api_reference: null` for `library`) — the Lite opt-out, with REQUIREMENTS carrying the surface until the upgrade. `docs-only` has no surface doc at any profile. `{{SURFACE_DOC_ROLE}}` is the kind of surface: `commands, flags, and output` for a CLI, `endpoints and screens` for a web service, or `endpoints` for one with no screens, `the public API` for a library. Each behavior subsection cites its owning `{{PREFIX}}-XXX`. A doc you write must also be declared: keep its key at the real path, because a written doc left `null` gets no scans. USER_GUIDE-cli carries sections for an interactive tool. A CLI with no views, keys, or highlighting loses the Views, Keyboard Controls, and Highlighting and Error Semantics sections, headings included. The prompts that assume a screen are rewritten for a plain run. Gate: every cited ID exists in REQUIREMENTS; surface tables match source 1:1; if bilingual, the second track mirrors the first section for section.
-5. **`README.md`** — onboarding: entry table, quick start, architecture overview *derived from the JSON when present*, agent-onboarding pointer, verification commands, neutrality checklist, doc cross-links. Gate: every quick-start command appears in the surface doc (under Lite or `docs-only`, in the REQUIREMENTS row that carries that surface). The neutrality sweep is the checker's own scan, so it runs in Phase C step 3. While no surface doc is seeded, a quick-start command's `must_appear_in` names `readme` and `requirements` instead of the surface key: a rule that targets only the unseeded surface key withdraws.
+5. **`README.md`** — onboarding: entry table, quick start, architecture overview *derived from the JSON when present*, agent-onboarding pointer, verification commands, neutrality checklist, doc cross-links. Gate: every quick-start command appears in the surface doc (under Lite or `docs-only`, in the REQUIREMENTS row that carries that surface). The neutrality sweep is the checker's own scan, so it runs in Phase C step 3. While no surface doc is seeded, a quick-start command's `must_appear_in` names `readme` and `requirements` instead of the surface key: a rule that targets only the unseeded surface key withdraws. A target with no entry point writes each Quick Start use case as one line instead of a command and its fence, ``Read `<page>#<heading>` for <what the reader needs>.`` Its gate is that every page a reading line names is named by a REQUIREMENTS row.
 6. **`AGENTS.md`** — **lean**: repo facts + the co-op contract (change-flow, sign-off, Stop-and-Ask). *What/Done* only — **no** generic agent discipline, **no** platform-CLI rules. `{{LIGHT_PROFILE_NOTE_OR_DELETE}}` takes this text under the `light` co-op profile and is deleted under every other one: ``*(Under the `light` co-op profile this entry and the VALIDATION block in item 5 of this list are encouraged, not required.)*`` Gate: **≤ `checks.line_limits.agents` lines**; no platform-CLI rule leaked in, and the template's own `git branch -d` line does not count. Two clauses wait. The Key-Files path clause runs after the resident files, because Key Files names `docs/VALIDATION.md` from step 7. `Every dev command runs clean` runs in Phase C step 3, because one of those commands is the checker.
-7. **`docs/VALIDATION.md`** — seed **empty** with the file H1 and the two record templates in a comment, the per-feature block and the read-back record. Resolve `{{COMPONENT_NAME}}`, the prefix, and the commands in the block template to TARGET's real values. The slots inside both templates are plain words with no marker around them. Leave them as they are. They are filled when a block or a record is appended. Gate: file exists. The H1 names the real component. The block template's commands are TARGET's real commands. No `{{` is left in the file.
+7. **`docs/VALIDATION.md`** — seed **empty** with the file H1 and the two record templates in a comment, the per-feature block and the read-back record. Resolve `{{COMPONENT_NAME}}`, the prefix, and the commands in the block template to TARGET's real values. The slots inside both templates are plain words with no marker around them. Leave them as they are. They are filled when a block or a record is appended. Gate: file exists. The H1 names the real component. The block template's commands are TARGET's real commands. A target with no entry point makes the substitutions the VALIDATION template's header names, and no others. No `{{` is left in the file.
 
 Also write **`AGENTIC-MODE.md`** (root index) and **`agentic-mode/SELF-TEST.md`**
 (from their templates), under every doc-set profile. These are resident meta
@@ -452,7 +470,14 @@ sensitive area — for the code owner to fill in.
    the index, AGENTS, README, `docs/`, `agentic-mode/`, and the CI file, when
    one was placed, must return **nothing**. In Adopt mode, sweep the files you
    generated or added pieces to; a hand-written doc you did not touch is not
-   swept. That sweep also catches an unresolved region.
+   swept. That sweep also catches an unresolved region. A target with no entry
+   point greps each doc this protocol rendered from a template, and in a
+   hand-written doc only the pieces you added, for `Code edited.`,
+   `Edit the code.`, and `Primary maintained entry point:`, and `What should
+   users type, press, see, or call?`, and, when it has no tests, for
+   `Full tests:`. A hit is a substitution a template header asked for that
+   the doc did not make. A hit in hand-written text is not a fault. Leave
+   that text as it is and report the hit to the user.
 5. **Read-back.** Run the read-back probe (`agentic-mode/SELF-TEST.md`, section D) on the docs as they stand. A bootstrap is a major doc change, so its outcome is done evidence. A gap the probe finds is fixed in the offending doc. After a fix, run steps 3 and 4 again, then run the probe again, until every question passes. Record the outcome at the bottom of `docs/VALIDATION.md`, below the comment that holds the templates, with the read-back record template the file carries. When no zero-context reader is available, record the probe as not run. That record does not block hand-off. Once the record is in place, run steps 3 and 4 again.
 
 ---
@@ -464,8 +489,9 @@ Summarize for the user:
 
 - **What was created** — the file list, the chosen profiles, and the one
   verification command: `python3 scripts/check_agentic_docs.py --config agentic-mode/config.json`.
-- **The daily loop** — for any behavior change: edit code → append/update the
-  requirement ID in REQUIREMENTS (with an Iteration History entry) → update the
+- **The daily loop** — for any behavior change: edit code (for a target with
+  no entry point, edit the page) → append/update the requirement ID in
+  REQUIREMENTS (with an Iteration History entry) → update the
   USER_GUIDE/API_REFERENCE subsection citing that ID (under Lite or
   `docs-only` there is none; the requirement row carries the surface) → update README quick-start if the
   surface changed → **append** a VALIDATION block citing the ID + issue/MR/PR

@@ -3,7 +3,7 @@
   "project": {
     "name": "agentic-mode",
     "type": "docs-only",
-    "description": "Canonical source of the agentic-mode documentation contract (the toolkit, not a bootstrapped target). It has no REQUIREMENTS or VALIDATION layer. docs.requirements and docs.validation both alias AGENTS.md so id-continuity's undeclared-dependency rule is satisfied without inventing those layers; id.prefix matches nothing in that file, so the ID check stays vacuous. The gate that matters here is the AGENTS.md line limit, command-consistency against Development Commands, and entrypoint existence."
+    "description": "Canonical source of the agentic-mode documentation contract (the toolkit, not a bootstrapped target). It declares docs-only and, by exception, writes no REQUIREMENTS or VALIDATION layer of its own. docs.requirements and docs.validation both alias AGENTS.md so the config stays valid; id.prefix matches nothing in that file, so the ID check is vacuous here. The gates that bind this repo are the AGENTS.md line limit, the neutrality sweep over AGENTS.md, command-consistency against Development Commands, and entrypoint existence."
   },
   "id": {
     "prefix": "AMDOC"
