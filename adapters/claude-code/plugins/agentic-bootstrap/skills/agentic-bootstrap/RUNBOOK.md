@@ -471,12 +471,13 @@ sensitive area — for the code owner to fill in.
    one was placed, must return **nothing**. In Adopt mode, sweep the files you
    generated or added pieces to; a hand-written doc you did not touch is not
    swept. That sweep also catches an unresolved region. A target with no entry
-   point greps each doc this protocol rendered from a template, never a
-   hand-written one, for `Code edited.`, `Edit the code.`, and
-   `Primary maintained entry point:`, and `What should users type, press,
-   see, or call?`, and, when it has no tests, for
+   point greps each doc this protocol rendered from a template, and in a
+   hand-written doc only the pieces you added, for `Code edited.`,
+   `Edit the code.`, and `Primary maintained entry point:`, and `What should
+   users type, press, see, or call?`, and, when it has no tests, for
    `Full tests:`. A hit is a substitution a template header asked for that
-   the doc did not make.
+   the doc did not make. A hit in hand-written text is not a fault. Leave
+   that text as it is and report the hit to the user.
 5. **Read-back.** Run the read-back probe (`agentic-mode/SELF-TEST.md`, section D) on the docs as they stand. A bootstrap is a major doc change, so its outcome is done evidence. A gap the probe finds is fixed in the offending doc. After a fix, run steps 3 and 4 again, then run the probe again, until every question passes. Record the outcome at the bottom of `docs/VALIDATION.md`, below the comment that holds the templates, with the read-back record template the file carries. When no zero-context reader is available, record the probe as not run. That record does not block hand-off. Once the record is in place, run steps 3 and 4 again.
 
 ---
