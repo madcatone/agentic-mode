@@ -1,3 +1,10 @@
+<!--
+Template-Source: agentic-bootstrap/AGENTS@v1  (@v1: Template-Source marker added; references to
+the surface doc, WORKFLOW doc, and architecture doc sit inside regions; the boundary bullets
+and the MR / PR Governance closing sentence hold for a repo with no WORKFLOW doc; the
+Change-Flow Boundary bullet names MR / PR Governance)
+-->
+
 # AGENTS.md — todo
 
 Repo facts and the human/agent co-operation contract for the `todo` example. It
@@ -69,11 +76,38 @@ Stop and ask a human before any of these, even if permissions technically allow 
 - Any **irreversible or externally visible** action not explicitly requested.
 - A user premise the evidence contradicts — report the evidence first.
 
+## MR / PR Governance
+
+Landing a change on `main`, the default branch, or any protected branch happens
+**only** through a merge/pull request (MR/PR) — never a direct commit or push,
+even where permissions technically allow it. This section is the platform-neutral
+policy; the CLI and exact commands live in `docs/WORKFLOW.md`.
+
+- **Route through review, positively.** Every completed change meant for a
+  protected branch gets an MR/PR opened or updated for it. The obligation is to
+  *land through review*, not merely to avoid pushing directly.
+- **Authorization inference.** When the user says "push the completed work," read
+  it as *push the source branch and open or update its MR/PR* — unless they
+  explicitly name a non-protected branch **and** say not to open one.
+- **Before opening one, verify:** the correct cwd and worktree, the current
+  branch, a clean tree, the intended target branch, and whether an open MR/PR
+  already exists for the same source branch. Never open one from an unpushed
+  branch — push the source branch first, and only when the user asked. If the
+  target branch is unclear, ask.
+- **After opening or updating one, verify it** through the platform's own
+  tooling: confirm the title, description, source and target branches, assignee,
+  and pipeline/checks status all match intent.
+- **Report back** the MR/PR URL and its key metadata to the user.
+- **Recovery.** If a change reaches a protected branch directly by mistake,
+  restore review flow with a revert branch and a revert MR/PR — never force-push
+  or rewrite protected history. Run parallel MRs/PRs in separate worktrees so
+  they do not collide.
+
 ## Change-Flow Boundary (defer to WORKFLOW)
 
-- Move changes through review per `docs/WORKFLOW.md`. **Boundary test:** if a rule
-  names the platform CLI or a platform-specific comment style, it belongs in
-  `docs/WORKFLOW.md`, not here.
+- Move changes through review per **MR / PR Governance** above and per
+  `docs/WORKFLOW.md`. **Boundary test:** if a rule names the platform CLI or a
+  platform-specific comment style, it belongs in `docs/WORKFLOW.md`.
 
 ## Git Hygiene
 

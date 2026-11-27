@@ -2,9 +2,19 @@
 TEMPLATE: README.md — onboarding map for the target repo.
 Filled from config.json (project.*, id.prefix, docs.*, checks.commands, checks.entrypoints)
 and Phase-A answers (purpose/audience, entry points, quick start, neutrality placeholders).
-Architecture Overview is DERIVED from docs/architecture.json when present — do not hand-maintain it.
-README is the onboarding map, NOT the final authority for behavior (REQUIREMENTS) or workflow (WORKFLOW).
+Architecture Overview is DERIVED from the architecture doc when one is seeded — do not hand-maintain it.
+README is the onboarding map, NOT the final authority for behavior (REQUIREMENTS) or workflow.
+Workflow authority is the WORKFLOW doc when one is seeded and the AGENTS co-op contract otherwise.
 Harness-neutral: never name a specific agent product, model, or proprietary tool.
+Resolve `{{IF ...}}` regions per BOOTSTRAP-CORE, "Conditional Text in Templates".
+The CI-runners stand-in under Verification is kept only while no WORKFLOW doc is seeded.
+`{{CI_RUNNERS}}`: resolve from config `ci.runners` (comma-separated runner names); when config
+declares no runners, DELETE that whole line. The doc gate checks the `ci-runners:` marker
+against config.
+Template-Source: agentic-bootstrap/README@v1  (@v1: Template-Source marker added; regions for
+the surface doc, WORKFLOW doc, and architecture doc, plus the CI-runners line kept while no
+WORKFLOW doc is seeded)
+Rendered copies keep the Template-Source line in a comment at the top of the file; the rest of this header is not rendered.
 -->
 
 # {{PROJECT_NAME}}
@@ -49,10 +59,11 @@ This repository is project-neutral: no hardcoded {{FORBIDDEN_TOKEN_CLASSES}}. Pr
 
 {{PER_PLATFORM_DEP_OR_NOTE_OR_DELETE}}
 
+{{IF ARCHITECTURE_PATH}}
 ## Architecture Overview
 
-<!-- If docs/architecture.json exists, this section is derived from it; otherwise delete it. -->
-Diagram: `docs/architecture.json` (source of truth; any `.svg`/`.html` is rendered). Components: {{COMPONENT_LIST_FROM_JSON}}. Boundaries: {{REGION_LIST_FROM_JSON}}. Do not hand-maintain — derive from the JSON.
+Diagram: `{{ARCHITECTURE_PATH}}` (source of truth; any `.svg`/`.html` is rendered). Components: {{COMPONENT_LIST_FROM_JSON}}. Boundaries: {{REGION_LIST_FROM_JSON}}. Do not hand-maintain — derive from the JSON.
+{{END IF}}
 
 ## Data Flow
 
@@ -68,14 +79,14 @@ N. {{STEP_N_OUTPUT}}.
 
 ## Agent Onboarding Guide
 
-A cold-start collaborator (human or agent, no chat history) reads in this order: this README → `{{AGENTS_PATH}}` → `docs/architecture.json` (if present) → `{{REQUIREMENTS_PATH}}` → `{{SURFACE_DOC_PATH}}` → `{{VALIDATION_PATH}}` → `{{WORKFLOW_PATH}}`.
+A cold-start collaborator (human or agent, no chat history) reads in this order: this README → `{{AGENTS_PATH}}`{{IF ARCHITECTURE_PATH}} → `{{ARCHITECTURE_PATH}}`{{END IF}} → `{{REQUIREMENTS_PATH}}`{{IF SURFACE_DOC_PATH}} → `{{SURFACE_DOC_PATH}}`{{END IF}} → `{{VALIDATION_PATH}}`{{IF WORKFLOW_PATH}} → `{{WORKFLOW_PATH}}`{{END IF}}.
 
 Before editing core logic, answer: {{QUESTIONS_BEFORE_EDITING}}.
 
 Safe-change pattern:
 1. Edit the code.
 2. Update the requirement ID and its iteration history.
-3. Update the surface doc.
+3. {{IF SURFACE_DOC_PATH}}Update the surface doc.{{ELSE}}Update the observable surface in that requirement row.{{END IF}}
 4. Append a validation block.
 5. Run the docs gate.
 
@@ -91,6 +102,8 @@ python scripts/check_agentic_docs.py --config agentic-mode/config.json
 
 Every command in `checks.commands` (config.json) that lists `"readme"` in `must_appear_in` MUST appear verbatim above.
 
+{{IF WORKFLOW_PATH}}{{ELSE}}CI runners executing this repo's pipelines: {{CI_RUNNERS}} <!-- ci-runners: {{CI_RUNNERS}} -->{{END IF}}
+
 ## Project-Neutrality Checklist
 
 - No brand names / codenames / hardcoded packages / serials / IPs / environment hosts in code, docs, tests, or examples.
@@ -100,7 +113,7 @@ Every command in `checks.commands` (config.json) that lists `"readme"` in `must_
 ## Doc Cross-Links
 
 - Behavior contract: `{{REQUIREMENTS_PATH}}`
-- Observable surface: `{{SURFACE_DOC_PATH}}`
+{{IF SURFACE_DOC_PATH}}- Observable surface: `{{SURFACE_DOC_PATH}}`{{ELSE}}- Observable surface: the requirement rows in `{{REQUIREMENTS_PATH}}`{{END IF}}
 - Validation: `{{VALIDATION_PATH}}`
-- Workflow: `{{WORKFLOW_PATH}}`
+{{IF WORKFLOW_PATH}}- Workflow: `{{WORKFLOW_PATH}}`{{ELSE}}- Review policy: **MR / PR Governance** in `{{AGENTS_PATH}}`{{END IF}}
 - Resident index: `{{INDEX_PATH}}`

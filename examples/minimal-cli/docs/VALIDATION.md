@@ -1,3 +1,8 @@
+<!--
+Template-Source: agentic-bootstrap/VALIDATION@v1  (@v1: Template-Source marker added; the surface
+checklist line names where the surface is documented; the block heading may cite an upgrade commit)
+-->
+
 # todo — Implementation Validation
 
 Per-feature done evidence. One block per landed non-trivial change. A reviewer
@@ -66,7 +71,7 @@ priorities, and tags are intentionally out of scope (see REQUIREMENTS Non-Goals)
 
 ### Documentation Updates
 - [ ] REQUIREMENTS — iteration-history entry appended; which IDs added
-- [ ] USER_GUIDE — command / flag / output updated
+- [ ] Observable surface — command / flag / key / endpoint / API updated wherever the surface is documented, in its doc's subsection or in the requirement row while no surface doc is seeded
 - [ ] README — quick start / verification updated, or "n/a"
 - [ ] VALIDATION — this block added
 
