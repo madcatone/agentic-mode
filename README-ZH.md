@@ -142,7 +142,7 @@ marketplace 即可安裝十二個 plugin 中的任意子集——每個都獨立
 
 | Plugin | 安裝什麼 | 正典來源 |
 | --- | --- | --- |
-| `agentic-bootstrap` | 文件契約 bootstrapper skill（跑 RUNBOOK）。 | `RUNBOOK.md` + `doctrine/BOOTSTRAP-CORE.md` + `templates/` + `checker/`（vendored） |
+| `agentic-bootstrap` | 文件契約 bootstrapper skill（跑 RUNBOOK）。 | `RUNBOOK.md` + `doctrine/BOOTSTRAP-CORE.md` + `templates/` + `checker/` + `tests/check_template_renders.py`（vendored） |
 | `gcm` | commit message 慣例 skill。 | [`playbooks/COMMIT-MESSAGES.md`](playbooks/COMMIT-MESSAGES.md) |
 | `two-axis-review` | 雙軸 review skill。 | [`playbooks/TWO-AXIS-REVIEW.md`](playbooks/TWO-AXIS-REVIEW.md) |
 | `review-response` | review-response 紀律 skill。 | [`playbooks/REVIEW-RESPONSE.md`](playbooks/REVIEW-RESPONSE.md) |
@@ -151,7 +151,7 @@ marketplace 即可安裝十二個 plugin 中的任意子集——每個都獨立
 | `fable5` | 指揮官操作模式 + 強模型創始 prompt。 | plugin 目錄本身（self-canonical） |
 | `commander` | 可實跑的 per-repo 派工評分迴圈：憲章、回報協議、任務模板、派工與評分腳本、台帳 scaffold。 | plugin 目錄本身（self-canonical） |
 | `idea-to-spec` | 規格合成 skill：一次性批次訪談、規模三級 triage、12 節 SPEC 模板。 | plugin 目錄本身（self-canonical） |
-| `pstack` | 36 個第三方工程 skill（MIT）：24 個設計／執行原則，加上 architect、arena、benchmark-checklist、blast-radius、create-verification-skill、figure-it-out、interrogate、maintain-verification-skill、tdd、technical-writing、typescript-best-practices、unslop。 | plugin 目錄本身（self-canonical；第三方，MIT 授權） |
+| `pstack` | 45 個第三方工程 skill（MIT）：24 個設計／執行原則，加上 21 個流程 skill（architect、arena、benchmark-checklist、blast-radius、create-formal-verification-skill、create-verification-skill、figure-it-out、in-your-own-words、interrogate、ketchup、ketchup-video、maintain-formal-verification-skill、maintain-verification-skill、poteto-help、reframe、sharpen、statechart、tdd、technical-writing、typescript-best-practices、unslop）。 | plugin 目錄本身（self-canonical；第三方，MIT 授權） |
 | `team-kit` | 四角色 worker kit：observer（純派工）、coder（實作＋SubagentStop verify 閘門）、reviewer（兩軸唯讀審查）、fortify（安全預檢）——附 team-rules 規範、hook 腳本與狀態面契約。 | plugin 目錄本身（self-canonical；見其 STATE-CONTRACT.md） |
 | `global-claude` | 檢查或建立使用者全域的 Claude Code 指示檔（`~/.claude/CLAUDE.md`，或已設定時的 `$CLAUDE_CONFIG_DIR/CLAUDE.md`）。以 `/global-claude` 叫用。 | plugin 目錄本身（self-canonical） |
 
@@ -164,7 +164,7 @@ playbook 對應**。`fable5` 管的是你怎麼操作一個 *session*（主模�
 產出寫進使用者層級的 config home）；`commander` 出的是同一套教義**可實跑的 per-repo 實例**
 （一份憲章加上由 subagent CLI 驅動的派工／評分腳本）；`idea-to-spec` 是一套產出「某個專案的
 SPEC」的互動式撰寫流程，正典就是這道程序本身，而非一份讀者能自行套用的規則文件；`pstack`
-是第三方 skill 包——36 個工程 skill 以 MIT 授權移植自外部 collection（出處見其
+是第三方 skill 包——45 個工程 skill 以 MIT 授權移植自外部 collection（出處見其
 `THIRD-PARTY-NOTICE.md`），正典就是引進的 collection 本身；`team-kit` 是四角色
 worker kit（純派工＋掛閘門的 worker），正典就是 kit 本身——規範、skill、狀態契約與
 hook 腳本同住在它的 plugin 目錄裡。`global-claude` 檢查使用者全域的 Claude Code
@@ -190,12 +190,32 @@ npx skills add madcatone/agentic-mode --all           # 全部 skill、全部 ag
 `--copy` 實體複製而非 symlink。專案層級安裝會把裝了什麼記在 `skills-lock.json`。
 
 帶附屬檔案的 skill（`commander` 的腳本與 reference 文件、`agentic-bootstrap` 的 checker、
-templates 與 RUNBOOK、`global-claude` 的偵測器與草稿模板）會整包安裝——子目錄一併帶過去。
+templates、RUNBOOK 與 render check、`global-claude` 的偵測器與草稿模板）會整包安裝——子目錄一併帶過去。
 
 > **貢獻者的約束。** 因為這些目錄會被複製進其他 agent 的 skill 資料夾，每份 `SKILL.md`
 > 以及它引用的每個檔案都必須用**相對於自己 skill 目錄**的路徑解析。用 harness 注入的變數
 > （例如 `${CLAUDE_PLUGIN_ROOT}`）或絕對路徑，會讓 Claude Code 以外的安裝全部失效。
 > 見 [`AGENTS.md`](AGENTS.md)。
+
+## 0.15.48 重新同步時新增的 pstack skill
+
+九個流程 skill 加進原本的 36 個。每一個的規則、一次範例、以及分析寫在
+[`adapters/claude-code/plugins/pstack/docs/new-skills-zh.md`](adapters/claude-code/plugins/pstack/docs/new-skills-zh.md)
+（英文：
+[`new-skills.md`](adapters/claude-code/plugins/pstack/docs/new-skills.md)）。
+上游 commit `9e278fe4d4ecd8bfe98b1b79bf4be662efb338cc`。本地 plugin 版本 1.1.0。
+
+| Skill | 它強制什麼、在哪裡停 | 怎麼跑 | 何時用、陷阱 |
+| --- | --- | --- | --- |
+| `in-your-own-words` | 重述目標與問題。停在那裡。 | 對一段很長的要求下 `/in-your-own-words`。輸出是 `interrogate` 當作意圖的那段重述。 | 雜亂討論串的開頭。陷阱：把重述當成可以開工。 |
+| `sharpen` | 四點（專家會補什麼、原始材料、方法、外部對證），然後一份改寫後的 prompt，要求把實驗能決定的選擇做成原型。不要做那件任務。 | 對正要送出的 prompt 下 `/sharpen`。 | 非瑣碎的 prompt 之前。陷阱：加深變成加功能。 |
+| `reframe` | 描述可能是兩或三個問題時，先列出並給出分開它們的徵兆，然後 8–12 個查過的術語、2–3 個鄰近領域、以及改寫後的描述。沒打開的引用刪掉。 | 對描述與檔案下 `/reframe`。 | 設計之前，日常用語可能指到兩個東西時。陷阱：改寫時加了範圍。 |
+| `ketchup` | 唯讀補上你在這個對話最後一則訊息之後的事，100 字以內加上已有的圖，並列出每一件等你的決定。不編造決定、不編造截圖。 | `/ketchup`。輸出：開場句、圖、每個要求一行口語、帶建議／證據／風險的行動項。 | 回到一段很長的對話時。陷阱：把仍等你的事標成完成。 |
+| `ketchup-video` | 與 `ketchup` 相同的時間窗與行動項，改以無聲投影片影片呈現（最多 10 張、字幕十個字、停留時間用轉出的影格檢查）。 | `/ketchup-video`。沒有投影片轉影片工具時，回覆點名缺的工具並退回 `ketchup` 文字。 | 對話裡已經有東西可指時。陷阱：錄螢幕，或字幕蓋住投影片。 |
+| `poteto-help` | 回答哪個已附的 skill 合適。一個 prompt、一條連結。不要開始工作。目錄就是這 45 個 skill。 | 對一個問題（不是任務）下 `/poteto-help`。 | 還不知道 slash 名稱時。陷阱：推薦這個套件沒有的 skill。 |
+| `create-formal-verification-skill` | 驗證一個代價高、測試很少碰到的性質，並留下一份已在暫用破壞上跑過的專案內 skill。不要放寬性質。TLA+ 的結果用 `statechart` 讀。 | `/create-formal-verification-skill`，或「prove this invariant」。 | 競爭、重試、剖析器、不安全的程式。陷阱：一個從未被看到失敗的檢查。 |
+| `maintain-formal-verification-skill` | 之後的 commit 裡把漂移和 bug 分開。結果：in sync、updated、bug、blocked。只改驗證。只有拉回來的檢查才移動同步 commit。 | 涵蓋程式合併之後下 `/maintain-formal-verification-skill`。 | 過期模型仍會通過時。陷阱：在同一輪裡改產品程式。 |
+| `statechart` | 把 TLA+ 模型畫成 Mermaid 狀態圖，並報告到每個被打破規則的最短路徑。暫用資料夾在 repo 之外。圖保持在 20 條箭頭以內。 | `/statechart`。第一次執行會安裝 TLC 與 Java，並且需要網路。 | 產品流程，以及形式驗證 skill 產出的模型。陷阱：把兩條被打破的規則併成一個狀態。 |
 
 ## Repo 地圖
 
@@ -225,7 +245,7 @@ templates 與 RUNBOOK、`global-claude` 的偵測器與草稿模板）會整包�
 - [`adapters/claude-code/`](adapters/claude-code/)——一個 Claude Code plugin
   marketplace：`agentic-bootstrap` 工具包、五份 playbook，加上 self-canonical 的
   `fable5` 指揮官操作模式、`commander` 派工評分迴圈、`idea-to-spec` 規格合成器、
-  `pstack` 第三方工程 skill 包（36 個 skill，MIT 授權）、`team-kit`
+  `pstack` 第三方工程 skill 包（45 個 skill，MIT 授權）、`team-kit`
   四角色 worker kit，與 `global-claude` 全域指示檔檢查，
   各自封裝成可選、可獨立安裝的 plugin（見[它的
   README](adapters/claude-code/README.md)與上面的
@@ -247,7 +267,7 @@ fork 教義。
 
 本 repo 是 agentic-mode 方法論的正典來源。當你把它 vendor 到下游（plugin、
 subtree），請**從這裡同步**，不要手改 vendor 進來的 `doctrine/`、`templates/`、
-`checker/`——一個永不回流的下游修改會變成無聲的漂移。若下游需要新能力，先在這裡加，
+`checker/` 與 render check——一個永不回流的下游修改會變成無聲的漂移。若下游需要新能力，先在這裡加，
 再重新同步。
 
 ## 授權

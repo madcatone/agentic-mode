@@ -41,7 +41,8 @@ A plugin skill reads only files under its own directory, so synced plugins
 carry a vendored copy. The canon is authoritative in one direction:
 
 1. Edit the harness-neutral source (`playbooks/*.md`, root `RUNBOOK.md`,
-   `doctrine/BOOTSTRAP-CORE.md`, `templates/`, `checker/`).
+   `doctrine/BOOTSTRAP-CORE.md`, `templates/`, `checker/`,
+   `tests/check_template_renders.py`).
 2. From the repo root, run `python3 scripts/sync_plugins.py`.
 3. `python3 scripts/sync_plugins.py --check` must exit 0. Never hand-edit a
    vendored copy under `plugins/` for a plugin that is in the sync MANIFEST.

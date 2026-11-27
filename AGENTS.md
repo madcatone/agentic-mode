@@ -107,6 +107,12 @@ python3 -m py_compile adapters/claude-code/plugins/global-claude/skills/global-c
 rc=0; grep -rn '{{' examples/minimal-cli || rc=$?; if [ "$rc" -eq 1 ]; then echo clean; elif [ "$rc" -eq 0 ]; then echo FOUND; exit 1; else echo "grep error: exit ${rc}"; exit "$rc"; fi
 ```
 
+- Render every Markdown template under all eight states of the three optional docs, prove the worked example's regions, and inject the faults the check must refuse (must exit 0):
+
+```bash
+python3 tests/check_template_renders.py --selftest && python3 tests/check_template_renders.py
+```
+
 - Byte-compile the doc linter and lint its own playbook (must exit 0):
 
 ```bash
@@ -127,15 +133,10 @@ python3 playbooks/scripts/okf_lint.py --selftest
 python3 scripts/sync_plugins.py --check
 ```
 
-- Validate the marketplace + plugin manifests parse:
+- Validate the marketplace + plugin manifests parse, and prove the skills carry no harness-injected path variable (the sweep prints `clean` and exits 0 only when grep exits 1; a match or a grep error fails):
 
 ```bash
 python3 -m json.tool .claude-plugin/marketplace.json >/dev/null && echo ok
-```
-
-- Prove the skills carry no harness-injected path variable (prints `clean` and exits 0 only when grep exits 1; a match or a grep error fails):
-
-```bash
 rc=0; grep -rn 'PLUGIN_ROOT' adapters/claude-code/plugins || rc=$?; if [ "$rc" -eq 1 ]; then echo clean; elif [ "$rc" -eq 0 ]; then echo FOUND; exit 1; else echo "grep error: exit ${rc}"; exit "$rc"; fi
 ```
 
@@ -148,14 +149,14 @@ rc=0; grep -rn 'PLUGIN_ROOT' adapters/claude-code/plugins || rc=$?; if [ "$rc" -
    in sync (the config schema is stated in exactly one place — `RUNBOOK.md`).
 4. The worked example still passes the gate, and this repo's own gate
    (`agentic-mode/config.json`) exits 0 (see Development Commands).
-5. If a `playbooks/` file or a vendored core file (`RUNBOOK.md`,
-   `doctrine/BOOTSTRAP-CORE.md`, `templates/`, `checker/`) changed,
-   `python3 scripts/sync_plugins.py` was run so the plugin copies match, and
-   `--check` exits 0. Never hand-edit a vendored
-   copy under `adapters/claude-code/plugins/`. (Exception: the `fable5`,
-   `commander`, `idea-to-spec`, `pstack`, `team-kit`, and `global-claude`
-   plugins are self-canonical — not vendored and not in the sync MANIFEST —
-   so their files are edited in place. See `adapters/claude-code/AGENTS.md`.)
+5. If a `playbooks/` file, `tests/check_template_renders.py`, or a vendored core
+   file (`RUNBOOK.md`, `doctrine/BOOTSTRAP-CORE.md`, `templates/`, `checker/`)
+   changed, `python3 scripts/sync_plugins.py` was run so the plugin copies
+   match, and `--check` exits 0. Never hand-edit a vendored copy under
+   `adapters/claude-code/plugins/`. (Exception: the `fable5`, `commander`,
+   `idea-to-spec`, `pstack`, `team-kit`, and `global-claude` plugins are
+   self-canonical — not vendored and not in the sync MANIFEST — so their
+   files are edited in place. See `adapters/claude-code/AGENTS.md`.)
 6. `README.md` and `README-ZH.md` stay information-equivalent when either changes.
 
 ## Sign-Off Points
