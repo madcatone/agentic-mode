@@ -165,7 +165,7 @@ independent and optional:
 
 | Plugin | Installs | Canonical source |
 | --- | --- | --- |
-| `agentic-bootstrap` | The doc-contract bootstrapper skill (runs the RUNBOOK). | `RUNBOOK.md` + `doctrine/BOOTSTRAP-CORE.md` + `templates/` + `checker/` (vendored) |
+| `agentic-bootstrap` | The doc-contract bootstrapper skill (runs the RUNBOOK). | `RUNBOOK.md` + `doctrine/BOOTSTRAP-CORE.md` + `templates/` + `checker/` + `tests/check_template_renders.py` (vendored) |
 | `gcm` | Commit-message convention skill. | [`playbooks/COMMIT-MESSAGES.md`](playbooks/COMMIT-MESSAGES.md) |
 | `two-axis-review` | Dual-axis review skill. | [`playbooks/TWO-AXIS-REVIEW.md`](playbooks/TWO-AXIS-REVIEW.md) |
 | `review-response` | Review-response discipline skill. | [`playbooks/REVIEW-RESPONSE.md`](playbooks/REVIEW-RESPONSE.md) |
@@ -224,7 +224,7 @@ level instead of project level, and `--copy` writes real files instead of
 symlinks. A project-level install records what it added in `skills-lock.json`.
 
 Skills that ship supporting files (`commander`'s scripts and reference docs,
-`agentic-bootstrap`'s checker, templates, and RUNBOOK, `global-claude`'s
+`agentic-bootstrap`'s checker, templates, RUNBOOK, and render check, `global-claude`'s
 detector and starter template) are installed whole —
 their subdirectories come along.
 
@@ -311,7 +311,7 @@ paths to it. Do not fork the doctrine.
 
 This repository is the canonical source of the agentic-mode methodology. When you
 vendor it downstream (a plugin, a subtree), sync **from here** and do not
-hand-edit the vendored `doctrine/`, `templates/`, or `checker/` — a downstream
+hand-edit the vendored `doctrine/`, `templates/`, `checker/`, or render check — a downstream
 edit that never flows back becomes silent drift. If a downstream repo needs a new
 capability, add it here first, then re-sync.
 

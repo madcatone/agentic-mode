@@ -34,7 +34,7 @@ Each plugin is independent and optional — install only what your team wants.
 
 | Plugin | What it installs | Canonical source |
 | --- | --- | --- |
-| [`agentic-bootstrap`](plugins/agentic-bootstrap) | The doc-contract bootstrapper: a skill that runs the RUNBOOK to bootstrap/adopt agentic-mode in any repo. | `RUNBOOK.md`, `doctrine/BOOTSTRAP-CORE.md`, `templates/`, `checker/` (all vendored into the skill) |
+| [`agentic-bootstrap`](plugins/agentic-bootstrap) | The doc-contract bootstrapper: a skill that runs the RUNBOOK to bootstrap/adopt agentic-mode in any repo. | `RUNBOOK.md`, `doctrine/BOOTSTRAP-CORE.md`, `templates/`, `checker/`, `tests/check_template_renders.py` (all vendored into the skill) |
 | [`gcm`](plugins/gcm) | Commit-message convention skill. | [`playbooks/COMMIT-MESSAGES.md`](../../playbooks/COMMIT-MESSAGES.md) |
 | [`doc-linter`](plugins/doc-linter) | Agent-doc linter skill: mechanical pass (`doc_lint.py`) + judgment rules. | [`playbooks/DOC-LINTER.md`](../../playbooks/DOC-LINTER.md) |
 | [`okf-doc-style`](plugins/okf-doc-style) | OKF v0.2 knowledge-bundle skill: 9-step runbook + mechanical pass (`okf_lint.py`). | [`playbooks/OKF-DOC-STYLE.md`](../../playbooks/OKF-DOC-STYLE.md) |
@@ -83,7 +83,8 @@ copy** of whatever canonical file it needs (`fable5`, `commander`, `idea-to-spec
   `description` that drive skill triggering) and take their **body verbatim**
   from the matching `playbooks/*.md` canon file.
 - `agentic-bootstrap` vendors the RUNBOOK, the doctrine (`reference/BOOTSTRAP-CORE.md`),
-  the checker, and the templates so the skill is fully self-contained.
+  the checker, the templates, and the render check (`scripts/check_template_renders.py`)
+  so the skill is self-contained.
 
 That duplication is a drift risk, so the sync is **owned by one script** and
 gated in CI:
@@ -94,8 +95,9 @@ python3 scripts/sync_plugins.py --check   # verify only; exit 1 on any drift
 ```
 
 The canon is authoritative in **one direction**: edit the `playbooks/*.md` (or
-the root `RUNBOOK.md` / `doctrine/` / `templates/` / `checker/`), then re-run
-`sync_plugins.py`. Never hand-edit a vendored copy — the `--check` gate in
+the root `RUNBOOK.md` / `doctrine/` / `templates/` / `checker/`, or
+`tests/check_template_renders.py`), then re-run `sync_plugins.py`. Never
+hand-edit a vendored copy — the `--check` gate in
 [`.github/workflows/agentic-docs.yml`](../../.github/workflows/agentic-docs.yml)
 will fail the build if a vendored file drifts from its source.
 

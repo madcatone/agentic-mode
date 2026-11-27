@@ -8,7 +8,7 @@
     {
       "name": "agentic-bootstrap",
       "source": "./adapters/claude-code/plugins/agentic-bootstrap",
-      "description": "Bootstrap or adopt the agentic-mode documentation pipeline in any repo — a layered, ID-joined, harness-neutral set of collaboration docs (AGENTS.md, REQUIREMENTS, USER_GUIDE/API_REFERENCE, VALIDATION, WORKFLOW) plus a config-driven checker and CI gate. Self-contained: vendors the RUNBOOK, doctrine, templates, and checker."
+      "description": "Bootstrap or adopt the agentic-mode documentation pipeline in any repo — a layered, ID-joined, harness-neutral set of collaboration docs (AGENTS.md, REQUIREMENTS, USER_GUIDE/API_REFERENCE, VALIDATION, WORKFLOW) plus a config-driven checker and CI gate. Self-contained: vendors the RUNBOOK, doctrine, templates, checker, and the render check."
     },
     {
       "name": "gcm",

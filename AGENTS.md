@@ -149,14 +149,14 @@ rc=0; grep -rn 'PLUGIN_ROOT' adapters/claude-code/plugins || rc=$?; if [ "$rc" -
    in sync (the config schema is stated in exactly one place — `RUNBOOK.md`).
 4. The worked example still passes the gate, and this repo's own gate
    (`agentic-mode/config.json`) exits 0 (see Development Commands).
-5. If a `playbooks/` file or a vendored core file (`RUNBOOK.md`,
-   `doctrine/BOOTSTRAP-CORE.md`, `templates/`, `checker/`) changed,
-   `python3 scripts/sync_plugins.py` was run so the plugin copies match, and
-   `--check` exits 0. Never hand-edit a vendored
-   copy under `adapters/claude-code/plugins/`. (Exception: the `fable5`,
-   `commander`, `idea-to-spec`, `pstack`, `team-kit`, and `global-claude`
-   plugins are self-canonical — not vendored and not in the sync MANIFEST —
-   so their files are edited in place. See `adapters/claude-code/AGENTS.md`.)
+5. If a `playbooks/` file, `tests/check_template_renders.py`, or a vendored core
+   file (`RUNBOOK.md`, `doctrine/BOOTSTRAP-CORE.md`, `templates/`, `checker/`)
+   changed, `python3 scripts/sync_plugins.py` was run so the plugin copies
+   match, and `--check` exits 0. Never hand-edit a vendored copy under
+   `adapters/claude-code/plugins/`. (Exception: the `fable5`, `commander`,
+   `idea-to-spec`, `pstack`, `team-kit`, and `global-claude` plugins are
+   self-canonical — not vendored and not in the sync MANIFEST — so their
+   files are edited in place. See `adapters/claude-code/AGENTS.md`.)
 6. `README.md` and `README-ZH.md` stay information-equivalent when either changes.
 
 ## Sign-Off Points

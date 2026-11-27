@@ -58,6 +58,7 @@ VERBATIM_FILES = [
     ("doctrine/BOOTSTRAP-CORE.md", f"{BOOTSTRAP}/reference/BOOTSTRAP-CORE.md"),
     ("checker/check_agentic_docs.py", f"{BOOTSTRAP}/checker/check_agentic_docs.py"),
     ("checker/config.example.json", f"{BOOTSTRAP}/checker/config.example.json"),
+    ("tests/check_template_renders.py", f"{BOOTSTRAP}/scripts/check_template_renders.py"),
 ]
 
 # canon dir -> vendored dir (every regular file copied byte-for-byte).
