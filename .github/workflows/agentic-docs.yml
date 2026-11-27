@@ -43,6 +43,8 @@ jobs:
       - name: Sweep the example for leftover template placeholders
         run: |
           rc=0; grep -rn '{{' examples/minimal-cli || rc=$?; if [ "$rc" -eq 1 ]; then echo clean; elif [ "$rc" -eq 0 ]; then echo FOUND; exit 1; else echo "grep error: exit ${rc}"; exit "$rc"; fi
+      - name: Render every Markdown template and prove the worked example's regions
+        run: python3 tests/check_template_renders.py --selftest && python3 tests/check_template_renders.py
       - name: Check plugin vendoring is in sync with the canon
         run: python scripts/sync_plugins.py --check
       - name: Run the sync fire-demos
