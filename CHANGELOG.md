@@ -27,6 +27,17 @@ the tag date.
   status, including `broken_symlink` and `unreadable`, and judges write
   and apply approval in the conversation language.
 
+### Changed
+- `pstack` plugin 1.1.0: resynced the 36 shipped skills to upstream
+  `cursor/plugins` path `pstack/` at
+  `9e278fe4d4ecd8bfe98b1b79bf4be662efb338cc` (upstream 0.15.48), and ported
+  nine more (poteto-help, ketchup, in-your-own-words, sharpen,
+  create-formal-verification-skill, maintain-formal-verification-skill,
+  statechart, ketchup-video, reframe). The pack is 45 skills. Operator
+  guides: `adapters/claude-code/plugins/pstack/docs/new-skills.md` and
+  `new-skills-zh.md`. Fourteen upstream skills stay omitted; see
+  `THIRD-PARTY-NOTICE.md`.
+
 ## [1.3.0] — 2026-11-18
 
 ### Added

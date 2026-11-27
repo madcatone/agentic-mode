@@ -34,7 +34,7 @@ Each plugin is independent and optional — install only what your team wants.
 
 | Plugin | What it installs | Canonical source |
 | --- | --- | --- |
-| [`agentic-bootstrap`](plugins/agentic-bootstrap) | The doc-contract bootstrapper: a skill that runs the RUNBOOK to bootstrap/adopt agentic-mode in any repo. | `RUNBOOK.md`, `doctrine/BOOTSTRAP-CORE.md`, `templates/`, `checker/` (all vendored into the skill) |
+| [`agentic-bootstrap`](plugins/agentic-bootstrap) | The doc-contract bootstrapper: a skill that runs the RUNBOOK to bootstrap/adopt agentic-mode in any repo. | `RUNBOOK.md`, `doctrine/BOOTSTRAP-CORE.md`, `templates/`, `checker/`, `tests/check_template_renders.py` (all vendored into the skill) |
 | [`gcm`](plugins/gcm) | Commit-message convention skill. | [`playbooks/COMMIT-MESSAGES.md`](../../playbooks/COMMIT-MESSAGES.md) |
 | [`doc-linter`](plugins/doc-linter) | Agent-doc linter skill: mechanical pass (`doc_lint.py`) + judgment rules. | [`playbooks/DOC-LINTER.md`](../../playbooks/DOC-LINTER.md) |
 | [`okf-doc-style`](plugins/okf-doc-style) | OKF v0.2 knowledge-bundle skill: 9-step runbook + mechanical pass (`okf_lint.py`). | [`playbooks/OKF-DOC-STYLE.md`](../../playbooks/OKF-DOC-STYLE.md) |
@@ -43,7 +43,7 @@ Each plugin is independent and optional — install only what your team wants.
 | [`fable5`](plugins/fable5) | Commander-mode operating discipline + the strong-model founding prompt. | The plugin directory itself (self-canonical — see below) |
 | [`commander`](plugins/commander) | The runnable per-repo dispatch-and-score loop: constitution, report protocol, task template, dispatch + scoring scripts, ledger scaffold. | The plugin directory itself (self-canonical — see below) |
 | [`idea-to-spec`](plugins/idea-to-spec) | The spec synthesizer: turn rough idea material into a development SPEC — batch interview, size triage, 12-section template. | The plugin directory itself (self-canonical — see below) |
-| [`pstack`](plugins/pstack) | Thirty-six third-party engineering skills under MIT: 24 design/execution principles plus architect, arena, benchmark-checklist, blast-radius, create-verification-skill, figure-it-out, interrogate, maintain-verification-skill, tdd, technical-writing, typescript-best-practices, and unslop. | The plugin directory itself (self-canonical — see below; third-party, see its `THIRD-PARTY-NOTICE.md`) |
+| [`pstack`](plugins/pstack) | Forty-five third-party engineering skills under MIT: 24 design/execution principles plus 21 workflow skills, including the nine added in the 0.15.48 resync (poteto-help, ketchup, in-your-own-words, sharpen, create-formal-verification-skill, maintain-formal-verification-skill, statechart, ketchup-video, reframe). Operator guide: [`plugins/pstack/docs/new-skills.md`](plugins/pstack/docs/new-skills.md) and [`new-skills-zh.md`](plugins/pstack/docs/new-skills-zh.md). | The plugin directory itself (self-canonical — see below; third-party, see its `THIRD-PARTY-NOTICE.md`) |
 | [`team-kit`](plugins/team-kit) | The four-role worker kit: observer (pure dispatcher), coder (implementation under a SubagentStop verify gate), reviewer (dual-axis read-only review), fortify (security pre-check) — plus the team-rules canon, hook scripts, and the state contract. | The plugin directory itself (self-canonical — see below; see its `STATE-CONTRACT.md`) |
 | [`global-claude`](plugins/global-claude) | Check or seed the user-global Claude Code instruction file (`~/.claude/CLAUDE.md`, or `$CLAUDE_CONFIG_DIR/CLAUDE.md`). Invoke with `/global-claude`. | The plugin directory itself (self-canonical — see below) |
 
@@ -56,7 +56,7 @@ per-user config home or a per-repo ledger); `fable5` is the machine-wide doctrin
 and founding prompt, and `commander` is the runnable per-repo instance of it.
 `idea-to-spec` is an interactive authoring workflow whose product is one
 project's SPEC, so its canon is the procedure itself rather than a rules document
-a reader could apply by hand. `pstack` is a third-party skill pack — 36 skills
+a reader could apply by hand. `pstack` is a third-party skill pack — 45 skills
 ported under MIT from an external collection (see its `THIRD-PARTY-NOTICE.md`) —
 so its canon is the imported collection itself, which this repo does not author.
 `team-kit` is a four-role worker kit (dispatcher plus gated workers) whose canon
@@ -83,7 +83,8 @@ copy** of whatever canonical file it needs (`fable5`, `commander`, `idea-to-spec
   `description` that drive skill triggering) and take their **body verbatim**
   from the matching `playbooks/*.md` canon file.
 - `agentic-bootstrap` vendors the RUNBOOK, the doctrine (`reference/BOOTSTRAP-CORE.md`),
-  the checker, and the templates so the skill is fully self-contained.
+  the checker, the templates, and the render check (`scripts/check_template_renders.py`)
+  so the skill is self-contained.
 
 That duplication is a drift risk, so the sync is **owned by one script** and
 gated in CI:
@@ -94,8 +95,9 @@ python3 scripts/sync_plugins.py --check   # verify only; exit 1 on any drift
 ```
 
 The canon is authoritative in **one direction**: edit the `playbooks/*.md` (or
-the root `RUNBOOK.md` / `doctrine/` / `templates/` / `checker/`), then re-run
-`sync_plugins.py`. Never hand-edit a vendored copy — the `--check` gate in
+the root `RUNBOOK.md` / `doctrine/` / `templates/` / `checker/`, or
+`tests/check_template_renders.py`), then re-run `sync_plugins.py`. Never
+hand-edit a vendored copy — the `--check` gate in
 [`.github/workflows/agentic-docs.yml`](../../.github/workflows/agentic-docs.yml)
 will fail the build if a vendored file drifts from its source.
 

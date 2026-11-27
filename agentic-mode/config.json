@@ -79,6 +79,10 @@
         "must_appear_in": ["agents"]
       },
       {
+        "run": "python3 tests/check_template_renders.py --selftest && python3 tests/check_template_renders.py",
+        "must_appear_in": ["agents"]
+      },
+      {
         "run": "python3 -m py_compile playbooks/scripts/doc_lint.py",
         "must_appear_in": ["agents"]
       },
@@ -120,6 +124,7 @@
       "tests/run_fire_demos.sh",
       "tests/run_review_eval_demos.sh",
       "tests/run_sync_demos.sh",
+      "tests/check_template_renders.py",
       "adapters/claude-code/plugins/team-kit/eng/tests/run-tests.sh",
       "adapters/claude-code/plugins/global-claude/skills/global-claude/scripts/detect_global_claude.py",
       ".claude-plugin/marketplace.json",
