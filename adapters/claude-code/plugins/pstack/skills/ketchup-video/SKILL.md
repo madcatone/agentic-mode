@@ -5,7 +5,7 @@ description: "Catch the user up like /ketchup, with a short subtitled video of s
 
 # Ketchup video
 
-Follow [`/ketchup`](../ketchup/SKILL.md), but show what happened in a short subtitled video instead of its summary and visuals. Its window starts at the last message the user wrote before `/ketchup-video`, not before any earlier `/ketchup`. Writing and rendering the video, outside the repo, is the one exception to its read-only rule. Render with a slide-to-video tool available in the environment. When no such tool is available, skip the video, name the missing tool in one line, and give the `/ketchup` text reply. The reply is ketchup's opening sentence, the embedded video, one line naming any work left that you can do yourself, and the action items. When the video shows a call's options, call each option by the name the video gives it. If the render fails, say so in one line and give only the calls.
+Follow `/ketchup`, but show what happened in a short subtitled video instead of its summary and visuals. Its window starts at the last message the user wrote before `/ketchup-video`, not before any earlier `/ketchup`. Writing and rendering the video, outside the repo, is the one exception to its read-only rule. Render with a slide-to-video tool available in the environment. When no such tool is available, skip the video, name the missing tool in one line, and give the `/ketchup` text reply. The reply is ketchup's opening sentence, the embedded video, one line naming any work left that you can do yourself, and the action items. When the video shows a call's options, call each option by the name the video gives it. If the render fails, say so in one line and give only the calls.
 
 ## Slides
 
