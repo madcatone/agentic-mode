@@ -27,8 +27,6 @@ the tag date.
   status, including `broken_symlink` and `unreadable`, and judges write
   and apply approval in the conversation language.
 
-## [Unreleased]
-
 ### Changed
 - `pstack` plugin 1.1.0: resynced the 36 shipped skills to upstream
   `cursor/plugins` path `pstack/` at

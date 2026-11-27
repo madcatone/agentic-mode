@@ -9,9 +9,9 @@ Answer the user's question about the skills shipped in this pack. Hand them a pr
 
 A message that asks for work, such as "use pstack to fix this bug", is not a help question. Name the skill that fits, give the prompt, and stop. Do not start the task in this turn.
 
-This file maps questions to the skills shipped beside it. Those files own the details. Read the file you route to before you quote it, and trust it when it disagrees with this map. The guide for the nine skills added in this port is [`../../docs/new-skills.md`](../../docs/new-skills.md).
+This file maps questions to the skills shipped beside it. Those files own the details. Read the file you route to before you quote it, and trust it when it disagrees with this map.
 
-This pack does not ship a setup skill, a mode skill, or the fourteen skills listed in `THIRD-PARTY-NOTICE.md`. When a question names one of those, say it is not in this pack and route to the closest shipped skill.
+This pack does not ship a setup skill, a mode skill, or these fourteen skills: `automate-me`, `bro`, `correct`, `how`, `make-bot-ui`, `no-comments`, `poteto-mode`, `recall`, `reflect`, `setup-pstack`, `show-me-your-work`, `swarm`, `teach`, `why`. When a question names one of those, say it is not in this pack and route to the closest shipped skill.
 
 ## Find out what they need
 
@@ -64,6 +64,10 @@ Close calls:
 - `/ketchup` covers only this chat since the user's last message. `/ketchup-video` shows that same window as slides. `/in-your-own-words` restates the goal before work starts.
 - `/figure-it-out` designs one rigorous run when no narrower skill fits. `/architect` sketches the shape first. `/sharpen` rewrites the prompt and does not do the task.
 
+## Catch up on this chat
+
+Use `/ketchup` for a plain-words catch-up since the user's last message in this chat, with every call that waits on them. Use `/ketchup-video` for that same window as a short subtitled video. When no slide-to-video tool is available, `/ketchup-video` names the missing tool and gives the `/ketchup` text.
+
 ## Principles
 
 Principles are one-rule skills. The user rarely invokes one. They steer with the names instead, as in "apply prove it works. show me the real output." Typing `/principle-<name>` still loads one on demand. The twenty-four shipped principles are:
@@ -104,7 +108,7 @@ A good prompt states the goal and how to tell it's done. It does not list a hand
 | A question got treated as the next step of the last task | Say "new task". |
 | The reply claims success from a green build | Ask for the real command, flow, stored value, or profile. That is the prove-it-works principle. |
 | Parallel agents overwrote each other | Give each agent its own worktree. |
-| A skill did not load | The user types the skill name, or names it in the prompt. This pack has no skill that loads from ordinary sentences alone. |
+| A skill did not load | The user types its slash name, names it in the prompt, or the message matches a trigger phrase in that skill's description. |
 | The reply is too long to catch up on | Run `/ketchup`. Use `/ketchup-video` when a slide video can be rendered. |
 
 For a run that drifts, [`references/prompting.md`](references/prompting.md) has one-line steers.
