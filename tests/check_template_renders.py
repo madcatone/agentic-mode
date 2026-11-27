@@ -40,8 +40,10 @@ checkout's template of the same name and version: for a declared layer the first
 the doc and the stand-in is gone, searched for whole and sentence by sentence; for an undeclared
 layer the first branch is gone, searched for on its own or, when it is only a path and too light
 for that, as the template's line with a path where the region stood; no marker is left behind.
-Upper and lower case are one on both sides. A doc whose note names another version, or a
-template this checkout does not carry, is reported and not proven.
+The note is the first HTML comment to carry `Template-Source:`: another comment or other content
+may stand before it, and a BOM may open the file; what stands before the note stays the doc's
+text and is searched. Upper and lower case are one on both sides. A doc whose note names another
+version, or a template this checkout does not carry, is reported and not proven.
 
 What T2 cannot prove; nothing is reported for it:
 - a stand-in that was rewritten: only the template's wording of it is searched for;
@@ -55,7 +57,8 @@ What T2 cannot prove; nothing is reported for it:
   search finds it, and step 4 leaves it to the reader;
 - a stand-in left in another doc: each doc is searched for its own template's regions only;
 - a doc without a `Template-Source` note, one no run rendered from a template or added pieces
-  to: it is not searched;
+  to: it is not searched. A note behind other comments or content, or under a BOM at the head
+  of the file, is still found;
 - a numbered list left unrenumbered by a dropped item: the doctrine's renumbering rule is for
   whoever renders a target. This script's reference renderer does not renumber, and no target
   is checked for it.
@@ -230,7 +233,7 @@ class Doc(NamedTuple):
     name: str
     version: Optional[int]
     marker: int   # the line carrying the Template-Source marker
-    norm: Norm    # the leading Template-Source note blanked, then normalised
+    norm: Norm    # the Template-Source note blanked, then normalised
 
 
 class Report(NamedTuple):
@@ -256,7 +259,7 @@ BQUOTE_RE = re.compile(r"\A(?: {0,3}>[ \t]?)+")
 
 def read(path: str) -> str:
     try:
-        with open(path, encoding="utf-8") as fh:
+        with open(path, encoding="utf-8-sig") as fh:
             return fh.read()
     except (OSError, UnicodeDecodeError) as exc:
         raise Fail("cannot read %s: %s" % (path, exc))
@@ -850,15 +853,19 @@ def discover_docs(root: str) -> List[Doc]:
             if not fn.endswith(".md") or fn.endswith(".template.md"):
                 continue
             text = read(os.path.join(dirpath, fn))
-            m = re.match(r"\s*<!--(.*?)-->", text, re.S)
-            if not m or "Template-Source:" not in m.group(1):
+            # the first HTML comment to carry the note, not the file's first: another comment or
+            # text may stand above it, and that stays in the doc as its own text
+            note = next((c for c in re.finditer(r"<!--(.*?)-->", text, re.S)
+                         if "Template-Source:" in c.group(1)), None)
+            if note is None:
                 continue                  # a hand-written doc carries no marker: nothing to prove
-            src = SOURCE_RE.search(m.group(1))
+            src = SOURCE_RE.search(note.group(1))
             # RUNBOOK :403: the Template-Source note is not searched: it quotes a stand-in
             docs.append(Doc(os.path.relpath(os.path.join(dirpath, fn), root), src.group(1) if src else "",
                             int(src.group(2)) if src else None,
-                            text.count("\n", 0, m.start(1) + src.start()) + 1 if src else 1,
-                            normalize(re.sub(r"[^\n]", " ", m.group(0)) + text[m.end():])))
+                            text.count("\n", 0, note.start(1) + src.start()) + 1 if src else 1,
+                            normalize(text[:note.start()] + re.sub(r"[^\n]", " ", note.group(0))
+                                      + text[note.end():])))
     return docs
 
 
@@ -1164,6 +1171,14 @@ T2 = (
              "or a hand-written doc, with any local exception declared in its header.",
              "or a hand-written doc, with any local exception declared in its header, "
              "no WORKFLOW doc is seeded.", "target-stand-in-remains"),
+    Mutation("F4", "CI-runners stand-in line put back, a lint comment above the Template-Source note",
+             "example", "README.md", "<!--\nTemplate-Source:",
+             "CI runners executing this repo's pipelines: selftest-runner\n\n"
+             "<!-- markdownlint-disable MD013 -->\n<!--\nTemplate-Source:", "target-stand-in-remains"),
+    Mutation("F4", "CI-runners stand-in line put back, the doc opening with a UTF-8 BOM",
+             "example", "README.md", "<!--\nTemplate-Source:",
+             "\ufeffCI runners executing this repo's pipelines: selftest-runner\n\n"
+             "<!--\nTemplate-Source:", "target-stand-in-remains"),
     Mutation("F5", "first branch of a whole-line region never ported", "example", "AGENTS.md",
              "- `docs/USER_GUIDE.md`: observable surface (commands, flags, output).\n", "",
              "target-first-branch-missing", -1),
