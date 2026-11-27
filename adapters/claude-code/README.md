@@ -84,7 +84,7 @@ copy** of whatever canonical file it needs (`fable5`, `commander`, `idea-to-spec
   from the matching `playbooks/*.md` canon file.
 - `agentic-bootstrap` vendors the RUNBOOK, the doctrine (`reference/BOOTSTRAP-CORE.md`),
   the checker, the templates, and the render check (`scripts/check_template_renders.py`)
-  so the skill is fully self-contained.
+  so the skill is self-contained.
 
 That duplication is a drift risk, so the sync is **owned by one script** and
 gated in CI:

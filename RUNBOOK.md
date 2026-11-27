@@ -16,8 +16,9 @@ The doctrine behind every rule lives in [`doctrine/BOOTSTRAP-CORE.md`](doctrine/
 ## Definitions
 
 - **TOOLKIT** — this repository. It carries everything you need: this RUNBOOK,
-  `doctrine/` (the doctrine), `templates/` (all document templates), and
-  `checker/` (the mechanical checker). Nothing is ever written into TOOLKIT.
+  `doctrine/` (the doctrine), `templates/` (all document templates),
+  `checker/` (the mechanical checker), and `tests/check_template_renders.py`
+  (the render check). Nothing is ever written into TOOLKIT.
 - **TARGET** — the repository you are bootstrapping. All generated files are
   written into TARGET. Ask your user if TARGET is ambiguous.
 

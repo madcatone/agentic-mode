@@ -7,12 +7,12 @@ description: Bootstrap or adopt the agentic-mode documentation pipeline in any r
 
 This is the **Claude Code plugin wrapper** around the harness-neutral
 agentic-mode toolkit. It carries no doctrine of its own — the canonical
-protocol, doctrine, templates, and checker are **vendored into this skill
-directory** so the skill is fully self-contained (a skill can only read files
-under its own directory). The single source of truth remains the agentic-mode
-repository; these vendored copies are kept byte-for-byte in sync by
-`scripts/sync_plugins.py` in that repo. Never hand-edit the vendored files here
-— change the canon upstream and re-sync.
+protocol, doctrine, templates, checker, and the render check are **vendored
+into this skill directory** so the skill is self-contained (a skill can only
+read files under its own directory). The single source of truth remains the
+agentic-mode repository; these vendored copies are kept byte-for-byte in sync
+by `scripts/sync_plugins.py` in that repo. Never hand-edit the vendored files
+here — change the canon upstream and re-sync.
 
 ## What ships in this skill directory
 
