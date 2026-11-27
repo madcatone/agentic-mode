@@ -189,7 +189,7 @@ npx skills add madcatone/agentic-mode --all           # 全部 skill、全部 ag
 `--copy` 實體複製而非 symlink。專案層級安裝會把裝了什麼記在 `skills-lock.json`。
 
 帶附屬檔案的 skill（`commander` 的腳本與 reference 文件、`agentic-bootstrap` 的 checker、
-templates 與 RUNBOOK、`global-claude` 的偵測器與草稿模板）會整包安裝——子目錄一併帶過去。
+templates、RUNBOOK 與 render check、`global-claude` 的偵測器與草稿模板）會整包安裝——子目錄一併帶過去。
 
 > **貢獻者的約束。** 因為這些目錄會被複製進其他 agent 的 skill 資料夾，每份 `SKILL.md`
 > 以及它引用的每個檔案都必須用**相對於自己 skill 目錄**的路徑解析。用 harness 注入的變數
@@ -246,7 +246,7 @@ fork 教義。
 
 本 repo 是 agentic-mode 方法論的正典來源。當你把它 vendor 到下游（plugin、
 subtree），請**從這裡同步**，不要手改 vendor 進來的 `doctrine/`、`templates/`、
-`checker/`——一個永不回流的下游修改會變成無聲的漂移。若下游需要新能力，先在這裡加，
+`checker/` 與 render check——一個永不回流的下游修改會變成無聲的漂移。若下游需要新能力，先在這裡加，
 再重新同步。
 
 ## 授權
