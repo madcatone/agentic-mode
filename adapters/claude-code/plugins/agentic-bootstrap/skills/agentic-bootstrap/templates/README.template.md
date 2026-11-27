@@ -5,16 +5,31 @@ and Phase-A answers (purpose/audience, entry points, quick start, neutrality pla
 Architecture Overview is DERIVED from the architecture doc when one is seeded — do not hand-maintain it.
 README is the onboarding map, NOT the final authority for behavior (REQUIREMENTS) or workflow.
 Workflow authority is the WORKFLOW doc when one is seeded and the AGENTS co-op contract otherwise.
+The entry table's second row is a sample. Write one row per entry point and delete the samples. The
+no-value rule does not apply to a sample.
+A placeholder that describes something the target does not have follows the RUNBOOK's Phase-B rule
+for a placeholder with no value. `{{SUPPORT_MODULE_1}}` and `{{TESTS_DIR}}` each own a line.
+`{{TESTS_DIR}}` is the path of the tests, a directory or a single file. When the target needs no
+runtime placeholders, delete the sentence that says to provide them and the checklist bullet that
+lists them.
+Main Components: `{{SYMBOL_n}}` is one bullet per public function, class, or module of that entry
+point. Leave out a name that starts with an underscore unless a requirement row cites it.
+`{{SECONDARY_USE_CASE_TITLE_OR_DELETE}}`: a second quick start the target has. When there is none,
+delete the heading and its code block. It is not the secondary entry point of Phase A question 6.
+`{{REGION_LIST_FROM_JSON}}`: with no regions in the architecture doc,
+write `none`.
+Data Flow: one numbered step per stage, from what enters to what leaves. The two lines are samples.
 Harness-neutral: never name a specific agent product, model, or proprietary tool.
 Resolve `{{IF ...}}` regions per BOOTSTRAP-CORE, "Conditional Text in Templates".
 The CI-runners stand-in under Verification is kept only while no WORKFLOW doc is seeded.
 `{{CI_RUNNERS}}`: resolve from config `ci.runners` (comma-separated runner names); when config
 declares no runners, DELETE that whole line. The doc gate checks the `ci-runners:` marker
 against config.
-Template-Source: agentic-bootstrap/README@v1  (@v1: Template-Source marker added; regions for
-the surface doc, WORKFLOW doc, and architecture doc, plus the CI-runners line kept while no
-WORKFLOW doc is seeded)
-Rendered copies keep the Template-Source line in a comment at the top of the file; the rest of this header is not rendered.
+Template-Source: agentic-bootstrap/README@v2  (@v2: Data Flow is two sample lines, the two component
+bullets name their own job slot, and the header states the no-value rule and the sample rule for
+this template's slots; the verification sentence no longer says "above";
+commands run `python3`)
+Rendered copies keep the Template-Source lines in a comment at the top of the file; the rest of this header is not rendered.
 -->
 
 # {{PROJECT_NAME}}
@@ -67,15 +82,14 @@ Diagram: `{{ARCHITECTURE_PATH}}` (source of truth; any `.svg`/`.html` is rendere
 
 ## Data Flow
 
-1. {{STEP_1_INPUT}}.
-2. {{STEP_2}}.
-N. {{STEP_N_OUTPUT}}.
+1. {{first step: what enters, from where}}.
+2. {{next step}}.
 
 ## Main Components
 
 ### `{{ENTRY_1}}`
-- `{{SYMBOL_1}}`: {{JOB}}.
-- `{{SYMBOL_2}}`: {{JOB}}.
+- `{{SYMBOL_1}}`: {{JOB_OF_SYMBOL_1}}.
+- `{{SYMBOL_2}}`: {{JOB_OF_SYMBOL_2}}.
 
 ## Agent Onboarding Guide
 
@@ -97,10 +111,10 @@ Safe-change pattern:
 {{TEST_CMD}}
 {{SMOKE_CMD}}
 # Docs coherence gate (ID continuity, command-surface consistency, neutrality)
-python scripts/check_agentic_docs.py --config agentic-mode/config.json
+python3 scripts/check_agentic_docs.py --config agentic-mode/config.json
 ```
 
-Every command in `checks.commands` (config.json) that lists `"readme"` in `must_appear_in` MUST appear verbatim above.
+Every command in `checks.commands` (config.json) that lists `"readme"` in `must_appear_in` MUST appear verbatim in this file.
 
 {{IF WORKFLOW_PATH}}{{ELSE}}CI runners executing this repo's pipelines: {{CI_RUNNERS}} <!-- ci-runners: {{CI_RUNNERS}} -->{{END IF}}
 

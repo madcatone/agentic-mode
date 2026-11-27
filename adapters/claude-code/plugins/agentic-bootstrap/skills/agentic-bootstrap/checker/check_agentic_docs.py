@@ -14,7 +14,7 @@ JSON config -- the framework code below never changes between projects. Copy
 this file to ``scripts/check_agentic_docs.py`` in any repo, drop a
 ``agentic-mode/config.json`` next to it, and run::
 
-    python scripts/check_agentic_docs.py --config agentic-mode/config.json
+    python3 scripts/check_agentic_docs.py --config agentic-mode/config.json
 
 Each finding is printed as::
 
@@ -68,7 +68,9 @@ Check categories
 5. ``entrypoint`` -- each path in ``checks.entrypoints`` must exist; ``.py``
    files are additionally byte-compiled with ``py_compile``.
 6. ``doc-presence`` -- every path declared under ``docs`` must exist (a value
-   of ``null`` means "not used by this project" and is skipped).
+   of ``null`` means "not used by this project" and is skipped). When
+   ``checks.require_resident_docs`` is on, a ``SELF-TEST.md`` must also exist
+   in the directory holding the config file.
 7. ``iteration-continuity`` -- opt-in via ``checks.iteration_history.enabled``.
    Inside the requirements doc's Iteration History section (heading configurable
    via ``checks.iteration_history.heading``, default ``Iteration History``) the
@@ -90,9 +92,10 @@ with a message naming the offending key and an honest remedy:
 
 - Every field the checker reads must carry the right type: ``docs`` values are
   strings or ``null``, ``checks.line_limits`` values are integers, list fields
-  are lists of strings, the ``enabled`` / ``forbid_*`` switches are actual
-  booleans (a truthy ``"false"`` string cannot flip an opt-in check on, and a
-  falsy ``false`` cannot silently stand in for an empty list), and
+  are lists of strings, the ``enabled`` / ``forbid_*`` /
+  ``require_resident_docs`` switches are actual booleans (a truthy ``"false"``
+  string cannot flip an opt-in check on, and a falsy ``false`` cannot silently
+  stand in for an empty list), and
   ``project.type`` is one of ``cli`` / ``library`` / ``web-service`` /
   ``docs-only``. A wrong type is
   an error -- never a silent coercion and never a traceback. A ``null`` on an
@@ -119,9 +122,13 @@ with a message naming the offending key and an honest remedy:
   error. An absent
   ``project.type`` takes the strict reading (a surface project, so
   ``user_guide``); ``iteration-continuity``
-  (when enabled) requires ``requirements``. Checks without a disable switch
-  say the path must be declared; ``iteration-continuity`` offers its
-  ``enabled: false`` switch instead.
+  (when enabled) requires ``requirements``. With
+  ``checks.require_resident_docs`` on -- a boolean, default ``false``, so a
+  config written before the switch existed still passes -- ``index``,
+  ``readme``, and ``agents`` must be declared as non-empty paths.
+  Checks without a disable switch say the path must be declared;
+  ``iteration-continuity`` offers its ``enabled: false`` switch instead, and
+  the resident-docs dependency offers ``checks.require_resident_docs: false``.
 
 The marker ``agentic-gate: allow`` exempts a line's *content* from every
 text-scanning check, so rule/spec docs can quote a bad example on purpose.
@@ -279,7 +286,9 @@ def validate_config(config: Dict) -> None:
       gate to doc-presence-only. Dependencies: id-continuity -> requirements,
       validation, and the surface doc selected by ``project.type`` (cli /
       web-service -> user_guide, library -> api_reference, docs-only -> none);
-      iteration-continuity (when enabled) -> requirements. ``docs-only``
+      iteration-continuity (when enabled) -> requirements; doc-presence
+      (resident docs) (when ``checks.require_resident_docs`` is on) -> index,
+      readme, agents. ``docs-only``
       projects have no observable-surface doc (REQUIREMENTS carries the
       surface), so neither surface key is required for them; an absent
       ``project.type`` takes the strict reading (a surface project, so
@@ -298,7 +307,8 @@ def validate_config(config: Dict) -> None:
       *raw* value, before any ``or`` default is applied.
 
     Remedies stay honest: only checks that actually have a disable switch
-    suggest one (iteration-continuity); the rest say the path must be declared.
+    suggest one (iteration-continuity, doc-presence (resident docs)); the rest
+    say the path must be declared.
 
     A ``null`` on an optional field means "not provided": the optional list
     fields and the ``harness_neutrality`` / ``iteration_history`` objects fall
@@ -414,6 +424,9 @@ def validate_config(config: Dict) -> None:
     optional_str_list(ci.get("runners"), "ci.runners")
     require_bool(checks, "forbid_ipv4", "checks.forbid_ipv4")
     require_bool(checks, "forbid_local_paths", "checks.forbid_local_paths")
+    require_bool(
+        checks, "require_resident_docs", "checks.require_resident_docs"
+    )
 
     harness = checks.get("harness_neutrality")
     if harness is not None and not isinstance(harness, dict):
@@ -437,7 +450,7 @@ def validate_config(config: Dict) -> None:
     if heading is None:
         iter_cfg["heading"] = "Iteration History"  # null == not provided
 
-    # Declared-dependency checks. The opt-in check is verified first so its
+    # Declared-dependency checks. The opt-in checks are verified first so their
     # remedy (the disable switch) is the one shown when it applies; checks
     # without a disable switch never suggest one.
     def require(key: str, check: str, remedy: str,
@@ -463,6 +476,13 @@ def validate_config(config: Dict) -> None:
             "declare it as a path, or set checks.iteration_history.enabled "
             "to false",
         )
+    if checks.get("require_resident_docs"):
+        for key in ("index", "readme", "agents"):
+            require(
+                key, "doc-presence (resident docs)",
+                "declare it as a path, or set checks.require_resident_docs "
+                "to false",
+            )
     require(
         "requirements", "id-continuity",
         "declare it as a path (this check has no disable switch)",
@@ -1252,8 +1272,13 @@ def check_entrypoints(root: str, config: Dict, rel) -> List[Finding]:
 # ---------------------------------------------------------------------------
 # 6. doc-presence
 # ---------------------------------------------------------------------------
-def check_doc_presence(root: str, config: Dict, rel) -> List[Finding]:
-    """Every declared doc path must exist; ``null`` means "not used" and skips."""
+def check_doc_presence(root: str, config: Dict, rel,
+                       config_dir: str) -> List[Finding]:
+    """Every declared doc path must exist; ``null`` means "not used" and skips.
+
+    When ``checks.require_resident_docs`` is on, the resident ``SELF-TEST.md``
+    must exist in the config file's directory as well.
+    """
     findings: List[Finding] = []
     docs = doc_paths(config)
     for key, value in docs.items():
@@ -1265,6 +1290,14 @@ def check_doc_presence(root: str, config: Dict, rel) -> List[Finding]:
                 value, 0, "doc-presence",
                 f"declared doc '{key}' does not exist",
             ))
+    if config.get("checks", {}).get("require_resident_docs"):
+        self_test = os.path.join(config_dir, "SELF-TEST.md")
+        if not os.path.isfile(self_test):
+            findings.append(Finding(
+                rel(self_test), 0, "doc-presence",
+                "resident doc 'SELF-TEST.md' beside the config file does not "
+                "exist; checks.require_resident_docs requires it",
+            ))
     return findings
 
 
@@ -1274,7 +1307,8 @@ def check_doc_presence(root: str, config: Dict, rel) -> List[Finding]:
 def run(config_path: str, root_override: Optional[str]) -> int:
     config = load_config(config_path)
     validate_config(config)
-    root = root_override or os.path.dirname(os.path.abspath(config_path)) or "."
+    config_dir = os.path.dirname(os.path.abspath(config_path))
+    root = root_override or config_dir or "."
     # Without an explicit --root the root is unconditionally the config
     # directory's parent -- the repo root when the config lives in
     # <repo>/agentic-mode/, and the directory above the config's folder
@@ -1291,7 +1325,7 @@ def run(config_path: str, root_override: Optional[str]) -> int:
     findings: List[Finding] = []
 
     # File-scoped structural checks first.
-    findings.extend(check_doc_presence(root, config, rel))
+    findings.extend(check_doc_presence(root, config, rel, config_dir))
     findings.extend(check_entrypoints(root, config, rel))
     findings.extend(check_line_limits(root, config, rel, contents))
     findings.extend(check_id_continuity(root, config, rel, contents))

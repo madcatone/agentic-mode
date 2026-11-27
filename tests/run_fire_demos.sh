@@ -15,9 +15,16 @@
 #             "category:message-fragment" to pin cases whose contract is one
 #             specific finding among same-category neighbours);
 #   exit 0 -- output must report "total: 0" (a real Summary, not a crash);
-#   exit 2 -- output must name a "config error".
+#   exit 2 -- output must name a "config error"; a 4th argument (a message
+#             fragment) additionally pins it to that line.
 # A traceback carries none of these, so a crash cannot masquerade as a
 # satisfied contract under any expected code.
+#
+# The config under test is tests/fire-demos/<case>/config.json unless a 5th
+# argument names another config path relative to the repo root (for cases
+# that reproduce the <repo>/agentic-mode/config.json layout; an exit-0 case
+# passes an empty 4th argument to reach it). --root is always the case
+# directory.
 #
 # Case-name families (ported from the #1 hardening rounds):
 #   c*  round 1 -- ported fixes C1-C7
@@ -29,6 +36,11 @@
 #   a*  surface-doc dependency by project type (type-mapped surface doc):
 #       the explicit-null Lite exemption and the absent-key error (#49)
 #   g*  coverage gaps found in read-back (one firing case per check family)
+#   d*  resident docs switch (opt-in via checks.require_resident_docs): on and
+#       complete, docs.index/readme/agents null, SELF-TEST.md missing, switch
+#       absent, the switch typed as a string, and the config in an
+#       agentic-mode/ subdirectory with SELF-TEST.md at the repo root instead
+#       of beside the config (flagged) and beside the config (clean)
 #   t*  tilde fences + fence-engine edge cases (indent leniency, fake
 #       closers) (#5)
 #   m*  ci-runners marker consistency (opt-in via config ci.runners):
@@ -58,8 +70,9 @@ expect() {
     _expected=$1
     _dir=$2
     _desc=$3
+    _config=${5:-tests/fire-demos/$_dir/config.json}
     python3 checker/check_agentic_docs.py \
-        --config "tests/fire-demos/$_dir/config.json" \
+        --config "$_config" \
         --root "tests/fire-demos/$_dir" >"$tmp" 2>&1
     _actual=$?
     if [ "$_actual" != "$_expected" ]; then
@@ -93,6 +106,10 @@ expect() {
         2)
             grep -Eq 'config error|I/O error' "$tmp" ||
                 _why='no "config error"/"I/O error" line'
+            if [ -z "$_why" ] && [ -n "${4-}" ]; then
+                grep 'config error' "$tmp" | grep -Fq -- "$4" ||
+                    _why="no \"config error\" line matching '$4'"
+            fi
             ;;
         esac
     fi
@@ -207,6 +224,35 @@ expect 1 g3-declared-doc-missing \
     "declared user_guide file missing while config is valid -> flagged" \
     doc-presence
 
+# ---- resident docs switch (opt-in via checks.require_resident_docs) ----------
+expect 0 d1-resident-docs-clean \
+    "control: switch on, index/readme/agents declared, SELF-TEST.md beside the config -> clean"
+expect 2 d2-resident-index-null \
+    "require_resident_docs=true (the switch) and docs.index null -> config error: docs.index is not declared" \
+    "docs.index is not declared"
+expect 1 d3-resident-self-test-missing \
+    "switch on, resident docs declared, no SELF-TEST.md beside the config -> flagged" \
+    doc-presence:checks.require_resident_docs
+expect 0 d4-resident-switch-absent-clean \
+    "switch absent: docs.index null and no SELF-TEST.md run clean (default off)"
+expect 2 d5-resident-switch-string \
+    "require_resident_docs: \"false\" string -> config error" \
+    "must be a boolean"
+expect 2 d6-resident-readme-null \
+    "require_resident_docs=true (the switch) and docs.readme null -> config error: docs.readme is not declared" \
+    "docs.readme is not declared"
+expect 2 d7-resident-agents-null \
+    "require_resident_docs=true (the switch) and docs.agents null -> config error: docs.agents is not declared" \
+    "docs.agents is not declared"
+expect 1 d8-resident-self-test-at-root-not-config \
+    "config in agentic-mode/, SELF-TEST.md at the repo root instead of beside the config -> flagged" \
+    doc-presence:SELF-TEST.md \
+    tests/fire-demos/d8-resident-self-test-at-root-not-config/agentic-mode/config.json
+expect 0 d9-resident-config-in-subdir-clean \
+    "control: config in agentic-mode/, SELF-TEST.md beside the config (not at the repo root) -> clean" \
+    "" \
+    tests/fire-demos/d9-resident-config-in-subdir-clean/agentic-mode/config.json
+
 # ---- tilde fences + fence-engine edge cases (#5) -------------------------------
 expect 0 t1-tilde-fence-exempt-clean \
     "closed ~~~ fence: deny word inside is exempt -> clean"
@@ -234,7 +280,7 @@ expect 1 m2-marker-without-config-runners \
     ci-runners
 expect 1 m3-runners-without-any-marker \
     "config declares runners but no governed doc carries the marker" \
-    ci-runners:no ci-runners marker
+    "ci-runners:no ci-runners marker"
 expect 0 m4-ci-runners-marker-clean \
     "control: marker matches config ci.runners exactly -> clean"
 expect 0 m5-quoted-marker-inline-exempt \

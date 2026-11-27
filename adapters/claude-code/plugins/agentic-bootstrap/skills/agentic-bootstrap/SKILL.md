@@ -40,9 +40,10 @@ path. A skill can only read what it vendors.
    behind every rule.
 3. **Follow the RUNBOOK exactly:** decide bootstrap vs adopt, run the Phase A
    repo scan + 10-question interview, produce the docs in dependency order with
-   each gate passing, copy `checker/check_agentic_docs.py` into the target's
+   each gate clause passing where its step says it runs, copy
+   `checker/check_agentic_docs.py` into the target's
    `scripts/`, place the CI file, and run the checker until it exits clean.
-   Render body prose in the TARGET's chosen language, but never translate the
+   Render body prose in the TARGET's primary language, but never translate the
    section headings of `AGENTIC-MODE.md` / `agentic-mode/SELF-TEST.md` — they
    are canonical English reference anchors, and translating them breaks every
    cross-repo citation that names them.
@@ -74,7 +75,8 @@ neutrality is the whole point of the contract.
 - **Harness neutrality (iron rule).** Nothing generated may name a specific
   agent product, model, or proprietary tool. Harness-specific packaging lives
   only in adapters/plugins like this one.
-- **Gate before advancing.** Every Phase-B doc passes its inline gate; Phase C
-  exits the checker clean before Phase D.
+- **Gate before advancing.** Every Phase-B doc passes the gate clauses its step
+  can run. A clause that waits runs where the RUNBOOK says. Phase C exits the
+  checker clean before Phase D.
 - **The config is the single machine truth.** Every command/path/prefix/limit a
   doc references must match `agentic-mode/config.json`.

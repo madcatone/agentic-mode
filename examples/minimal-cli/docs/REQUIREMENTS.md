@@ -1,7 +1,8 @@
 <!--
-Template-Source: agentic-bootstrap/REQUIREMENTS@v1  (@v1: Template-Source marker added; rows
-carry the observable surface while no surface doc is seeded; a sentence under Functional
-Requirements states where the surface is documented)
+Template-Source: agentic-bootstrap/REQUIREMENTS@v2  (@v2: the Event Model heading is one
+descriptive slot; the two Iteration History entries are samples and the history starts empty;
+the superseded-row note shows a three-digit ID;
+the rule that superseded rows stay is a rendered sentence)
 -->
 
 # todo — Requirements and Evolution
@@ -52,8 +53,7 @@ Each row states one behavior. Its observable surface is documented in
 | TODO-004 | The `done` command shall mark the task with the given id complete, or report that no such task exists. |
 | TODO-005 | The `remove` command shall delete the task with the given id, or report that no such task exists. |
 
-<!-- One row per observable behavior. Superseded rows stay, marked
-     "(superseded by TODO-0NN)" — never deleted. -->
+Rows are never deleted. A superseded row stays, marked for example as "(superseded by TODO-NNN)".
 
 ## Task Store Model
 

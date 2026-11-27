@@ -48,8 +48,9 @@ or follow it yourself.
 
 Run the four-phase protocol in `RUNBOOK.md`: a repo scan + a 10-question
 interview (Phase A), generate the layered docs in dependency order with each gate
-passing (Phase B), copy the checker and wire CI (Phase C), hand off to
-self-operation (Phase D). The result is a repo any collaborator can operate cold.
+clause passing where its step says it runs (Phase B), copy the checker and wire
+CI (Phase C), hand off to self-operation (Phase D). The result is a repo any
+collaborator can operate cold.
 
 The interview's second question also picks a **doc-set profile**: `Lite`,
 `Standard`, or `Full`. The profile decides how many layers Phase B seeds (the
@@ -57,7 +58,8 @@ doctrine's doc-set table). `Lite` seeds `README.md`, `AGENTS.md`,
 `docs/REQUIREMENTS.md`, and `docs/VALIDATION.md`. Under `Lite`, each
 REQUIREMENTS row states its observable surface and the command that exercises
 it. `Standard` adds the surface doc (`USER_GUIDE` or `API_REFERENCE`) and
-`docs/WORKFLOW.md`. `Full` adds `docs/architecture.json`. Every profile also
+`docs/WORKFLOW.md`. `Full` adds `docs/architecture.json` unless Phase A's
+second question lets the target skip it. Every profile also
 writes the resident index `AGENTIC-MODE.md` and `agentic-mode/SELF-TEST.md`.
 The templates carry the difference as guarded regions, so every profile
 renders without pointing at a doc it does not have. The worked example below

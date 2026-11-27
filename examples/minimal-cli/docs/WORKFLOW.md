@@ -1,12 +1,13 @@
 <!-- Copied from templates/WORKFLOW-github.template.md (agentic-mode).
-     Only the H1, the Template-Source marker, and the template's placeholders
-     (build/test/smoke commands, prefix, bilingual) were substituted; the
-     review-loop body is unchanged. One local exception is kept across template
-     refreshes. The docs gate runs through the parent repo's checker, because
-     this example ships no copy of it.
-     Template-Source: agentic-bootstrap/WORKFLOW-github@v3  (@v3: the two docs-sync lines name "the observable
-     surface" instead of a surface doc, so a docs-only target ports them as-is) -->
-
+     Only the template's placeholders (build/test/smoke commands, prefix,
+     bilingual) were substituted, and the Template-Source marker lines stay as
+     the template carries them; the review-loop body is unchanged. One local
+     exception is kept across template refreshes. The docs gate runs through
+     the parent repo's checker, because this example ships no copy of it.
+Template-Source: agentic-bootstrap/WORKFLOW-github@v4  (@v4: with no runners in config the sentence
+under the CI-runners line goes too; commands run `python3`; the ID example uses three digits; the
+all-green line exempts a command that failed before the change; the header states the cut for a
+target with no tests and both renderings of the bilingual conditional) -->
 
 # GitHub Workflow — Collaborator Rule
 
@@ -18,7 +19,7 @@ This document is the authoritative GitHub workflow rule for anyone (human or age
 
 - **Without explicit user consent, do not commit, push, amend, rebase, force-push, or `--no-verify`.** "The user agreed once" is not standing consent; ask every time.
 - **No blanket staging** (`git add -A` / `git add .`). Stage files explicitly: `git add <file1> <file2>`. Ignored directories can still let stray untracked files slip into the stage.
-- **Never claim tests pass without running them.** Run the repo's real commands (from AGENTS Development Commands): build/compile `python3 -m py_compile todo.py`; tests none (this example carries no test command; `python3 todo.py list` is its smoke run). Green means you saw the passing summary, not "should pass." (see §10 Red lines)
+- **Never claim tests pass without running them.** Run the repo's real commands (from AGENTS Development Commands): build/compile `python3 -m py_compile todo.py`. Green means you saw the passing summary, not "should pass." (see §10 Red lines)
 - **A behavior change must sync docs in the same change** (REQUIREMENTS iteration history + the observable surface + VALIDATION). Otherwise it is not done.
 - **PR and issue comments must be self-contained.** The reader has not seen your chat history.
 - External replies posted to GitHub issues/PRs use an EOF-terminated multi-line format (HEREDOC). Chat replies are exempt.
@@ -79,7 +80,7 @@ Conventional commit (team convention — the canonical rules live in your team's
 **Types:** `feat`, `fix`, `refactor`, `perf`, `test`, `docs`, `style`, `build`, `ci`, `ops`, `chore`, `revert` (dependency bumps are `build`, not `chore`; only CI-config changes are `ci`).
 **Ticket (as-needed):** when the change maps to a tracked ticket, put its ID between the type and the colon, space-separated, no parentheses (`fix PROJ-123: Correct session teardown`); omit it when there is no ticket.
 **Subject:** ≤ 50 chars, type lowercase, subject first letter capitalized, imperative, no trailing period.
-**Body:** 1–4 tight lines; explain motivation/trade-offs/pitfalls; include measured evidence; reference the requirement ID ("implements TODO-0NN") and `Closes #N`. Omit the body entirely when the diff already shows the why.
+**Body:** 1–4 tight lines; explain motivation/trade-offs/pitfalls; include measured evidence; reference the requirement ID ("implements TODO-NNN") and `Closes #N`. Omit the body entirely when the diff already shows the why.
 **Precedence:** if this repo has a commit-msg hook or its own documented convention, that takes precedence over these defaults.
 
 ### HEREDOC example
@@ -115,8 +116,7 @@ EOF
 Run the repo's real commands from AGENTS Development Commands, e.g.:
 ```bash
 python3 -m py_compile todo.py
-python3 todo.py list
-python3 todo.py add "smoke task"
+python3 todo.py add "smoke task" && python3 todo.py list
 ```
 Docs coherence gate — cwd `examples/minimal-cli/`:
 ```bash
@@ -126,7 +126,7 @@ Docs coherence gate — cwd the agentic-mode repo root (same check):
 ```bash
 python3 checker/check_agentic_docs.py --config examples/minimal-cli/agentic-mode/config.json --root examples/minimal-cli
 ```
-**All green is the only "done."**
+**All green is the only "done."** A command that already failed before this change is reported, and does not count against it.
 
 ### Docs sync checklist (every behavior change)
 - [ ] REQUIREMENTS — append an iteration-history entry.

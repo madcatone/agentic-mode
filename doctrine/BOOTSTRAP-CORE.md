@@ -105,8 +105,8 @@ Every non-trivial landed change gets a block in `docs/VALIDATION.md`. The block 
 Three rules the block enforces:
 
 1. **Each `User Requirements Met` bullet MUST cite a stable ID** drawn from the REQUIREMENTS table — not prose.
-2. **Each feature block header MUST cite its issue or MR/PR number**, matching a `Closes #N` / `MR !N` / `PR #N` marker in Iteration History. A doc-set upgrade that no issue or MR/PR covers cites the upgrade commit instead.
-3. **Verification Commands MUST include** (a) a build/compile of touched entry points, (b) a test step, (c) ≥1 smoke run against a fixture or example — sourced from AGENTS.md Development Commands, not reinvented.
+2. **Each feature block header MUST cite its issue or MR/PR number**, matching a `Closes #N` / `MR !N` / `PR #N` marker in Iteration History. A doc-set upgrade that no issue or MR/PR covers cites the upgrade commit instead. A read-back record is not a feature block. Its heading cites the date and the scope, and it follows the record template in `docs/VALIDATION.md`.
+3. **Verification Commands MUST include** (a) a build/compile of touched entry points, (b) a test step, when the project has tests, (c) ≥1 smoke run against a fixture or example — sourced from AGENTS.md Development Commands, not reinvented.
 
 **Verification procedures live in scripts, not prose.** A checker can verify that a command *exists* in a doc; it cannot verify that the procedure the doc describes still matches reality — prose steps drift as platforms change, while an in-repo script either runs or fails. Record *where the procedure lives* (the script), not the procedure itself. And record the **verification action** (a fresh version timestamp, a live smoke test), not a status name ("green," "deployed") — platforms silently redefine status semantics (a job can skip by design and stay green), while an action's truth re-generates on every run.
 
@@ -124,7 +124,7 @@ When present, `docs/architecture.json` is the source of truth; any rendered `.sv
 - Derive the component list by mining entry points + AGENTS Key Files + README Main Components — do not hand-author.
 - **Stability rule.** Append components/connections; do not rename existing ids or reflow position/size unless intentionally restructuring — diffability is the point.
 
-The architecture doc is **optional** and gated on `project.type` and the team's need. A single-entry `cli` or a `docs-only` repo may skip it; a multi-component `web-service` benefits most. When skipped, set `docs.architecture` to `null` in config. The shape of the file is stated once, in RUNBOOK Phase B step 1.
+The architecture doc is **optional**. Write it unless the target has one entry point and no other component, or is `docs-only`. The need is settled at bootstrap (RUNBOOK.md Phase A, question 2), which asks the user in those two cases. A skip leaves the profile at `Full` and sets `docs.architecture` to `null` in config. The shape of the file is stated once, in RUNBOOK Phase B step 1.
 
 Anti-pattern: a `.png` or `.drawio` committed directly, with no source. It rots the first time someone is too lazy to open the editor. <!-- agentic-gate: allow -->
 
@@ -139,7 +139,9 @@ Two collaborator-facing docs, with different jobs:
 
 Keeping them separate avoids one giant rules file that no one re-reads.
 
-**The `WORKFLOW.md` doc is ported as-is** — verbatim except its declared substitution points. When adopting this mode in a new repo, copy the canonical platform workflow doc, then resolve only those points: the H1 platform name, the `Template-Source:` marker, and every `{{PLACEHOLDER}}` the template header lists (build/test/smoke commands, prefix, bilingual conditionals). Do not re-author its prose: the review loop, comment style, and red lines are platform constants and out of scope for regeneration.
+**The `WORKFLOW.md` doc is ported as-is** — verbatim except its declared substitution points. When adopting this mode in a new repo, copy the canonical platform workflow doc, then resolve only those points: every `{{PLACEHOLDER}}` the template header lists (build/test/smoke commands, prefix, bilingual conditionals). The `Template-Source:` marker lines stay as the template carries them. Do not re-author its prose: the review loop, comment style, and red lines are platform constants and out of scope for regeneration.
+A step that does not fit the platform's actual behavior may be fixed locally,
+and the doc's header note declares the exception.
 
 **Boundary test:** if a candidate AGENTS.md rule names the platform CLI or a platform-specific comment style, it belongs in WORKFLOW, not AGENTS.md.
 
@@ -163,18 +165,18 @@ Every Markdown template carries the same marker, not only the WORKFLOW one, and 
 
 When the team works in two languages:
 
-- **Both language tracks are first-class.** Each track has full Problem/Goals/Non-Goals/Requirements/Iteration History under its own `## English` / `## {{SECONDARY_LANGUAGE_HEADER}}` heading. Neither is a translation footnote.
+- **Both language tracks are first-class.** Each track has full Problem/Goals/Non-Goals/Requirements/Iteration History under its own heading: `bilingual.primary_heading` (`## English` by default) for the first track and `bilingual.secondary_heading` for the second. Neither is a translation footnote.
 - **Requirement tables stay in lock-step.** Same ID, same count, same order.
 - **External replies on the issue/MR platform use the platform's required multi-line comment format, in both languages.** Chat replies are not bound by this.
 - **Match the author's language in replies.** A reply matches the language of the issue/MR it answers.
 
-**Detection.** The bootstrap interview (RUNBOOK.md Phase A, the bilingual question) decides this. If yes, both REQUIREMENTS and the observable-surface doc get two full tracks; VALIDATION stays single-language (checklists are bilingual-neutral). If monolingual, drop this section and collapse the templates to one track.
+**Detection.** The bootstrap interview (RUNBOOK.md Phase A, the bilingual question) decides this. If yes, both REQUIREMENTS and the observable-surface doc get two full tracks; VALIDATION stays single-language (checklists are bilingual-neutral). In the second track, a heading the checker reads by name keeps its English words. If monolingual, drop this section and collapse the templates to one track. The `## English` heading goes with the second track, and each `###` heading of the remaining track becomes `##`. RUNBOOK.md Phase B states both cuts.
 
 ---
 
 ## Rendering Language and Canonical Headings
 
-Unlike bilingual tracks (config-gated), this rule always applies. **Body prose renders in the repo's chosen language; section headings in `AGENTIC-MODE.md` and `agentic-mode/SELF-TEST.md` stay in the canonical English the templates carry.** Never translate the headings — they are reference anchors: the doctrine, the RUNBOOK, upgrade notes, and cross-repo tooling cite sections by name ("Doc Inventory", "Canonical Questions", the SELF-TEST §A–D rows). A translated heading silently severs every one of those citations. The field evidence: three adopters translated headings three different ways in one week, and no cross-repo instruction could resolve.
+Unlike bilingual tracks (config-gated), this rule always applies. **Body prose renders in the repo's primary language; section headings in `AGENTIC-MODE.md` and `agentic-mode/SELF-TEST.md` stay in the canonical English the templates carry.** Never translate the headings — they are reference anchors: the doctrine, the RUNBOOK, upgrade notes, and cross-repo tooling cite sections by name ("Doc Inventory", "Canonical Questions", the SELF-TEST §A–D rows). A translated heading silently severs every one of those citations. The field evidence: three adopters translated headings three different ways in one week, and no cross-repo instruction could resolve.
 
 ---
 
@@ -192,6 +194,7 @@ A template never names a doc-set profile. A template names an optional doc throu
 - **A region can sit inside a line or span several lines.** A table cell, a list item, or a clause can hold a region, and so can a block of lines. Regions do not nest, and none sits inside a heading line: a heading's text is a cross-repo reference anchor and reads the same at every profile. A region may still drop a whole section together with its heading, when the section belongs to a doc that is not seeded.
 - **Select a branch. Do not write new text.** Keep one branch verbatim and drop the other branch together with its markers. Renumber a numbered list only when a whole item disappeared. A dropped region leaves no line behind: drop a line that held only the dropped branch and its markers, and collapse the blank lines that a dropped block leaves into one blank line.
 - **Rules for template authors.** An optional path placeholder may appear only inside the first branch of its own region. Prefer a sentence that is true whether or not the doc is seeded, and use a region only when the wording itself must differ. Every marker is spelled with `{{`, so an unresolved region fails the RUNBOOK's Phase-C placeholder sweep. For the same reason, rendered prose never quotes that sweep's brace pattern. The toolkit's Development Commands render every Markdown template under all eight states of the three optional docs and refuse a malformed region, a region in a heading line, and an optional path outside the first branch of its own region.
+- **Instructions to the renderer do not render.** An instruction to whoever renders the template lives in a template comment or inside the slot it explains. Every sentence outside them renders, so the body carries only rules for the target's collaborators. A body comment stays in the rendered copy, with its placeholders resolved, unless it tells the renderer to repeat or delete.
 - `{{IF_BILINGUAL: <text>}}` in the WORKFLOW templates is the older one-line form of a keep-or-delete region for `bilingual.enabled`. It is unchanged.
 
 ---
@@ -226,7 +229,7 @@ The rule is not "never repeat words." The rule is "never let duplicated facts be
 | Fact type | Canonical owner | Allowed mirrors | Owner not seeded: the stand-in | Update rule |
 |---|---|---|---|---|
 | Development / verification commands | `AGENTS.md` Development Commands | README Verification, REQUIREMENTS Verification Commands, per-feature VALIDATION blocks | Not applicable. Every profile seeds the owner. | Mirrors copy the current command or explicitly say they are a focused subset. |
-| User-visible commands, flags, keys, endpoints, API signatures | `docs/USER_GUIDE.md` or `docs/API_REFERENCE.md` | README Quick Start, REQUIREMENTS requirement rows | **REQUIREMENTS requirement rows.** Each row states the behavior and the exact command or call that exercises it, with what the user observes. | Mirrors must be checked by the command-surface parity tests (SELF-TEST §A). |
+| User-visible commands, flags, keys, endpoints, API signatures | `docs/USER_GUIDE.md` or `docs/API_REFERENCE.md` | README Quick Start, REQUIREMENTS requirement rows | **REQUIREMENTS requirement rows.** Each row states the behavior and the exact command or call that exercises it, with what the user observes. | The checker verifies every command that `checks.commands` lists (SELF-TEST §A). Parity beyond those commands is a review matter. |
 | Behavior contract and stable IDs | `docs/REQUIREMENTS.md` | USER_GUIDE/API_REFERENCE citations, VALIDATION `Requirements Met`, commits/MRs | Not applicable. Every profile seeds the owner. | Mirrors cite IDs; they do not redefine the requirement. |
 | Per-feature completion evidence | `docs/VALIDATION.md` | MR/PR description, issue closure comment | Not applicable. Every profile seeds the owner. | Mirrors may summarize, but the validation block is the re-verification home. |
 | Workflow / review commands | `docs/WORKFLOW.md` | AGENTS one-line deferral | **AGENTS.md "MR / PR Governance" and "Git Hygiene"**, the platform-neutral policy that every profile keeps. While `ci.runners` is declared, the CI-runners line sits in README Verification. | Do not duplicate platform-specific steps in AGENTS. |
@@ -292,7 +295,7 @@ Not every repo can adopt the full system on day one, and not every team wants th
 | `docs-only` | Placed when `ci.platform` is `gitlab`/`github`, exactly as every profile; the gate runs the checker on every change (docs-only changes included). The checker also stays runnable by hand. | Enforced | Docs/knowledge repos. Enforced in CI when a platform is set, honored by hand when `ci.platform` is `none`. |
 | `light` | Placed when `ci.platform` is `gitlab`/`github` | **Relaxed** — iteration history and per-feature VALIDATION blocks are encouraged, not required | Small, low-churn repos, prototypes, solo work where full provenance is overhead. |
 
-The co-op profile signals to collaborators how strictly the append-only rules bind; CI gate placement follows `ci.platform` independently (set it to `none` only when the repo genuinely wants no pipeline enforcement — the gate is otherwise placed for every profile, `docs-only` included).
+The co-op profile signals to collaborators how strictly the append-only rules bind; CI gate placement follows `ci.platform` independently (set it to `none` only when the repo genuinely wants no pipeline enforcement — the gate is otherwise placed for every profile, `docs-only` included). The profile has no key in config. Under `full` and `docs-only` the bootstrap turns on the checker's iteration-history continuity check (`checks.iteration_history.enabled`). Under `light` it stays off.
 
 ### Doc-set profile (chosen at bootstrap — RUNBOOK.md Phase A, question 2)
 
@@ -300,7 +303,7 @@ The co-op profile signals to collaborators how strictly the append-only rules bi
 |---|---|---|---|
 | Lite | `README.md`, `AGENTS.md`, `docs/REQUIREMENTS.md`, seeded `docs/VALIDATION.md` | Small single-entry tool, low surface, no established MR workflow yet | First visible behavior change or second collaborator. |
 | Standard | Lite + observable-surface doc (`USER_GUIDE`/`API_REFERENCE`) + `docs/WORKFLOW.md` | Active feature work with issue/MR review | Repeated architecture questions or cross-component changes. |
-| Full | Standard + `docs/architecture.json` | Multi-component repo, multiple collaborators, protected branches | Default for repos expected to live beyond one feature cycle. |
+| Full | Standard + `docs/architecture.json`, unless the Architecture-as-Code section lets the target skip it | Multi-component repo, multiple collaborators, protected branches | Default for repos expected to live beyond one feature cycle. |
 
 Every profile also seeds the resident index (`AGENTIC-MODE.md`) and `agentic-mode/SELF-TEST.md`.
 

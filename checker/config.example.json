@@ -37,13 +37,14 @@
     "forbid_ipv4": false,
     "ipv4_allowlist": ["127.0.0.1", "0.0.0.0"],
     "forbid_local_paths": false,
+    "require_resident_docs": false,
     "iteration_history": {
       "enabled": false,
       "heading": "Iteration History"
     },
     "commands": [
       {
-        "run": "python -m pytest",
+        "run": "python3 -m pytest",
         "must_appear_in": ["agents", "readme"]
       }
     ],

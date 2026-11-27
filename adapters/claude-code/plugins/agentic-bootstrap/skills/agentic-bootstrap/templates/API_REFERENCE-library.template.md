@@ -7,11 +7,12 @@ Every documented symbol CITES its owning {{PREFIX}}-XXX from REQUIREMENTS. Signa
 source 1:1. Document only the PUBLIC surface — internal/private symbols are out of scope here.
 BILINGUAL: keep the second track ONLY IF config bilingual.enabled == true; else delete it.
 Harness-neutral: never name a specific agent product, model, or proprietary tool.
-Template-Source: agentic-bootstrap/API_REFERENCE-library@v1  (@v1: Template-Source marker added)
-Rendered copies keep the Template-Source line in a comment at the top of the file; the rest of this header is not rendered.
+Template-Source: agentic-bootstrap/API_REFERENCE-library@v2  (@v2: the title takes the
+component-name slot; the ID examples use three digits)
+Rendered copies keep the Template-Source lines in a comment at the top of the file; the rest of this header is not rendered.
 -->
 
-# {{COMPONENT}} — API Reference
+# {{COMPONENT_NAME}} — API Reference
 
 ## English
 
@@ -31,11 +32,11 @@ The stable, supported surface. Anything not listed here is internal and may chan
 
 | Symbol | Kind | Summary | Requirement |
 | --- | --- | --- | --- |
-| `{{name}}` | {{function/class/constant/type}} | {{one-line job}} | {{PREFIX}}-0NN |
+| `{{name}}` | {{function/class/constant/type}} | {{one-line job}} | {{PREFIX}}-NNN |
 
 ### Reference
 
-#### `{{symbol_signature}}`  ({{PREFIX}}-0NN)
+#### `{{symbol_signature}}`  ({{PREFIX}}-NNN)
 - **Purpose:** {{what it does}}.
 - **Parameters:** `{{param}}` — {{type}}, {{meaning; required/optional; default}}.
 - **Returns:** {{type}} — {{meaning}}.

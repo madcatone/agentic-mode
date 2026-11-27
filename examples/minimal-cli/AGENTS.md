@@ -1,8 +1,8 @@
 <!--
-Template-Source: agentic-bootstrap/AGENTS@v1  (@v1: Template-Source marker added; references to
-the surface doc, WORKFLOW doc, and architecture doc sit inside regions; the boundary bullets
-and the MR / PR Governance closing sentence hold for a repo with no WORKFLOW doc; the
-Change-Flow Boundary bullet names MR / PR Governance)
+Template-Source: agentic-bootstrap/AGENTS@v2  (@v2: Git Hygiene allows deleting a merged local
+branch, as the WORKFLOW doc does; the header states the light-profile note and the no-value rule
+for this template's optional slots; the Change-Flow Boundary heading drops its parenthetical;
+Change Flow step 6 exempts a command that failed before the change; commands run `python3`)
 -->
 
 # AGENTS.md — todo
@@ -16,7 +16,7 @@ tool, model, or dispatch to use — that is your own environment's business. Rea
 
 - A tiny standard-library CLI task tracker, and the worked example for the
   agentic-mode documentation contract.
-- Primary maintained entry point: `todo.py`. There is no secondary entry point.
+- Primary maintained entry point: `todo.py`.
 - **Project-neutral.** Do not add brand names, hardcoded hosts, IP literals, or
   absolute machine paths to code, docs, tests, or examples. The store path is a
   runtime input (`--store` / `TODO_STORE`).
@@ -33,7 +33,7 @@ tool, model, or dispatch to use — that is your own environment's business. Rea
 ## Development Commands
 
 - Build / compile: `python3 -m py_compile todo.py`
-- Smoke / run: `python3 todo.py list`
+- Smoke / run: `python3 todo.py add "smoke task" && python3 todo.py list`
 - Docs coherence gate. Same check; run the invocation that matches your cwd:
   - From the agentic-mode repo root: `python3 checker/check_agentic_docs.py --config examples/minimal-cli/agentic-mode/config.json --root examples/minimal-cli`
   - From this directory (`examples/minimal-cli/`): `python3 ../../checker/check_agentic_docs.py --config agentic-mode/config.json`
@@ -55,7 +55,9 @@ key that keeps them in sync:
 4. `README.md` — quick-start updated **iff** a user-visible command changed.
 5. `docs/VALIDATION.md` — a per-feature block is **appended**, citing the
    `TODO-XXX` ID and the issue/PR number.
-6. Verification commands run clean and the docs gate exits clean.
+6. Verification commands run clean and the docs gate exits clean. A
+   command that already failed before this change is reported, and does not
+   fail this step.
 
 ## Sign-Off Points
 
@@ -103,7 +105,7 @@ policy; the CLI and exact commands live in `docs/WORKFLOW.md`.
   or rewrite protected history. Run parallel MRs/PRs in separate worktrees so
   they do not collide.
 
-## Change-Flow Boundary (defer to WORKFLOW)
+## Change-Flow Boundary
 
 - Move changes through review per **MR / PR Governance** above and per
   `docs/WORKFLOW.md`. **Boundary test:** if a rule names the platform CLI or a
@@ -113,4 +115,7 @@ policy; the CLI and exact commands live in `docs/WORKFLOW.md`.
 
 - Do not commit the runtime task store (`tasks.json`) or other transient output.
 - Explicit file staging; never commit secrets or `.env` values.
-- Never push directly to `main` — open a pull request instead.
+- Do not push, force-push, tag, or delete branches unless the user explicitly
+  asks. Never push directly to `main` — open a pull request instead. You may
+  delete one kind of branch unasked. A local branch whose commits are already
+  merged goes with `git branch -d`, never `-D`.
