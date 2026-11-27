@@ -211,7 +211,7 @@ Scan TARGET first; only ask what the scan cannot derive. The scan is
   WORKFLOW template to copy.
 - **Existing docs.** Check the target paths so you know bootstrap vs adopt.
 
-Then ask the user **only** these 10 questions. **Question 1 is always first** —
+Then ask the user these 10 questions. Ask more only where a later step says to. **Question 1 is always first** —
 it sets the rigor for everything after:
 
 1. **Co-op profile** — `full` / `docs-only` / `light`? Sets how strictly the **append-only ritual** binds; it does **not** decide the CI gate — gate placement follows `ci.platform` (Q3), for every profile.
@@ -254,7 +254,7 @@ write `the toolkit's repository, held by its maintainer`.
 Fill the two lists under `checks` from the scan and the answers:
 
 - `checks.entrypoints`: the path of every entry point from Q6, the primary
-  one first. The checker checks that each path exists and byte-compiles
+  one first. The checker checks that each path is an existing file and byte-compiles
   each `.py` file.
 - `checks.commands`: one rule per command that a doc must quote verbatim.
   Each of the build, test, and smoke commands in the bundle gets
@@ -452,7 +452,7 @@ sensitive area — for the code owner to fill in.
    one was placed, must return **nothing**. In Adopt mode, sweep the files you
    generated or added pieces to; a hand-written doc you did not touch is not
    swept. That sweep also catches an unresolved region.
-5. **Read-back.** Run the read-back probe (`agentic-mode/SELF-TEST.md`, section D) on the docs as they stand. A bootstrap is a major doc change, so its outcome is done evidence. Record it at the bottom of `docs/VALIDATION.md`, below the comment that holds the templates, with the read-back record template the file carries. When no zero-context reader is available, record the probe as not run. That record does not block hand-off. A gap the probe finds is fixed in the offending doc. Once the record is in place, run steps 3 and 4 again.
+5. **Read-back.** Run the read-back probe (`agentic-mode/SELF-TEST.md`, section D) on the docs as they stand. A bootstrap is a major doc change, so its outcome is done evidence. A gap the probe finds is fixed in the offending doc. After a fix, run steps 3 and 4 again, then run the probe again, until every question passes. Record the outcome at the bottom of `docs/VALIDATION.md`, below the comment that holds the templates, with the read-back record template the file carries. When no zero-context reader is available, record the probe as not run. That record does not block hand-off. Once the record is in place, run steps 3 and 4 again.
 
 ---
 
