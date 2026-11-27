@@ -175,10 +175,10 @@ independent and optional:
 | `okf-doc-style` | OKF v0.2 knowledge-bundle authoring + lint skill. | [`playbooks/OKF-DOC-STYLE.md`](playbooks/OKF-DOC-STYLE.md) |
 | `fable5` | Commander-mode operating discipline + the strong-model founding prompt. | The plugin directory itself (self-canonical) |
 | `commander` | The runnable per-repo dispatch-and-score loop: constitution, report protocol, task template, dispatch + scoring scripts, ledger scaffold. | The plugin directory itself (self-canonical) |
-| `idea-to-spec` | The spec-synthesizer skill: batch interview, size triage, 12-section SPEC template. | The plugin directory itself (self-canonical) |
+| `idea-to-spec` | The spec-synthesizer skill: one-round batch interview, three-level size triage, 12-section SPEC template. | The plugin directory itself (self-canonical) |
 | `pstack` | Forty-five third-party engineering skills under MIT: 24 design/execution principles plus 21 workflow skills (architect, arena, benchmark-checklist, blast-radius, create-formal-verification-skill, create-verification-skill, figure-it-out, in-your-own-words, interrogate, ketchup, ketchup-video, maintain-formal-verification-skill, maintain-verification-skill, poteto-help, reframe, sharpen, statechart, tdd, technical-writing, typescript-best-practices, unslop). | The plugin directory itself (self-canonical; third-party under MIT) |
 | `team-kit` | The four-role worker kit: observer (pure dispatcher), coder (implementation under a SubagentStop verify gate), reviewer (dual-axis read-only review), fortify (security pre-check) — plus the team-rules canon, hook scripts, and the state contract. | The plugin directory itself (self-canonical; see its STATE-CONTRACT.md) |
-| `global-claude` | Check or seed the user-global Claude Code instruction file (`~/.claude/CLAUDE.md`, or `$CLAUDE_CONFIG_DIR/CLAUDE.md`). Invoke with `/global-claude`. | The plugin directory itself (self-canonical) |
+| `global-claude` | Check or seed the user-global Claude Code instruction file (`~/.claude/CLAUDE.md`, or `$CLAUDE_CONFIG_DIR/CLAUDE.md` when that variable is set). Invoke with `/global-claude`. | The plugin directory itself (self-canonical) |
 
 The commit/review conventions differ from team to team, which is why they are
 optional plugins and policy-overridable playbooks rather than part of the core.
@@ -200,8 +200,8 @@ its `THIRD-PARTY-NOTICE.md` — so its canon is the imported collection itself.
 is the kit itself — rules, skills, state contract, and hook scripts live together
 in its plugin directory. `global-claude` checks the user-global Claude Code
 instruction file and, when that file is missing, offers a short global-scope
-starter or a one-line pointer at a global AGENTS.md; it writes only after an
-explicit yes. None of the six is a repo document
+starter or a one-line pointer at an existing global AGENTS.md; it writes only
+after an explicit yes. None of the six is a repo document
 contract, so none can live in the neutral core. Their **plugin directories are
 their own canon**: nothing is vendored into them and they are not part of the
 `sync_plugins.py` sync.
