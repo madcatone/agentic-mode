@@ -1096,8 +1096,8 @@ class Mutation(NamedTuple):
 
 T1 = (
     Mutation("F1", "optional path named outside its region", "templates", "AGENTS.template.md",
-             "- Docs coherence gate: `python scripts/check_agentic_docs.py --config agentic-mode/config.json`",
-             "- Docs coherence gate: `python scripts/check_agentic_docs.py --config agentic-mode/config.json`"
+             "- Docs coherence gate: `python3 scripts/check_agentic_docs.py --config agentic-mode/config.json`",
+             "- Docs coherence gate: `python3 scripts/check_agentic_docs.py --config agentic-mode/config.json`"
              " (see `{{WORKFLOW_PATH}}`)", "optional-path-outside-region"),
     Mutation("F1", "optional path named inside its own stand-in", "templates", "AGENTS.template.md",
              "no WORKFLOW doc is seeded, so this section is the whole review policy.",
